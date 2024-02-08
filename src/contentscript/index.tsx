@@ -5,6 +5,7 @@ import React, { FC, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import browser from 'webextension-polyfill'
 import { ExtensionStorage } from './extension-storage'
+import { MultitablePanel } from './multitable-panel/multitable-panel'
 import { setupWallet } from './wallet'
 
 const NetworkId = 'mainnet'
@@ -92,3 +93,10 @@ async function main() {
 }
 
 main().catch(console.error)
+const container = document.createElement('div')
+container.style.display = 'flex' // сделать плавающим сверху, добавить обводку?
+document.body.appendChild(container)
+
+const root = createRoot(container)
+
+root.render(<MultitablePanel />)
