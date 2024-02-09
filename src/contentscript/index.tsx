@@ -90,13 +90,14 @@ async function main() {
       })
     }
   })
+
+  const container = document.createElement('div')
+  container.style.display = 'flex'
+  document.body.appendChild(container)
+
+  const root = createRoot(container)
+
+  root.render(<MultitablePanel engine={engine} />)
 }
 
 main().catch(console.error)
-const container = document.createElement('div')
-container.style.display = 'flex' // сделать плавающим сверху, добавить обводку?
-document.body.appendChild(container)
-
-const root = createRoot(container)
-
-root.render(<MultitablePanel />)

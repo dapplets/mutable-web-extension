@@ -1,6 +1,6 @@
+import { Engine, Mutation } from 'mutable-web-engine'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { mockedData } from './mocked-mutation'
 const WrapperDropdown = styled.div`
   position: relative;
 
@@ -258,36 +258,39 @@ const iconDropdown = (
       <path
         d="M3.25 4.875L6.5 8.125L9.75 4.875"
         stroke="#fff"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
   </svg>
 )
-export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+  engine: Engine
+}
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
-  const { ...anotherProps } = props
+  const { engine } = props
   const [isOpen, setOpen] = useState(false)
-  const [selectedMutation, setSelectedMutation] = useState(mockedData[0])
+  const [selectedMutation, setSelectedMutation] = useState<Mutation | null>(null)
 
-  const [mutations, setMutations] = useState(mockedData)
+  const [mutations, setMutations] = useState<Mutation[]>([])
 
   useEffect(() => {
     const init = async () => {
-      await loadMutation()
+      const mutations = await engine.getMutations()
+      setMutations(mutations)
+
+      const mutation = await engine.getCurrentMutation()
+      setSelectedMutation(mutation)
     }
     init()
-  }, [])
+  }, [engine])
 
-  const loadMutation = async () => {
-    console.log('load')
-  }
-
-  const enableMutation = async (mut: any, x: (x) => void) => {
+  const enableMutation = async (mut: Mutation, x: (x) => void) => {
     setSelectedMutation(mut)
-    x(false)
+    x(false) // ToDo: ???
+    await engine.switchMutation(mut.id)
   }
 
   const visibleDescription = (hash: string): string => {
@@ -313,7 +316,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           {selectedMutation && (
             <>
               <SelectedMutationDescription>
-                {visibleDescription(selectedMutation.description)}
+                {visibleDescription(selectedMutation.metadata.name)}
               </SelectedMutationDescription>
               <SelectedMutationId> {selectedMutation.id}</SelectedMutationId>
             </>
@@ -341,7 +344,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 }}
                 key={i}
               >
-                <InputMutation> {visibleDescription(mut.description)}</InputMutation>
+                <InputMutation> {visibleDescription(mut.metadata.name)}</InputMutation>
                 <AuthorMutation> {visibleDescription(mut.id)}</AuthorMutation>
                 {mut.id === 'dapplets.sputnik-dao.near/community' ? (
                   <PopularLabel> Popular</PopularLabel>
