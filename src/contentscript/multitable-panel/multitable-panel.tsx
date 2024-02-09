@@ -2,8 +2,8 @@ import React, { FC, useEffect } from 'react'
 import styled from 'styled-components'
 import { Dropdown } from './components/dropdown'
 
-const WrapperPanel = styled.div<{ $right: string; $width: string }>`
-  width: ${(props) => props.$width};
+const WrapperPanel = styled.div<{ $right: string;}>`
+  width: 100vw;
   right: ${(props) => props.$right};
   position: fixed;
   z-index: 1009;
@@ -43,7 +43,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
           ? 0
           : 468
       }px`}
-      $width={`${window.innerWidth}px`}
+
     >
       <NorthPanel>
         <Dropdown />

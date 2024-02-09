@@ -306,7 +306,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
         setOpen(false)
       }}
       tabIndex={0}
-      style={{ scrollbarColor: 'rgb(61, 127, 255)  rgb(61, 127, 255)', scrollbarWidth: 'thin' }}
+      style={{ scrollbarColor: 'rgb(147, 150, 152)  rgb(255, 255, 255)', scrollbarWidth: 'thin' }}
     >
       <SelectedMutationBlock>
         <SelectedMutationInfo>
