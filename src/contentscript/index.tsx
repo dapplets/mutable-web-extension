@@ -1,5 +1,5 @@
 import { setupWalletSelector } from '@near-wallet-selector/core'
-import { Engine, Overlay } from 'mutable-web-engine'
+import { DappletOverlay, Engine } from 'mutable-web-engine'
 import { useInitNear } from 'near-social-vm'
 import React, { FC, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -45,12 +45,7 @@ const App: FC = () => {
         features: {
           skipTxConfirmationPopup: true,
         },
-        customElements: {
-          DappletOverlay: ({ children }: { children: React.ReactNode[] }) => {
-            const child = children.filter((c) => typeof c !== 'string' || !!c.trim())[0]
-            return <Overlay>{child}</Overlay>
-          },
-        },
+        customElements: { DappletOverlay },
       })
     }
   }, [initNear])
