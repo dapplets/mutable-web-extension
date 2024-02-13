@@ -1,3 +1,4 @@
+import { Engine } from 'mutable-web-engine'
 import React, { FC, useEffect } from 'react'
 import styled from 'styled-components'
 import { Dropdown } from './components/dropdown'
@@ -30,7 +31,10 @@ const NorthPanel = styled.div`
   box-sizing: border-box;
   box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
 `
-interface MultitablePanelProps {}
+interface MultitablePanelProps {
+  engine: Engine
+}
+
 export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
   useEffect(() => {}, [window.innerWidth])
 
@@ -46,7 +50,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
 
     >
       <NorthPanel>
-        <Dropdown />
+        <Dropdown engine={props.engine} />
       </NorthPanel>
     </WrapperPanel>
   )
