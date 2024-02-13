@@ -29,12 +29,22 @@ const SelectedMutationDescription = styled.div`
   font-size: 12px;
   line-height: 149%;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 180px;
+  display: inline-block;
 `
 const SelectedMutationId = styled.div`
   font-family: 'Segoe UI', sans-serif;
   font-size: 10px;
   line-height: 100%;
   color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 180px;
+  display: inline-block;
 `
 const OpenListDefault = styled.span`
   cursor: pointer;
@@ -147,6 +157,7 @@ const Label = styled.div`
   color: rgba(183, 188, 196, 0.6);
   text-transform: uppercase;
   box-sizing: border-box;
+
   &::before {
     content: '';
 
@@ -224,6 +235,11 @@ const InputMutation = styled.span`
   line-height: 149%;
 
   color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 180px;
+  display: inline-block;
 `
 
 const AuthorMutation = styled.div`
@@ -232,6 +248,11 @@ const AuthorMutation = styled.div`
   font-size: 10px;
   line-height: 100%;
   color: rgb(34 34 34 / 60%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 180px;
+  display: inline-block;
 `
 
 const PopularLabel = styled.div`
@@ -293,16 +314,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     await engine.switchMutation(mut.id)
   }
 
-  const visibleDescription = (hash: string): string => {
-    if (hash.length > 50) {
-      const firstCharacters = hash.substring(0, 50)
-
-      return `${firstCharacters}...`
-    } else {
-      return hash
-    }
-  }
-
   return (
     <WrapperDropdown
       onBlur={() => {
@@ -316,9 +327,9 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           {selectedMutation && (
             <>
               <SelectedMutationDescription>
-                {visibleDescription(selectedMutation.metadata.name)}
+                {selectedMutation.metadata.name}
               </SelectedMutationDescription>
-              <SelectedMutationId> {selectedMutation.id}</SelectedMutationId>
+              <SelectedMutationId>{selectedMutation.id}</SelectedMutationId>
             </>
           )}
         </SelectedMutationInfo>
@@ -344,11 +355,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 }}
                 key={i}
               >
-                <InputMutation> {visibleDescription(mut.metadata.name)}</InputMutation>
-                <AuthorMutation> {visibleDescription(mut.id)}</AuthorMutation>
-                {mut.id === 'dapplets.sputnik-dao.near/community' ? (
-                  <PopularLabel> Popular</PopularLabel>
-                ) : null}
+                <InputMutation>{mut.metadata.name}</InputMutation>
+                <AuthorMutation>{mut.id}</AuthorMutation>
               </InputBlock>
             ))}
         </MutationsList>

@@ -3,7 +3,7 @@ import React, { FC, useEffect } from 'react'
 import styled from 'styled-components'
 import { Dropdown } from './components/dropdown'
 
-const WrapperPanel = styled.div<{ $right: string;}>`
+const WrapperPanel = styled.div<{ $right: string }>`
   width: 100vw;
   right: ${(props) => props.$right};
   position: fixed;
@@ -47,7 +47,6 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
           ? 0
           : 468
       }px`}
-
     >
       <NorthPanel>
         <Dropdown engine={props.engine} />
