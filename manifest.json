@@ -56,7 +56,6 @@
     "tabs",
     "activeTab",
     "contextMenus",
-    "clipboardRead",
     "clipboardWrite"
   ],
   "host_permissions": [
