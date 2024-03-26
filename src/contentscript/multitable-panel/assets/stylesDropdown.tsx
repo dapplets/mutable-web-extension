@@ -141,9 +141,9 @@ export const MutationsList = styled.div`
   background: #fff;
   box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
 
-  width: 294px;
+  width: 318px;
   box-sizing: border-box;
-  left: -3.5px;
+  left: -26px;
   top: 38px;
   border-radius: 0px 0px 10px 10px;
   max-height: 500px;
@@ -178,7 +178,7 @@ export const ButtonListBlock = styled.div`
   position: relative;
   &::before {
     content: '';
-    width: 294px;
+    width: 318px;
     position: absolute;
     top: 0;
     left: -6px;

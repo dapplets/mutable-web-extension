@@ -90,7 +90,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const changeAvalibleMutations = () => {
     setAvalible(!isAvalible)
   }
-  console.log(mutations)
 
   return (
     <WrapperDropdown

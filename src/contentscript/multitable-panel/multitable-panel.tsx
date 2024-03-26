@@ -1,9 +1,17 @@
 import { Engine } from 'mutable-web-engine'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import Draggable from 'react-draggable'
 import styled from 'styled-components'
-import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
-import { Dropdown } from './components/dropdown'
+import {
+  getPanelPinned,
+  getPanelPosition,
+  removePanelPinned,
+  setPanelPinned,
+  setPanelPosition,
+} from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
+import { Dropdown } from './components/dropdown'
+
 const WrapperPanel = styled.div`
   width: 100vw;
   right: 0;
@@ -33,7 +41,7 @@ const WrapperPanel = styled.div`
   }
   .visible-pin {
     opacity: 1 !important;
-    transform: translateY(0) !important;
+    transform: translateY(0);
   }
 `
 const NorthPanel = styled.div`
@@ -47,9 +55,9 @@ const NorthPanel = styled.div`
   user-select: none;
   margin: 0 auto;
 
-  width: 294px;
+  width: 318px;
   height: 45px;
-
+  z-index: 5000;
   padding: 4px;
   padding-top: 0;
   border-radius: 0 0 6px 6px;
@@ -61,8 +69,6 @@ const NorthPanel = styled.div`
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 `
 
-
-
 const PinWrapper = styled.div`
   width: 16px;
   height: 16px;
@@ -73,14 +79,52 @@ const PinWrapper = styled.div`
     opacity: 0.5;
   }
 `
+const DragWrapper = styled.div`
+  width: 16px;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  border-radius: 2px;
+  &:hover,
+  &:focus {
+    opacity: 0.5;
+  }
+`
+
+const DragIconWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 8px;
+  height: 8px;
+`
+
+const iconDrag = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="8" height="1.5" viewBox="0 0 6 1" fill="none">
+    <rect width="8" height="1.5" rx="0.5" fill="white" />
+  </svg>
+)
 
 interface MultitablePanelProps {
   engine: Engine
 }
-
 export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
   const [visible, setVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
+  const [activeDrags, setActiveDrags] = useState(0)
+  const [deltaPosition, setDeltaPosition] = useState(
+    getPanelPosition() ? { x: parseInt(getPanelPosition()), y: 0 } : { x: 0, y: 0 }
+  )
+  const refNorthPanel = useRef<HTMLDivElement>(null)
+  const [defaultPosition, setdefaultPosition] = useState(
+    getPanelPosition() ? { x: parseInt(getPanelPosition()), y: 0 } : { x: 0, y: 0 }
+  )
+
+  const [bounds, setBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 })
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -90,6 +134,34 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
     return () => clearTimeout(timer)
   }, [isPin, visible])
 
+  const handleDrag = (e, ui) => {
+    setVisible(false)
+
+    setDeltaPosition({
+      x: deltaPosition.x + ui.deltaX,
+      y: deltaPosition.y + ui.deltaY,
+    })
+
+    setPanelPosition(deltaPosition.x.toString())
+    setTimeout(() => {
+      setVisible(true)
+    }, 7000)
+  }
+
+  const onStart = () => {
+    setActiveDrags(activeDrags + 1)
+  }
+
+  const onStop = () => {
+    setActiveDrags(activeDrags - 1)
+  }
+
+  const dragHandlers = {
+    onStart,
+    onStop,
+
+    defaultPosition,
+  }
   const handlePin = () => {
     if (isPin) {
       removePanelPinned()
@@ -99,14 +171,70 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
     setPin(!isPin)
   }
 
+  const updateBounds = () => {
+    if (!refNorthPanel.current) return
+
+    const rect = refNorthPanel.current.getBoundingClientRect()
+    if (!rect) return
+
+    setBounds({
+      left: -((window.innerWidth - rect.width) / 2),
+      top: 0,
+      right: (window.innerWidth - rect.width) / 2,
+      bottom: 0,
+    })
+  }
+
+  useLayoutEffect(() => {
+    updateBounds()
+    window.addEventListener('resize', updateBounds)
+    return () => window.removeEventListener('resize', updateBounds)
+  }, [])
+
   return (
     <WrapperPanel>
-      <NorthPanel
-        className={isPin ? 'visible-pin' : visible ? 'visible-north-panel' : 'visible-default'}
+      <div
+        style={{
+          position: 'relative',
+          width: '99%',
+
+          left: '0',
+          display: 'flex',
+          justifyContent: 'center',
+          height: '1px',
+          zIndex: 5000,
+          margin: '0 5px 0 15px',
+        }}
+        className="container-drag-north-panel"
       >
-        <Dropdown setVisible={setVisible} engine={props.engine} />
-        <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
-      </NorthPanel>
+        <Draggable
+          {...dragHandlers}
+          onDrag={handleDrag}
+          onStart={onStart}
+          onStop={onStop}
+          handle=".dragWrapper"
+          axis="x"
+          bounds={bounds}
+        >
+          <NorthPanel
+            ref={(node) => {
+              refNorthPanel.current = node
+            }}
+            id="northPanel"
+            className={isPin ? 'visible-pin' : visible ? 'visible-north-panel' : 'visible-default'}
+          >
+            <DragWrapper className="dragWrapper">
+              <DragIconWrapper>
+                {iconDrag}
+                {iconDrag}
+                {iconDrag}
+              </DragIconWrapper>
+            </DragWrapper>
+            <Dropdown setVisible={setVisible} engine={props.engine} />
+            <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
+          </NorthPanel>
+        </Draggable>
+      </div>
     </WrapperPanel>
   )
 }

@@ -36,6 +36,7 @@
     "prettier-plugin-organize-imports": "^3.2.2",
     "process": "^0.11.10",
     "raw-loader": "^4.0.2",
+    "react-draggable": "^4.4.6",
     "resize-observer-polyfill": "^1.5.1",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.60.0",
