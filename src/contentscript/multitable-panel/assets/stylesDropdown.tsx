@@ -10,6 +10,18 @@ export const WrapperDropdown = styled.div`
   height: 35px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
+
+  .simplebar-scrollbar::before {
+    background-color: #384bff;
+    width: 4px;
+    border-radius: 10px;
+  }
+  .simplebar-vertical {
+    margin-top: 10px;
+    width: 2px;
+    background: transparent;
+    margin-right: -5px;
+  }
 `
 
 export const SelectedMutationBlock = styled.div`
@@ -137,7 +149,7 @@ export const MutationsList = styled.div`
   max-height: 500px;
 
   overflow: hidden;
-  overflow-y: auto;
+
   gap: 10px;
   @keyframes listVisible {
     0% {
@@ -162,7 +174,7 @@ export const ButtonListBlock = styled.div`
   justify-content: space-evenly;
   width: 100%;
   align-items: center;
-
+  margin-bottom: 10px;
   position: relative;
   &::before {
     content: '';
@@ -217,6 +229,7 @@ export const ListMutations = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3px;
+  margin-bottom: 10px;
 `
 
 export const InputBlock = styled.div<{ $enable?: string; $enableBefore?: string }>`
