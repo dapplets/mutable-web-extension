@@ -1,280 +1,49 @@
 import { Engine, Mutation } from 'mutable-web-engine'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
-import styled from 'styled-components'
+import SimpleBar from 'simplebar-react'
 import { setCurrentMutationId } from '../../storage'
+import {
+  AuthorMutation,
+  AvalibleArrowBlock,
+  AvalibleArrowLable,
+  AvalibleLable,
+  AvalibleLableBlock,
+  AvalibleMutations,
+  ButtonBack,
+  ButtonListBlock,
+  ButtonMutation,
+  ImageBlock,
+  InfoWrapper,
+  InputBlock,
+  InputIconWrapper,
+  InputInfoWrapper,
+  InputMutation,
+  ListMutations,
+  MutationsList,
+  OpenList,
+  OpenListDefault,
+  SelectedMutationBlock,
+  SelectedMutationDescription,
+  SelectedMutationId,
+  SelectedMutationInfo,
+  StarSelectedMutationWrapper,
+  WrapperDropdown,
+} from '../assets/stylesDropdown'
+import {
+  availableIcon,
+  back,
+  iconDropdown,
+  info,
+  mutate,
+  starMutationList,
+  starMutationListDefault,
+  starSelectMutation,
+  starSelectMutationDefault,
+  trash,
+} from '../assets/vectors'
+import { ipfs } from '../constants'
 
-const WrapperDropdown = styled.div`
-  position: relative;
-
-  display: flex;
-  align-items: center;
-
-  width: 242px;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-`
-
-const SelectedMutationBlock = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 2px 6px;
-  cursor: pointer;
-`
-
-const SelectedMutationInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 181px;
-`
-const SelectedMutationDescription = styled.div`
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 12px;
-  line-height: 149%;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 180px;
-  display: inline-block;
-`
-
-const SelectedMutationId = styled.div`
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 10px;
-  line-height: 100%;
-  color: rgba(255, 255, 255, 0.6);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 180px;
-  display: inline-block;
-`
-
-const OpenListDefault = styled.span`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  @keyframes rotateIsClose {
-    0% {
-      transform: rotate(180deg);
-    }
-
-    50% {
-      transform: rotate(90deg);
-    }
-
-    100% {
-      transform: rotate(0deg);
-    }
-  }
-  animation: rotateIsClose 0.2s ease forwards;
-  transition: all 0.3s;
-  &:hover {
-    svg {
-      transform: scale(1.2);
-    }
-  }
-`
-
-const OpenList = styled.span`
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  @keyframes rotateIsOpen {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    50% {
-      transform: rotate(90deg);
-    }
-
-    100% {
-      transform: rotate(180deg);
-    }
-  }
-  animation: rotateIsOpen 0.2s ease forwards;
-  transition: all 0.3s;
-  &:hover {
-    svg {
-      transform: scale(1.2);
-    }
-  }
-`
-
-const MutationsList = styled.div`
-  position: absolute;
-  z-index: 3;
-
-  display: flex;
-  flex-direction: column;
-
-  padding: 6px;
-  padding-top: 0;
-
-  background: #fff;
-  box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
-
-  width: 242px;
-  box-sizing: border-box;
-  left: 0.5px;
-  top: 39px;
-  border-radius: 0px 0px 10px 10px;
-  max-height: 300px;
-
-  overflow: hidden;
-  overflow-y: auto;
-
-  @keyframes listVisible {
-    0% {
-      opacity: 0;
-    }
-
-    50% {
-      opacity: 0.5;
-    }
-
-    100% {
-      opacity: 1;
-    }
-  }
-  animation: listVisible 0.2s ease forwards;
-  transition: all 0.3s;
-`
-
-const Label = styled.div`
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  padding: 6.5px 13px;
-
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 6px;
-  font-weight: 700;
-  line-height: 100%;
-  color: rgba(183, 188, 196, 0.6);
-  text-transform: uppercase;
-  box-sizing: border-box;
-
-  &::before {
-    content: '';
-
-    position: absolute;
-    top: 8px;
-    left: 6px;
-
-    display: inline-block;
-
-    width: 60px;
-    height: 1px;
-
-    background: #b7bcc4;
-    border-radius: 10px;
-  }
-
-  &::after {
-    content: '';
-
-    position: absolute;
-    top: 8px;
-    right: 6px;
-
-    display: inline-block;
-
-    width: 60px;
-    height: 1px;
-
-    background: #b7bcc4;
-    border-radius: 10px;
-  }
-`
-
-const InputBlock = styled.div<{ $enable?: string; $enableBefore?: string }>`
-  display: flex;
-
-  padding: 6.5px 13px;
-  cursor: pointer;
-
-  position: relative;
-
-  flex-direction: column;
-  align-items: flex-start;
-  box-sizing: border-box;
-  width: 100%;
-  padding-left: 24px;
-
-  background: ${(props) => props.$enable || '#fff'};
-  border-radius: 4px;
-
-  &::before {
-    content: '';
-
-    position: absolute;
-    top: 45%;
-    left: 6px;
-
-    display: inline-block;
-
-    width: 8px;
-    height: 8px;
-
-    background: ${(props) => props.$enableBefore || '#e7ecef'};
-    border-radius: 4px;
-  }
-
-  .inputMutation {
-    background: ${(props) => props.$enable || '#fff'};
-  }
-`
-
-const InputMutation = styled.span`
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 12px;
-  line-height: 149%;
-
-  color: #222;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 180px;
-  display: inline-block;
-`
-
-const AuthorMutation = styled.div`
-  font-family: 'Segoe UI', sans-serif;
-
-  font-size: 10px;
-  line-height: 100%;
-  color: rgb(34 34 34 / 60%);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 180px;
-  display: inline-block;
-`
-
-const iconDropdown = (
-  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g opacity="0.5">
-      <path
-        d="M3.25 4.875L6.5 8.125L9.75 4.875"
-        stroke="#fff"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-  </svg>
-)
+import 'simplebar-react/dist/simplebar.min.css'
 
 export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   engine: Engine
@@ -287,6 +56,10 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const [selectedMutation, setSelectedMutation] = useState<Mutation | null>(null)
 
   const [mutations, setMutations] = useState<Mutation[]>([])
+  // todo: mock
+  const [isSelectedMutation, setIsSelectedMutation] = useState(false)
+  // todo: mock
+  const [isAvalible, setAvalible] = useState(false)
 
   useEffect(() => {
     const init = async () => {
@@ -309,22 +82,27 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     setCurrentMutationId(mut.id)
   }
 
+  // todo: mock
+  const changeSelected = () => {
+    setIsSelectedMutation(!isSelectedMutation)
+  }
+  // todo: mock
+  const changeAvalibleMutations = () => {
+    setAvalible(!isAvalible)
+  }
+  console.log(mutations)
+
   return (
     <WrapperDropdown
-      onBlur={() => {
-        setVisible(false)
-        setOpen(false)
-      }}
+      // onBlur={() => {
+      //   setVisible(false)
+      //   setOpen(false)
+      // }}
       tabIndex={0}
-      style={{ scrollbarColor: 'rgb(147, 150, 152)  rgb(255, 255, 255)', scrollbarWidth: 'thin' }}
+      // style={{ scrollbarColor: 'rgb(147, 150, 152)  rgb(255, 255, 255)', scrollbarWidth: 'thin' }}
     >
-      <SelectedMutationBlock
-        onClick={() => {
-          isOpen ? setVisible(true) : setVisible(false)
-
-          setOpen(!isOpen)
-        }}
-      >
+      <SelectedMutationBlock>
+        <InfoWrapper>{info}</InfoWrapper>
         <SelectedMutationInfo>
           {selectedMutation && (
             <>
@@ -335,32 +113,160 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
             </>
           )}
         </SelectedMutationInfo>
-
+        <StarSelectedMutationWrapper onClick={changeSelected}>
+          {isSelectedMutation ? starSelectMutation : starSelectMutationDefault}
+        </StarSelectedMutationWrapper>
         {isOpen ? (
-          <OpenList>{iconDropdown}</OpenList>
+          <OpenList
+            onClick={() => {
+              isOpen ? setVisible(true) : setVisible(false)
+
+              setOpen(!isOpen)
+            }}
+          >
+            {iconDropdown}
+          </OpenList>
         ) : (
-          <OpenListDefault>{iconDropdown}</OpenListDefault>
+          <OpenListDefault
+            onClick={() => {
+              isOpen ? setVisible(true) : setVisible(false)
+
+              setOpen(!isOpen)
+            }}
+          >
+            {iconDropdown}
+          </OpenListDefault>
         )}
       </SelectedMutationBlock>
 
       {isOpen && (
         <MutationsList>
-          <Label>Available mutations</Label>
+          {' '}
+          <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
+            <ButtonListBlock>
+              <ButtonBack>{back}to Original</ButtonBack>
+              <ButtonMutation>Mutate{mutate}</ButtonMutation>
+            </ButtonListBlock>
+            <ListMutations>
+              {mutations.length &&
+                mutations.map((mut, i) => (
+                  <InputBlock
+                    $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
+                    $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
+                    onClick={() => {
+                      enableMutation(mut)
+                    }}
+                    key={i}
+                  >
+                    <ImageBlock>
+                      {' '}
+                      <img src={ipfs + mut.metadata.image.ipfs_cid} />
+                    </ImageBlock>
+                    <InputInfoWrapper>
+                      {/* todo: mocked classname */}
+                      <InputMutation
+                        className={mut.id === selectedMutation?.id ? 'inputMutationSelected' : ''}
+                      >
+                        {mut.metadata.name}
+                      </InputMutation>
+                      {/* todo: mocked classname */}
+                      <AuthorMutation
+                        className={
+                          mut.id === selectedMutation?.id && isSelectedMutation
+                            ? 'authorMutationSelected'
+                            : ''
+                        }
+                      >
+                        {mut.id}
+                      </AuthorMutation>
+                    </InputInfoWrapper>
+                    {/* todo: mocked */}
+                    <InputIconWrapper
+                      onClick={(e) => {
+                        e.stopPropagation()
 
-          {mutations.length &&
-            mutations.map((mut, i) => (
-              <InputBlock
-                $enable={mut.id === selectedMutation?.id && '#f7f7f7'}
-                $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
-                onClick={() => {
-                  enableMutation(mut)
-                }}
-                key={i}
-              >
-                <InputMutation>{mut.metadata.name}</InputMutation>
-                <AuthorMutation>{mut.id}</AuthorMutation>
-              </InputBlock>
-            ))}
+                        setVisible(true)
+                        setOpen(true)
+                        {
+                          /* todo: mocked */
+                        }
+                        if (mut.id === selectedMutation?.id && isSelectedMutation) {
+                          changeSelected()
+                        } else if (mut.id === selectedMutation?.id && !isSelectedMutation) {
+                          changeSelected()
+                        } else {
+                          null
+                        }
+                      }}
+                    >
+                      {mut.id === selectedMutation?.id && isSelectedMutation
+                        ? starMutationList
+                        : mut.id === selectedMutation?.id && !isSelectedMutation
+                        ? starMutationListDefault
+                        : trash}
+                    </InputIconWrapper>
+                  </InputBlock>
+                ))}
+            </ListMutations>
+            <AvalibleMutations>
+              <AvalibleLableBlock>
+                <AvalibleLable>available</AvalibleLable>
+                {/* todo: mock */}
+                <AvalibleArrowBlock
+                  className={isAvalible ? 'iconRotate' : ''}
+                  onClick={changeAvalibleMutations}
+                >
+                  <AvalibleArrowLable>+266 mutations more</AvalibleArrowLable>
+                  {availableIcon}
+                </AvalibleArrowBlock>
+              </AvalibleLableBlock>
+              {/* todo: mock */}
+              {isAvalible &&
+                mutations.length &&
+                mutations.map((mut, i) => (
+                  <InputBlock
+                    $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
+                    $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
+                    onClick={() => {
+                      enableMutation(mut)
+                    }}
+                    key={i}
+                    className="avalibleMutationsInput"
+                  >
+                    <ImageBlock>
+                      {' '}
+                      <img src={ipfs + mut.metadata.image.ipfs_cid} />
+                    </ImageBlock>
+                    <InputInfoWrapper>
+                      <InputMutation>{mut.metadata.name}</InputMutation>
+                      <AuthorMutation>{mut.id}</AuthorMutation>
+                    </InputInfoWrapper>
+                  </InputBlock>
+                ))}
+              {isAvalible &&
+                mutations.length &&
+                mutations.map((mut, i) => (
+                  <InputBlock
+                    $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
+                    $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
+                    onClick={() => {
+                      enableMutation(mut)
+                    }}
+                    key={i}
+                    className="avalibleMutationsInput"
+                  >
+                    <ImageBlock>
+                      {' '}
+                      <img src={ipfs + mut.metadata.image.ipfs_cid} />
+                    </ImageBlock>
+                    <InputInfoWrapper>
+                      <InputMutation>{mut.metadata.name}</InputMutation>
+                      <AuthorMutation>{mut.id}</AuthorMutation>
+                    </InputInfoWrapper>
+                  </InputBlock>
+                ))}
+            </AvalibleMutations>{' '}
+          </SimpleBar>
         </MutationsList>
       )}
     </WrapperDropdown>
