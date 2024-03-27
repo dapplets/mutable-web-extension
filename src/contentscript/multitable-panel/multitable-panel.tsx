@@ -36,7 +36,7 @@ const WrapperPanel = styled.div`
     }
   }
   .visible-default {
-    opacity: 1;
+    opacity: 1 !important;
     transform: translateY(0);
   }
   .visible-pin {
@@ -132,27 +132,30 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
     }, 5000)
 
     return () => clearTimeout(timer)
-  }, [isPin, visible])
+  }, [isPin])
 
   const handleDrag = (e, ui) => {
-    setVisible(false)
-
     setDeltaPosition({
       x: deltaPosition.x + ui.deltaX,
       y: deltaPosition.y + ui.deltaY,
     })
 
     setPanelPosition(deltaPosition.x.toString())
-    setTimeout(() => {
-      setVisible(true)
-    }, 7000)
   }
 
-  const onStart = () => {
+  const onStart = (e) => {
+    if (!isPin) {
+      document.getElementById('northPanel').style.opacity = '1'
+    }
+
     setActiveDrags(activeDrags + 1)
   }
 
-  const onStop = () => {
+  const onStop = (e) => {
+    setTimeout(() => {
+      document.getElementById('northPanel').style.removeProperty('opacity')
+    }, 5000)
+
     setActiveDrags(activeDrags - 1)
   }
 
@@ -203,7 +206,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
           justifyContent: 'center',
           height: '1px',
           zIndex: 5000,
-          margin: '0 5px 0 15px',
+          margin: '0 10px 0 25px',
         }}
         className="container-drag-north-panel"
       >
