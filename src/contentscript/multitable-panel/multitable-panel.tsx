@@ -1,25 +1,19 @@
 import { Engine, Mutation } from 'mutable-web-engine'
-import React, { FC, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
-import {
-  getPanelPinned,
-  getPanelPosition,
-  removePanelPinned,
-  setPanelPinned,
-  setPanelPosition,
-} from '../storage'
+import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
 
-const WrapperPanel = styled.div`
-  width: 100vw;
+const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
+  width: 100%;
   right: 0;
   position: fixed;
   z-index: 5000;
   top: 0;
-  height: 15px;
   background: transparent;
+
   &::before {
     content: '';
     width: 100%;
@@ -35,16 +29,18 @@ const WrapperPanel = styled.div`
       transform: translateY(0);
     }
   }
+
   .visible-default {
     opacity: 1 !important;
     transform: translateY(0);
   }
+
   .visible-pin {
     opacity: 1 !important;
     transform: translateY(0);
   }
 `
-const NorthPanel = styled.div`
+const NorthPanel = styled.div<{ $isAnimated?: boolean }>`
   position: relative;
 
   display: flex;
@@ -53,7 +49,6 @@ const NorthPanel = styled.div`
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  margin: 0 auto;
 
   width: 318px;
   height: 45px;
@@ -66,7 +61,8 @@ const NorthPanel = styled.div`
   box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
   opacity: 0;
   transform: translateY(-100%);
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  transition: ${(props) =>
+    props.$isAnimated ? 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out' : 'initial'};
 `
 
 const PinWrapper = styled.div`
@@ -116,17 +112,7 @@ interface MultitablePanelProps {
 export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [visible, setVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
-  const [activeDrags, setActiveDrags] = useState(0)
-  const [deltaPosition, setDeltaPosition] = useState(
-    getPanelPosition() ? { x: parseInt(getPanelPosition()), y: 0 } : { x: 0, y: 0 }
-  )
-  const refNorthPanel = useRef<HTMLDivElement>(null)
-  const [defaultPosition, setdefaultPosition] = useState(
-    getPanelPosition() ? { x: parseInt(getPanelPosition()), y: 0 } : { x: 0, y: 0 }
-  )
-
-  const [bounds, setBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 })
-
+  const [isDragging, setIsDragging] = useState(false)
   const [mutations, setMutations] = useState<Mutation[]>([])
   const [selectedMutation, setSelectedMutation] = useState<Mutation | null>(null)
 
@@ -149,37 +135,14 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     return () => clearTimeout(timer)
   }, [isPin])
 
-  const handleDrag = (e, ui) => {
-    setDeltaPosition({
-      x: deltaPosition.x + ui.deltaX,
-      y: deltaPosition.y + ui.deltaY,
-    })
-
-    setPanelPosition(deltaPosition.x.toString())
+  const handleStartDrag = () => {
+    setIsDragging(true)
   }
 
-  const onStart = (e) => {
-    if (!isPin) {
-      document.getElementById('northPanel').style.opacity = '1'
-    }
-
-    setActiveDrags(activeDrags + 1)
+  const handleStopDrag = () => {
+    setIsDragging(false)
   }
 
-  const onStop = (e) => {
-    setTimeout(() => {
-      document.getElementById('northPanel').style.removeProperty('opacity')
-    }, 5000)
-
-    setActiveDrags(activeDrags - 1)
-  }
-
-  const dragHandlers = {
-    onStart,
-    onStop,
-
-    defaultPosition,
-  }
   const handleMutationChange = async (mutationId: string) => {
     const mutation = mutations.find((mutation) => mutation.id === mutationId)
 
@@ -197,79 +160,48 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setPin(!isPin)
   }
 
-  const updateBounds = () => {
-    if (!refNorthPanel.current) return
-
-    const rect = refNorthPanel.current.getBoundingClientRect()
-    if (!rect) return
-
-    setBounds({
-      left: -((window.innerWidth - rect.width) / 2),
-      top: 0,
-      right: (window.innerWidth - rect.width) / 2,
-      bottom: 0,
-    })
-  }
-
-  useLayoutEffect(() => {
-    updateBounds()
-    window.addEventListener('resize', updateBounds)
-    return () => window.removeEventListener('resize', updateBounds)
-  }, [])
-
   if (mutations.length === 0) {
     return null
   }
 
   return (
-    <WrapperPanel>
-      <div
-        style={{
-          position: 'relative',
-          width: '99%',
-
-          left: '0',
-          display: 'flex',
-          justifyContent: 'center',
-          height: '1px',
-          zIndex: 5000,
-          margin: '0 10px 0 25px',
-        }}
-        className="container-drag-north-panel"
+    <WrapperPanel $isAnimated={!isDragging}>
+      <Draggable
+        axis="x"
+        bounds="parent"
+        handle=".dragWrapper"
+        onStart={handleStartDrag}
+        onStop={handleStopDrag}
+        defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
       >
-        <Draggable
-          {...dragHandlers}
-          onDrag={handleDrag}
-          onStart={onStart}
-          onStop={onStop}
-          handle=".dragWrapper"
-          axis="x"
-          bounds={bounds}
+        {/* ToDo: refactor className */}
+        <NorthPanel
+          className={
+            isPin
+              ? 'visible-pin'
+              : visible && !isDragging
+              ? 'visible-north-panel'
+              : 'visible-default'
+          }
+          $isAnimated={!isDragging}
         >
-          <NorthPanel
-            ref={(node) => {
-              refNorthPanel.current = node
-            }}
-            id="northPanel"
-            className={isPin ? 'visible-pin' : visible ? 'visible-north-panel' : 'visible-default'}
-          >
-            <DragWrapper className="dragWrapper">
-              <DragIconWrapper>
-                {iconDrag}
-                {iconDrag}
-                {iconDrag}
-              </DragIconWrapper>
-            </DragWrapper>
-            <Dropdown
-              mutations={mutations}
-              selectedMutation={selectedMutation}
-              onMutationChange={handleMutationChange}
-              setVisible={setVisible}
-            />
-            <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
-          </NorthPanel>
-        </Draggable>
-      </div>
+          <DragWrapper className="dragWrapper">
+            <DragIconWrapper>
+              {/* ToDo: replace with one icon */}
+              {iconDrag}
+              {iconDrag}
+              {iconDrag}
+            </DragIconWrapper>
+          </DragWrapper>
+          <Dropdown
+            mutations={mutations}
+            selectedMutation={selectedMutation}
+            onMutationChange={handleMutationChange}
+            setVisible={setVisible}
+          />
+          <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
+        </NorthPanel>
+      </Draggable>
     </WrapperPanel>
   )
 }

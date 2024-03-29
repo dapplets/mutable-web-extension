@@ -64,10 +64,7 @@ async function main() {
 
   const engine = new Engine({
     networkId: networkConfig.networkId,
-    // todo: 
-  //   Argument of type '{ networkId: any; gatewayId: string; selector: WalletSelector; }' is not assignable to parameter of type 'EngineConfig'.
-  // Object literal may only specify known properties, and 'gatewayId' does not exist in type 'EngineConfig'
-    // gatewayId: 'mutable-web-extension',
+    gatewayId: 'mutable-web-extension',
     selector,
   })
 
