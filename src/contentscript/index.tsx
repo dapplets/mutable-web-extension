@@ -1,7 +1,7 @@
 import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { EventEmitter as NEventEmitter } from 'events'
-import { DappletOverlay, Engine } from 'mutable-web-engine'
+import { DappletCallout, DappletOverlay, Engine } from 'mutable-web-engine'
 import { useInitNear } from 'near-social-vm'
 import React, { FC, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -41,7 +41,7 @@ const App: FC = () => {
         features: {
           skipTxConfirmationPopup: true,
         },
-        customElements: { DappletOverlay },
+        customElements: { DappletOverlay, DappletCallout },
       })
     }
   }, [initNear])
