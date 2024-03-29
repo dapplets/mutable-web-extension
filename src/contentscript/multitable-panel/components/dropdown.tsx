@@ -1,7 +1,6 @@
-import { Engine, Mutation } from 'mutable-web-engine'
-import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
+import { Mutation } from 'mutable-web-engine'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, useState } from 'react'
 import SimpleBar from 'simplebar-react'
-import { setCurrentMutationId } from '../../storage'
 import {
   AuthorMutation,
   AvalibleArrowBlock,
@@ -46,40 +45,23 @@ import { ipfs } from '../constants'
 import 'simplebar-react/dist/simplebar.min.css'
 
 export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
-  engine: Engine
+  mutations: Mutation[]
+  selectedMutation: Mutation | null
+  onMutationChange: (mutationId: string | null) => void
   setVisible: (visible: boolean) => void
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
-  const { engine, setVisible } = props
-  const [isOpen, setOpen] = useState(false)
-  const [selectedMutation, setSelectedMutation] = useState<Mutation | null>(null)
+  const { selectedMutation, mutations, onMutationChange, setVisible } = props
 
-  const [mutations, setMutations] = useState<Mutation[]>([])
-  // todo: mock
   const [isSelectedMutation, setIsSelectedMutation] = useState(false)
-  // todo: mock
   const [isAvalible, setAvalible] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-  useEffect(() => {
-    const init = async () => {
-      const mutations = await engine.getMutations()
-      setMutations(mutations)
-
-      const mutation = await engine.getCurrentMutation()
-      setSelectedMutation(mutation)
-    }
-    init()
-  }, [engine])
-
-  const enableMutation = async (mut: Mutation) => {
-    setSelectedMutation(mut)
-    setOpen(false) // ToDo: ???
-
+  const handleMutationClick = (mutationId: string) => {
+    setIsOpen(false)
     isOpen ? setVisible(true) : setVisible(false)
-
-    await engine.switchMutation(mut.id)
-    setCurrentMutationId(mut.id)
+    onMutationChange(mutationId)
   }
 
   // todo: mock
@@ -95,7 +77,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     <WrapperDropdown
       // onBlur={() => {
       //   setVisible(false)
-      //   setOpen(false)
+      //   setIsOpen(false)
       // }}
       tabIndex={0}
       // style={{ scrollbarColor: 'rgb(147, 150, 152)  rgb(255, 255, 255)', scrollbarWidth: 'thin' }}
@@ -119,8 +101,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           <OpenList
             onClick={() => {
               isOpen ? setVisible(true) : setVisible(false)
-
-              setOpen(!isOpen)
+              setIsOpen(!isOpen)
             }}
           >
             {iconDropdown}
@@ -129,8 +110,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           <OpenListDefault
             onClick={() => {
               isOpen ? setVisible(true) : setVisible(false)
-
-              setOpen(!isOpen)
+              setIsOpen(!isOpen)
             }}
           >
             {iconDropdown}
@@ -153,7 +133,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
                     $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
                     onClick={() => {
-                      enableMutation(mut)
+                      onMutationChange(mut.id)
                     }}
                     key={i}
                   >
@@ -185,7 +165,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                         e.stopPropagation()
 
                         setVisible(true)
-                        setOpen(true)
+                        setIsOpen(true)
                         {
                           /* todo: mocked */
                         }
@@ -226,9 +206,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                   <InputBlock
                     $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
                     $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
-                    onClick={() => {
-                      enableMutation(mut)
-                    }}
+                    onClick={() => handleMutationClick(mut.id)}
                     key={i}
                     className="avalibleMutationsInput"
                   >
@@ -248,9 +226,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                   <InputBlock
                     $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
                     $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
-                    onClick={() => {
-                      enableMutation(mut)
-                    }}
+                    onClick={() => handleMutationClick(mut.id)}
                     key={i}
                     className="avalibleMutationsInput"
                   >

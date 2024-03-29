@@ -1,4 +1,4 @@
-import { Engine } from 'mutable-web-engine'
+import { Engine, Mutation } from 'mutable-web-engine'
 import React, { FC, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
@@ -112,7 +112,8 @@ const iconDrag = (
 interface MultitablePanelProps {
   engine: Engine
 }
-export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
+
+export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [visible, setVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
   const [activeDrags, setActiveDrags] = useState(0)
@@ -125,6 +126,20 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
   )
 
   const [bounds, setBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 })
+
+  const [mutations, setMutations] = useState<Mutation[]>([])
+  const [selectedMutation, setSelectedMutation] = useState<Mutation | null>(null)
+
+  useEffect(() => {
+    const init = async () => {
+      const mutations = await engine.getMutations()
+      setMutations(mutations)
+
+      const mutation = await engine.getCurrentMutation()
+      setSelectedMutation(mutation)
+    }
+    init()
+  }, [engine])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -165,6 +180,14 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
 
     defaultPosition,
   }
+  const handleMutationChange = async (mutationId: string) => {
+    const mutation = mutations.find((mutation) => mutation.id === mutationId)
+
+    setSelectedMutation(mutation)
+
+    await engine.switchMutation(mutation.id)
+  }
+
   const handlePin = () => {
     if (isPin) {
       removePanelPinned()
@@ -193,6 +216,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
     window.addEventListener('resize', updateBounds)
     return () => window.removeEventListener('resize', updateBounds)
   }, [])
+
+  if (mutations.length === 0) {
+    return null
+  }
 
   return (
     <WrapperPanel>
@@ -233,7 +260,12 @@ export const MultitablePanel: FC<MultitablePanelProps> = (props) => {
                 {iconDrag}
               </DragIconWrapper>
             </DragWrapper>
-            <Dropdown setVisible={setVisible} engine={props.engine} />
+            <Dropdown
+              mutations={mutations}
+              selectedMutation={selectedMutation}
+              onMutationChange={handleMutationChange}
+              setVisible={setVisible}
+            />
             <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
           </NorthPanel>
         </Draggable>
