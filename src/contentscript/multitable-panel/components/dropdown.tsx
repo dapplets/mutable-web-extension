@@ -74,6 +74,18 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     setAvalible(!isAvalible)
   }
 
+  const sortedMitations = mutations.sort((a, b) => {
+    const dateA = a.settings.lastUsage ? new Date(a.settings.lastUsage).getTime() : null
+    const dateB = b.settings.lastUsage ? new Date(b.settings.lastUsage).getTime() : null
+
+    if (!dateA) return 1
+    if (!dateB) return -1
+
+    return dateB - dateB
+  })
+
+  const lastFiveMutations = sortedMitations.slice(0, 5)
+
   return (
     <WrapperDropdown
       // onBlur={() => {
@@ -131,8 +143,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               <ButtonMutation>Mutate{mutate}</ButtonMutation>
             </ButtonListBlock>
             <ListMutations>
-              {mutations.length &&
-                mutations.map((mut, i) => (
+              {lastFiveMutations.length &&
+                lastFiveMutations.map((mut, i) => (
                   <InputBlock
                     $enable={mut.settings.isFavorite && 'rgba(56, 75, 255, 0.1)'}
                     $enableBefore={mut.settings.isFavorite && '#34d31a'}
@@ -166,7 +178,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     {/* todo: mocked */}
                     <InputIconWrapper
                       onClick={(e) => {
-                      
                         changeSelected(mut.id, isFavorite)
                       }}
                     >
@@ -187,7 +198,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                   className={isAvalible ? 'iconRotate' : ''}
                   onClick={changeAvalibleMutations}
                 >
-                  <AvalibleArrowLable>+266 mutations more</AvalibleArrowLable>
+                  <AvalibleArrowLable>{mutations.length} mutations</AvalibleArrowLable>
                   {availableIcon}
                 </AvalibleArrowBlock>
               </AvalibleLableBlock>
