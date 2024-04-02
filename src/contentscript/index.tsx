@@ -21,7 +21,7 @@ const eventEmitter = new NEventEmitter()
 const selectorPromise = setupWalletSelector({
   network: networkConfig.networkId as NetworkId,
   // The storage is faked because it's not necessary. The selected wallet ID is hardcoded below
-  storage: new ExtensionStorage(),
+  storage: new ExtensionStorage('wallet-selector'),
   modules: [setupWallet({ eventEmitter })],
 }).then((selector) => {
   // Use background wallet by default
@@ -66,6 +66,7 @@ async function main() {
     networkId: networkConfig.networkId,
     gatewayId: 'mutable-web-extension',
     selector,
+    storage: new ExtensionStorage('mutableweb'),
   })
 
   const mutationId = getCurrentMutationId()
