@@ -1,4 +1,5 @@
-import { Engine, Mutation } from 'mutable-web-engine'
+import { Engine } from 'mutable-web-engine'
+import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
@@ -113,8 +114,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [visible, setVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
   const [isDragging, setIsDragging] = useState(false)
-  const [mutations, setMutations] = useState<Mutation[]>([])
-  const [selectedMutation, setSelectedMutation] = useState<Mutation | null>(null)
+  const [mutations, setMutations] = useState<MutationWithSettings[]>([])
+  const [selectedMutation, setSelectedMutation] = useState<MutationWithSettings | null>(null)
 
   useEffect(() => {
     const init = async () => {
@@ -126,7 +127,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     }
     init()
   }, [engine])
-
+  // getMutation await
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(true)
@@ -149,6 +150,18 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setSelectedMutation(mutation)
 
     await engine.switchMutation(mutation.id)
+  }
+
+  const changeSelected = async (mutationId: string,isFavorite: string|null ) => {
+    if (mutationId === selectedMutation.id && selectedMutation.id === isFavorite) {
+      await  engine.deleteMutationFromFavorites(mutationId)
+    } else if (mutationId === selectedMutation.id && selectedMutation.id !== isFavorite) {
+      await  engine.addMutationToFavorites(mutationId)
+    } else {
+      // todo: remove mutation?
+
+      null
+    }
   }
 
   const handlePin = () => {
@@ -198,6 +211,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
             selectedMutation={selectedMutation}
             onMutationChange={handleMutationChange}
             setVisible={setVisible}
+            changeSelected={changeSelected}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>

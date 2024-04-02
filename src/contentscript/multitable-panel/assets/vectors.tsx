@@ -47,7 +47,7 @@ export const iconPin = (
 
 export const back = (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
-    <g clip-path="url(#clip0_35_2278)">
+    <g clipPath="url(#clip0_35_2278)">
       <path
         d="M0.666626 3.16669V7.16669H4.66663"
         stroke="#7A818B"

@@ -1,4 +1,3 @@
-import { Mutation } from 'mutable-web-engine'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useState } from 'react'
 import SimpleBar from 'simplebar-react'
 import {
@@ -42,19 +41,25 @@ import {
 } from '../assets/vectors'
 import { ipfs } from '../constants'
 
+import { Mutation, MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import 'simplebar-react/dist/simplebar.min.css'
 
 export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
-  mutations: Mutation[]
+  mutations: MutationWithSettings[]
   selectedMutation: Mutation | null
   onMutationChange: (mutationId: string | null) => void
   setVisible: (visible: boolean) => void
+  changeSelected: (mutationId: string, isFavorite: string | null) => void
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
-  const { selectedMutation, mutations, onMutationChange, setVisible } = props
+  const { selectedMutation, mutations, onMutationChange, setVisible, changeSelected } = props
+  const [isFavorite, seIsFavorite] = useState<string | null>(
+    mutations.filter((x) => x.settings.isFavorite).length
+      ? mutations.filter((x) => x.settings.isFavorite)[0].id
+      : null
+  )
 
-  const [isSelectedMutation, setIsSelectedMutation] = useState(false)
   const [isAvalible, setAvalible] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -64,10 +69,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     onMutationChange(mutationId)
   }
 
-  // todo: mock
-  const changeSelected = () => {
-    setIsSelectedMutation(!isSelectedMutation)
-  }
   // todo: mock
   const changeAvalibleMutations = () => {
     setAvalible(!isAvalible)
@@ -80,7 +81,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       //   setIsOpen(false)
       // }}
       tabIndex={0}
-      // style={{ scrollbarColor: 'rgb(147, 150, 152)  rgb(255, 255, 255)', scrollbarWidth: 'thin' }}
     >
       <SelectedMutationBlock>
         <InfoWrapper>{info}</InfoWrapper>
@@ -94,8 +94,12 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
             </>
           )}
         </SelectedMutationInfo>
-        <StarSelectedMutationWrapper onClick={changeSelected}>
-          {isSelectedMutation ? starSelectMutation : starSelectMutationDefault}
+        <StarSelectedMutationWrapper
+          onClick={() => changeSelected(selectedMutation.id, isFavorite)}
+        >
+          {selectedMutation && selectedMutation.id === isFavorite
+            ? starSelectMutation
+            : starSelectMutationDefault}
         </StarSelectedMutationWrapper>
         {isOpen ? (
           <OpenList
@@ -130,8 +134,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               {mutations.length &&
                 mutations.map((mut, i) => (
                   <InputBlock
-                    $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
-                    $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
+                    $enable={mut.settings.isFavorite && 'rgba(56, 75, 255, 0.1)'}
+                    $enableBefore={mut.settings.isFavorite && '#34d31a'}
                     onClick={() => {
                       onMutationChange(mut.id)
                     }}
@@ -151,7 +155,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                       {/* todo: mocked classname */}
                       <AuthorMutation
                         className={
-                          mut.id === selectedMutation?.id && isSelectedMutation
+                          mut.id === selectedMutation?.id && mut.id === isFavorite
                             ? 'authorMutationSelected'
                             : ''
                         }
@@ -162,25 +166,13 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     {/* todo: mocked */}
                     <InputIconWrapper
                       onClick={(e) => {
-                        e.stopPropagation()
-
-                        setVisible(true)
-                        setIsOpen(true)
-                        {
-                          /* todo: mocked */
-                        }
-                        if (mut.id === selectedMutation?.id && isSelectedMutation) {
-                          changeSelected()
-                        } else if (mut.id === selectedMutation?.id && !isSelectedMutation) {
-                          changeSelected()
-                        } else {
-                          null
-                        }
+                      
+                        changeSelected(mut.id, isFavorite)
                       }}
                     >
-                      {mut.id === selectedMutation?.id && isSelectedMutation
+                      {mut.settings.isFavorite
                         ? starMutationList
-                        : mut.id === selectedMutation?.id && !isSelectedMutation
+                        : mut.id === selectedMutation?.id
                         ? starMutationListDefault
                         : trash}
                     </InputIconWrapper>
@@ -199,7 +191,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                   {availableIcon}
                 </AvalibleArrowBlock>
               </AvalibleLableBlock>
-              {/* todo: mock */}
+
               {isAvalible &&
                 mutations.length &&
                 mutations.map((mut, i) => (
@@ -211,7 +203,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     className="avalibleMutationsInput"
                   >
                     <ImageBlock>
-                      {' '}
                       <img src={ipfs + mut.metadata.image.ipfs_cid} />
                     </ImageBlock>
                     <InputInfoWrapper>
@@ -220,27 +211,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     </InputInfoWrapper>
                   </InputBlock>
                 ))}
-              {isAvalible &&
-                mutations.length &&
-                mutations.map((mut, i) => (
-                  <InputBlock
-                    $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
-                    $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
-                    onClick={() => handleMutationClick(mut.id)}
-                    key={i}
-                    className="avalibleMutationsInput"
-                  >
-                    <ImageBlock>
-                      {' '}
-                      <img src={ipfs + mut.metadata.image.ipfs_cid} />
-                    </ImageBlock>
-                    <InputInfoWrapper>
-                      <InputMutation>{mut.metadata.name}</InputMutation>
-                      <AuthorMutation>{mut.id}</AuthorMutation>
-                    </InputInfoWrapper>
-                  </InputBlock>
-                ))}
-            </AvalibleMutations>{' '}
+            </AvalibleMutations>
           </SimpleBar>
         </MutationsList>
       )}
