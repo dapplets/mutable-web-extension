@@ -1,3 +1,4 @@
+import { Engine } from 'mutable-web-engine'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useState } from 'react'
 import SimpleBar from 'simplebar-react'
 import {
@@ -50,10 +51,12 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
   onMutationChange: (mutationId: string | null) => void
   setVisible: (visible: boolean) => void
   changeSelected: (mutationId: string, isFavorite: string | null) => void
+  engine: Engine
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
-  const { selectedMutation, mutations, onMutationChange, setVisible, changeSelected } = props
+  const { selectedMutation, mutations, onMutationChange, setVisible, changeSelected, engine } =
+    props
   const [isFavorite, seIsFavorite] = useState<string | null>(
     mutations.filter((x) => x.settings.isFavorite).length
       ? mutations.filter((x) => x.settings.isFavorite)[0].id
@@ -85,6 +88,11 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   })
 
   const lastFiveMutations = sortedMitations.slice(0, 5)
+  const handleResetMutation = () => {
+    onMutationChange('bos.dapplets.near/mutation/Sandbox')
+    setIsOpen(false)
+    window.sessionStorage.setItem('mutableweb:mutationId', 'bos.dapplets.near/mutation/Sandbox')
+  }
 
   return (
     <WrapperDropdown
@@ -139,7 +147,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           {' '}
           <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
             <ButtonListBlock>
-              <ButtonBack>{back}to Original</ButtonBack>
+              <ButtonBack onClick={handleResetMutation}>{back}to Original</ButtonBack>
               <ButtonMutation>Mutate{mutate}</ButtonMutation>
             </ButtonListBlock>
             <ListMutations>

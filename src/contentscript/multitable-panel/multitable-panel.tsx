@@ -150,6 +150,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setSelectedMutation(mutation)
 
     await engine.switchMutation(mutation.id)
+    window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
   }
 
   const changeSelected = async (mutationId: string,isFavorite: string|null ) => {
@@ -186,6 +187,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
         onStart={handleStartDrag}
         onStop={handleStopDrag}
         defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
+       
       >
         {/* ToDo: refactor className */}
         <NorthPanel
@@ -212,6 +214,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
             onMutationChange={handleMutationChange}
             setVisible={setVisible}
             changeSelected={changeSelected}
+            engine={engine}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>
