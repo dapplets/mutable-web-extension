@@ -52,11 +52,19 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
   setVisible: (visible: boolean) => void
   changeSelected: (mutationId: string, isFavorite: string | null) => void
   engine: Engine
+  setWidgetsName: (x) => void
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
-  const { selectedMutation, mutations, onMutationChange, setVisible, changeSelected, engine } =
-    props
+  const {
+    selectedMutation,
+    mutations,
+    onMutationChange,
+    setVisible,
+    changeSelected,
+    engine,
+    setWidgetsName,
+  } = props
   const [isFavorite, seIsFavorite] = useState<string | null>(
     mutations.filter((x) => x.settings.isFavorite).length
       ? mutations.filter((x) => x.settings.isFavorite)[0].id
@@ -148,7 +156,14 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
             <ButtonListBlock>
               <ButtonBack onClick={handleResetMutation}>{back}to Original</ButtonBack>
-              <ButtonMutation>Mutate{mutate}</ButtonMutation>
+              <ButtonMutation
+                onClick={() => {
+                  setIsOpen(!isOpen)
+                  setWidgetsName('bos.dapplets.near/widget/ModalSelectedMutationEditor')
+                }}
+              >
+                Mutate{mutate}
+              </ButtonMutation>
             </ButtonListBlock>
             <ListMutations>
               {lastFiveMutations.length &&

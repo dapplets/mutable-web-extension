@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
-
+import { Widget} from "near-social-vm";
 const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
   width: 100%;
   right: 0;
@@ -114,6 +114,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [visible, setVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
   const [isDragging, setIsDragging] = useState(false)
+  const [widgetsName, setWidgetsName] = useState(null)
   const [mutations, setMutations] = useState<MutationWithSettings[]>([])
   const [selectedMutation, setSelectedMutation] = useState<MutationWithSettings | null>(null)
 
@@ -215,11 +216,18 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
             setVisible={setVisible}
             changeSelected={changeSelected}
             engine={engine}
+            setWidgetsName={setWidgetsName}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>
       </Draggable>
+      {widgetsName && (
+      <div >
+        <Widget src={widgetsName} props={{mutationName:selectedMutation.metadata.name}} />
+      </div>
+    )}
     </WrapperPanel>
+   
   )
 }
 
