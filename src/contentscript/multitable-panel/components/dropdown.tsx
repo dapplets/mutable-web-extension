@@ -98,7 +98,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     window.sessionStorage.setItem('mutableweb:mutationId', 'bos.dapplets.near/mutation/Sandbox')
   }
   const lastFiveMutations = sortedMitations.slice(0, 5)
-  console.log(mutations, 'mutations')
 
   return (
     <WrapperDropdown
@@ -157,7 +156,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               <ButtonMutation
                 onClick={() => {
                   setIsOpen(!isOpen)
-                  setWidgetsName('bos.dapplets.near/widget/ModalSelectedMutationEditor')
+                  setWidgetsName(selectedMutation.id)
                 }}
               >
                 Mutate{mutate}

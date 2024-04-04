@@ -125,7 +125,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   useEffect(() => {
     init()
   }, [engine, isFavorite])
-  // getMutation await
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(true)
@@ -157,9 +157,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     await engine.switchMutation(mutation.id)
     window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
+    setWidgetsName(mutation.id)
   }
 
-  const changeSelected = async (mutationId: string, isFavorite: string | null) => {
+  const changeSelected = async (mutationId: string) => {
     if (mutationId === selectedMutation.id && selectedMutation.settings.isFavorite) {
       await engine.setFavoriteMutation(null)
       seIsFavorite(null)
@@ -185,6 +186,9 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   if (mutations.length === 0) {
     return null
+  }
+  const handleCloseMutation = () => {
+    setWidgetsName(null)
   }
 
   return (
@@ -232,11 +236,12 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       {widgetsName && (
         <div>
           <Widget
-            src={widgetsName}
+            src={'bos.dapplets.near/widget/ModalSelectedMutationEditor'}
             props={{
               mutationName: selectedMutation.metadata.name,
               apps: applications,
               selectedApps: selectedMutation.apps,
+              onClose: handleCloseMutation,
             }}
           />
         </div>
