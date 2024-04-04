@@ -1,5 +1,5 @@
 import { Engine } from 'mutable-web-engine'
-import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
+import { AppMetadata, MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import { Widget } from 'near-social-vm'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
@@ -120,6 +120,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [isFavorite, seIsFavorite] = useState<string | null>(
     selectedMutation && selectedMutation.settings.isFavorite ? selectedMutation.id : null
   )
+  const [applications, setApplications] = useState<AppMetadata[] | null>(null)
 
   useEffect(() => {
     init()
@@ -135,6 +136,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const init = async () => {
     const mutations = await engine.getMutations()
     setMutations(mutations)
+    const allApplications = await engine.getApplications()
+    setApplications(allApplications)
 
     const mutation = await engine.getCurrentMutation()
     setSelectedMutation(mutation)
@@ -157,24 +160,15 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   }
 
   const changeSelected = async (mutationId: string, isFavorite: string | null) => {
-    console.log(mutationId);
-    // console.log(isFavorite);
-    console.log( selectedMutation.id);
-    
-    
-    if (  mutationId === selectedMutation.id && selectedMutation.settings.isFavorite ) {
-      console.log('if');
-      
+    if (mutationId === selectedMutation.id && selectedMutation.settings.isFavorite) {
       await engine.setFavoriteMutation(null)
       seIsFavorite(null)
       await init()
-    } else if (mutationId === selectedMutation.id && !selectedMutation.settings.isFavorite ) {
-      console.log('else if');
+    } else if (mutationId === selectedMutation.id && !selectedMutation.settings.isFavorite) {
       await engine.setFavoriteMutation(mutationId)
       seIsFavorite(mutationId)
       await init()
     } else {
-      console.log('else ');
       await engine.removeMutationFromRecents(mutationId)
       await init()
     }
@@ -237,7 +231,14 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       </Draggable>
       {widgetsName && (
         <div>
-          <Widget src={widgetsName} props={{ mutationName: selectedMutation.metadata.name }} />
+          <Widget
+            src={widgetsName}
+            props={{
+              mutationName: selectedMutation.metadata.name,
+              apps: applications,
+              selectedApps: selectedMutation.apps,
+            }}
+          />
         </div>
       )}
     </WrapperPanel>
