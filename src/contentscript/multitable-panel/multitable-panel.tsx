@@ -156,8 +156,9 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setSelectedMutation(mutation)
 
     await engine.switchMutation(mutation.id)
+
     window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
-    setWidgetsName(mutation.id)
+    widgetsName ? setWidgetsName(mutation.id) : setWidgetsName(null)
   }
 
   const changeSelected = async (mutationId: string) => {
@@ -189,6 +190,20 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   }
   const handleCloseMutation = () => {
     setWidgetsName(null)
+  }
+
+  const handleResetMutation = async (setIsOpen?) => {
+    await engine.setFavoriteMutation(null)
+    await init()
+
+    handleMutationChange('bos.dapplets.near/mutation/Sandbox')
+    setIsOpen ? setIsOpen(false) : null
+
+    seIsFavorite(null)
+
+    window.sessionStorage.setItem('mutableweb:mutationId', 'bos.dapplets.near/mutation/Sandbox')
+    widgetsName ? setWidgetsName('bos.dapplets.near/mutation/Sandbox') : setWidgetsName(null)
+    engine.stop()
   }
 
   return (
@@ -229,6 +244,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
             engine={engine}
             setWidgetsName={setWidgetsName}
             isFavorite={isFavorite}
+            handleResetMutation={handleResetMutation}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>
@@ -242,6 +258,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
               apps: applications,
               selectedApps: selectedMutation.apps,
               onClose: handleCloseMutation,
+              handleResetMutation: handleResetMutation,
             }}
           />
         </div>

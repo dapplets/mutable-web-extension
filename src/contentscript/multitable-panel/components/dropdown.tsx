@@ -54,6 +54,7 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
   engine: Engine
   setWidgetsName: (x) => void
   isFavorite: string | null
+  handleResetMutation: (x) => void
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
@@ -66,6 +67,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     engine,
     setWidgetsName,
     isFavorite,
+    handleResetMutation,
   } = props
 
   const [isAvalible, setAvalible] = useState(false)
@@ -92,11 +94,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     return dateB - dateB
   })
 
-  const handleResetMutation = () => {
-    onMutationChange('bos.dapplets.near/mutation/Sandbox')
-    setIsOpen(false)
-    window.sessionStorage.setItem('mutableweb:mutationId', 'bos.dapplets.near/mutation/Sandbox')
-  }
   const lastFiveMutations = sortedMitations.slice(0, 5)
 
   return (
@@ -152,7 +149,9 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           {' '}
           <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
             <ButtonListBlock>
-              <ButtonBack onClick={handleResetMutation}>{back}to Original</ButtonBack>
+              <ButtonBack onClick={() => handleResetMutation(setIsOpen)}>
+                {back}to Original
+              </ButtonBack>
               <ButtonMutation
                 onClick={() => {
                   setIsOpen(!isOpen)
