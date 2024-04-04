@@ -42,17 +42,18 @@ import {
 } from '../assets/vectors'
 import { ipfs } from '../constants'
 
-import { Mutation, MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
+import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import 'simplebar-react/dist/simplebar.min.css'
 
 export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   mutations: MutationWithSettings[]
-  selectedMutation: Mutation | null
+  selectedMutation: MutationWithSettings | null
   onMutationChange: (mutationId: string | null) => void
   setVisible: (visible: boolean) => void
   changeSelected: (mutationId: string, isFavorite: string | null) => void
   engine: Engine
   setWidgetsName: (x) => void
+  isFavorite: string | null
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
@@ -64,12 +65,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     changeSelected,
     engine,
     setWidgetsName,
+    isFavorite,
   } = props
-  const [isFavorite, seIsFavorite] = useState<string | null>(
-    mutations.filter((x) => x.settings.isFavorite).length
-      ? mutations.filter((x) => x.settings.isFavorite)[0].id
-      : null
-  )
 
   const [isAvalible, setAvalible] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -95,12 +92,12 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     return dateB - dateB
   })
 
-  const lastFiveMutations = sortedMitations.slice(0, 5)
   const handleResetMutation = () => {
     onMutationChange('bos.dapplets.near/mutation/Sandbox')
     setIsOpen(false)
     window.sessionStorage.setItem('mutableweb:mutationId', 'bos.dapplets.near/mutation/Sandbox')
   }
+  const lastFiveMutations = sortedMitations.slice(0, 5)
 
   return (
     <WrapperDropdown
@@ -125,7 +122,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
         <StarSelectedMutationWrapper
           onClick={() => changeSelected(selectedMutation.id, isFavorite)}
         >
-          {selectedMutation && selectedMutation.id === isFavorite
+          {selectedMutation && selectedMutation.settings.isFavorite
             ? starSelectMutation
             : starSelectMutationDefault}
         </StarSelectedMutationWrapper>

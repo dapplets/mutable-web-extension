@@ -1,12 +1,12 @@
 import { Engine } from 'mutable-web-engine'
 import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
+import { Widget } from 'near-social-vm'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
-import { Widget} from "near-social-vm";
 const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
   width: 100%;
   right: 0;
@@ -117,17 +117,13 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [widgetsName, setWidgetsName] = useState(null)
   const [mutations, setMutations] = useState<MutationWithSettings[]>([])
   const [selectedMutation, setSelectedMutation] = useState<MutationWithSettings | null>(null)
+  const [isFavorite, seIsFavorite] = useState<string | null>(
+    selectedMutation && selectedMutation.settings.isFavorite ? selectedMutation.id : null
+  )
 
   useEffect(() => {
-    const init = async () => {
-      const mutations = await engine.getMutations()
-      setMutations(mutations)
-
-      const mutation = await engine.getCurrentMutation()
-      setSelectedMutation(mutation)
-    }
     init()
-  }, [engine])
+  }, [engine, isFavorite])
   // getMutation await
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -136,7 +132,13 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     return () => clearTimeout(timer)
   }, [isPin])
+  const init = async () => {
+    const mutations = await engine.getMutations()
+    setMutations(mutations)
 
+    const mutation = await engine.getCurrentMutation()
+    setSelectedMutation(mutation)
+  }
   const handleStartDrag = () => {
     setIsDragging(true)
   }
@@ -154,15 +156,27 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
   }
 
-  const changeSelected = async (mutationId: string,isFavorite: string|null ) => {
-    if (mutationId === selectedMutation.id && selectedMutation.id === isFavorite) {
-      await  engine.deleteMutationFromFavorites(mutationId)
-    } else if (mutationId === selectedMutation.id && selectedMutation.id !== isFavorite) {
-      await  engine.addMutationToFavorites(mutationId)
+  const changeSelected = async (mutationId: string, isFavorite: string | null) => {
+    console.log(mutationId);
+    // console.log(isFavorite);
+    console.log( selectedMutation.id);
+    
+    
+    if (  mutationId === selectedMutation.id && selectedMutation.settings.isFavorite ) {
+      console.log('if');
+      
+      await engine.setFavoriteMutation(null)
+      seIsFavorite(null)
+      await init()
+    } else if (mutationId === selectedMutation.id && !selectedMutation.settings.isFavorite ) {
+      console.log('else if');
+      await engine.setFavoriteMutation(mutationId)
+      seIsFavorite(mutationId)
+      await init()
     } else {
-      // todo: remove mutation?
-
-      null
+      console.log('else ');
+      await engine.removeMutationFromRecents(mutationId)
+      await init()
     }
   }
 
@@ -188,7 +202,6 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
         onStart={handleStartDrag}
         onStop={handleStopDrag}
         defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
-       
       >
         {/* ToDo: refactor className */}
         <NorthPanel
@@ -217,17 +230,17 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
             changeSelected={changeSelected}
             engine={engine}
             setWidgetsName={setWidgetsName}
+            isFavorite={isFavorite}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>
       </Draggable>
       {widgetsName && (
-      <div >
-        <Widget src={widgetsName} props={{mutationName:selectedMutation.metadata.name}} />
-      </div>
-    )}
+        <div>
+          <Widget src={widgetsName} props={{ mutationName: selectedMutation.metadata.name }} />
+        </div>
+      )}
     </WrapperPanel>
-   
   )
 }
 
