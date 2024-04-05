@@ -243,6 +243,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       if(owner){
         await engine.editMutation(selectedMutation)
       }else{
+        
         await engine.createMutation(selectedMutation)
       }
      
