@@ -239,17 +239,29 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   }
 
   const handleSaveMutation = async (selectedMutation, owner) => {
+    console.log(owner)
+    console.log(selectedMutation)
+
     try {
-      if(owner){
+      if (owner) {
         await engine.editMutation(selectedMutation)
-      }else{
-        
+      } else {
         await engine.createMutation(selectedMutation)
       }
-     
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleEditMutationId = (e) => {
+    console.log(e, 'e')
+
+    const updatedMutation = {
+      ...selectedMutation,
+      id: e.target.value,
+    }
+
+    setSelectedMutation(updatedMutation)
   }
 
   return (
@@ -310,6 +322,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
               handleEditMutationApps: handleEditMutationApps,
               selectedMutation: selectedMutation,
               handleSaveMutation: handleSaveMutation,
+              handleEditMutationId: handleEditMutationId,
             }}
           />
         </div>
