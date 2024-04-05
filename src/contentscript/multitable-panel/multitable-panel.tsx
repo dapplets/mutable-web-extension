@@ -206,6 +206,46 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     engine.stop()
   }
 
+  const handleEditMutationName = (e) => {
+    const updatedMutation = {
+      ...selectedMutation,
+      metadata: {
+        ...selectedMutation.metadata,
+        name: e.target.value,
+      },
+    }
+
+    setSelectedMutation(updatedMutation)
+  }
+
+  const handleRevertChanges = async () => {
+    const mutation = await engine.getCurrentMutation()
+    setSelectedMutation(mutation)
+  }
+
+  const handleEditMutationApps = (newApp) => {
+    console.log(newApp)
+
+    const updatedApps = selectedMutation.apps.includes(newApp)
+      ? selectedMutation.apps.filter((app) => app !== newApp)
+      : [...selectedMutation.apps, newApp]
+
+    const updatedMutation = {
+      ...selectedMutation,
+      apps: updatedApps,
+    }
+
+    setSelectedMutation(updatedMutation)
+  }
+
+  const handleSaveMutation = async (selectedMutation) => {
+    try {
+      await engine.editMutation(selectedMutation)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   return (
     <WrapperPanel $isAnimated={!isDragging}>
       <Draggable
@@ -258,7 +298,11 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
               apps: applications,
               selectedApps: selectedMutation.apps,
               onClose: handleCloseMutation,
-              handleResetMutation: handleResetMutation,
+              handleResetMutation: handleRevertChanges,
+              handleEditMutationName: handleEditMutationName,
+              handleEditMutationApps: handleEditMutationApps,
+              selectedMutation: selectedMutation,
+              handleSaveMutation: handleSaveMutation,
             }}
           />
         </div>
