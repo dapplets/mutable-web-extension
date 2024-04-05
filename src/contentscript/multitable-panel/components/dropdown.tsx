@@ -104,7 +104,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       // }}
       tabIndex={0}
     >
-      <SelectedMutationBlock>
+      <SelectedMutationBlock data-testid="selected-mutation-block">
         <InfoWrapper>{info}</InfoWrapper>
         <SelectedMutationInfo>
           {selectedMutation && (
