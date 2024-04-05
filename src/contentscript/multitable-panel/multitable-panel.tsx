@@ -247,7 +247,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   }
 
   return (
-    <WrapperPanel $isAnimated={!isDragging}>
+    <WrapperPanel $isAnimated={!isDragging} data-testid="mutable-panel">
       <Draggable
         axis="x"
         bounds="parent"
@@ -258,6 +258,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       >
         {/* ToDo: refactor className */}
         <NorthPanel
+          data-testid="north-panel"
           className={
             isPin
               ? 'visible-pin'
