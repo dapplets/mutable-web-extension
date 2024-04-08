@@ -158,7 +158,9 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     await engine.switchMutation(mutation.id)
 
     window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
-    widgetsName ? setWidgetsName(mutation.id) : setWidgetsName(null)
+    widgetsName
+      ? setWidgetsName(mutation ? mutation.id : 'Some Mutation Name')
+      : setWidgetsName(null)
   }
 
   const changeSelected = async (mutationId: string) => {
@@ -193,26 +195,36 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   }
 
   const handleResetMutation = async (setIsOpen?) => {
-    await engine.setFavoriteMutation(null)
-    await init()
-
-    handleMutationChange('bos.dapplets.near/mutation/Sandbox')
-    setIsOpen ? setIsOpen(false) : null
-
+    setSelectedMutation(null)
     seIsFavorite(null)
-
-    window.sessionStorage.setItem('mutableweb:mutationId', 'bos.dapplets.near/mutation/Sandbox')
-    widgetsName ? setWidgetsName('bos.dapplets.near/mutation/Sandbox') : setWidgetsName(null)
     engine.stop()
+    window.sessionStorage.setItem('mutableweb:mutationId', null)
   }
 
   const handleEditMutationName = (e) => {
-    const updatedMutation = {
-      ...selectedMutation,
-      metadata: {
-        ...selectedMutation.metadata,
-        name: e.target.value,
-      },
+    let updatedMutation
+
+    if (!selectedMutation) {
+      updatedMutation = {
+        id: '',
+        apps: [],
+        targets: [],
+        metadata: {
+          name: e.target.value,
+        },
+        settings: {
+          isFavorite: false,
+          lastUsage: null,
+        },
+      }
+    } else {
+      updatedMutation = {
+        ...selectedMutation,
+        metadata: {
+          ...selectedMutation.metadata,
+          name: e.target.value,
+        },
+      }
     }
 
     setSelectedMutation(updatedMutation)
@@ -224,24 +236,36 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   }
 
   const handleEditMutationApps = (newApp) => {
-    console.log(newApp)
+    let updatedMutation
 
-    const updatedApps = selectedMutation.apps.includes(newApp)
-      ? selectedMutation.apps.filter((app) => app !== newApp)
-      : [...selectedMutation.apps, newApp]
+    if (!selectedMutation) {
+      updatedMutation = {
+        id: '',
+        apps: [newApp],
+        targets: [],
+        metadata: {
+          name: 'Some Mutation Name',
+        },
+        settings: {
+          isFavorite: false,
+          lastUsage: null,
+        },
+      }
+    } else {
+      const updatedApps = selectedMutation.apps.includes(newApp)
+        ? selectedMutation.apps.filter((app) => app !== newApp)
+        : [...selectedMutation.apps, newApp]
 
-    const updatedMutation = {
-      ...selectedMutation,
-      apps: updatedApps,
+      updatedMutation = {
+        ...selectedMutation,
+        apps: updatedApps,
+      }
     }
 
     setSelectedMutation(updatedMutation)
   }
 
   const handleSaveMutation = async (selectedMutation, owner) => {
-    console.log(owner)
-    console.log(selectedMutation)
-
     try {
       if (owner) {
         await engine.editMutation(selectedMutation)
@@ -253,13 +277,32 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     }
   }
 
-  const handleEditMutationId = (e) => {
-    console.log(e, 'e')
-
-    const updatedMutation = {
-      ...selectedMutation,
-      id: e.target.value,
+  const handleEditMutationId = (e, accountId) => {
+    const deleteNonLatin = (text) => {
+      return text.replace(/[^A-Za-z]/gi, '')
     }
+    let updatedMutation
+
+    if (!selectedMutation) {
+      updatedMutation = {
+        id: deleteNonLatin(e.target.value),
+        apps: [],
+        targets: [],
+        metadata: {
+          name: 'Some Mutation Name',
+        },
+        settings: {
+          isFavorite: false,
+          lastUsage: null,
+        },
+      }
+    } else {
+      updatedMutation = {
+        ...selectedMutation,
+        id: deleteNonLatin(e.target.value),
+      }
+    }
+  
 
     setSelectedMutation(updatedMutation)
   }
@@ -313,14 +356,14 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
           <Widget
             src={'bos.dapplets.near/widget/ModalSelectedMutationEditor'}
             props={{
-              mutationName: selectedMutation.metadata.name,
+              mutationName: selectedMutation ? selectedMutation.metadata.name : widgetsName,
               apps: applications,
-              selectedApps: selectedMutation.apps,
+              selectedApps: selectedMutation ? selectedMutation.apps : null,
               onClose: handleCloseMutation,
               handleResetMutation: handleRevertChanges,
               handleEditMutationName: handleEditMutationName,
               handleEditMutationApps: handleEditMutationApps,
-              selectedMutation: selectedMutation,
+              selectedMutation: selectedMutation ? selectedMutation : null,
               handleSaveMutation: handleSaveMutation,
               handleEditMutationId: handleEditMutationId,
             }}

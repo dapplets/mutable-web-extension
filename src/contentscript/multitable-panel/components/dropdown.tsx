@@ -12,7 +12,6 @@ import {
   ButtonListBlock,
   ButtonMutation,
   ImageBlock,
-  InfoWrapper,
   InputBlock,
   InputIconWrapper,
   InputInfoWrapper,
@@ -32,7 +31,6 @@ import {
   availableIcon,
   back,
   iconDropdown,
-  info,
   mutate,
   starMutationList,
   starMutationListDefault,
@@ -104,25 +102,37 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       // }}
       tabIndex={0}
     >
-      <SelectedMutationBlock data-testid="selected-mutation-block">
-        <InfoWrapper>{info}</InfoWrapper>
+      <SelectedMutationBlock
+        onClick={() => {
+          isOpen ? setVisible(true) : setVisible(false)
+          setIsOpen(!isOpen)
+        }}
+        data-testid="selected-mutation-block"
+      >
         <SelectedMutationInfo>
-          {selectedMutation && (
+          {selectedMutation ? (
             <>
               <SelectedMutationDescription>
                 {selectedMutation.metadata.name}
               </SelectedMutationDescription>
               <SelectedMutationId>{selectedMutation.id}</SelectedMutationId>
             </>
+          ) : (
+            <>
+              <SelectedMutationDescription>No mutations applied</SelectedMutationDescription>
+            </>
           )}
         </SelectedMutationInfo>
-        <StarSelectedMutationWrapper
-          onClick={() => changeSelected(selectedMutation.id, isFavorite)}
-        >
-          {selectedMutation && selectedMutation.settings.isFavorite
-            ? starSelectMutation
-            : starSelectMutationDefault}
-        </StarSelectedMutationWrapper>
+        {selectedMutation ? (
+          <StarSelectedMutationWrapper
+            onClick={() => changeSelected(selectedMutation.id, isFavorite)}
+          >
+            {selectedMutation && selectedMutation.settings.isFavorite
+              ? starSelectMutation
+              : starSelectMutationDefault}
+          </StarSelectedMutationWrapper>
+        ) : null}
+
         {isOpen ? (
           <OpenList
             onClick={() => {
@@ -155,7 +165,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               <ButtonMutation
                 onClick={() => {
                   setIsOpen(!isOpen)
-                  setWidgetsName(selectedMutation.id)
+                  setWidgetsName(selectedMutation?selectedMutation.id:'Some Mutation Name')
                 }}
               >
                 Mutate{mutate}
