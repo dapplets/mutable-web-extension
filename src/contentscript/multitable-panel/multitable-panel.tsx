@@ -190,7 +190,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   if (mutations.length === 0) {
     return null
   }
-  const handleCloseMutation = () => {
+  const handleModalClose = () => {
     setWidgetsName(null)
   }
 
@@ -201,7 +201,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     window.sessionStorage.setItem('mutableweb:mutationId', null)
   }
 
-  const handleEditMutationName = (e) => {
+  const handleMutationNameChange = (newMutationName: string) => {
     let updatedMutation
 
     if (!selectedMutation) {
@@ -210,7 +210,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
         apps: [],
         targets: [],
         metadata: {
-          name: e.target.value,
+          name: newMutationName,
         },
         settings: {
           isFavorite: false,
@@ -222,7 +222,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
         ...selectedMutation,
         metadata: {
           ...selectedMutation.metadata,
-          name: e.target.value,
+          name: newMutationName,
         },
       }
     }
@@ -235,7 +235,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setSelectedMutation(mutation)
   }
 
-  const handleEditMutationApps = (newApp) => {
+  const handleMutationAppsChange = (newApp) => {
     let updatedMutation
 
     if (!selectedMutation) {
@@ -265,19 +265,23 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setSelectedMutation(updatedMutation)
   }
 
-  const handleSaveMutation = async (selectedMutation, owner) => {
+  const handleMutationCreate = async () => {
     try {
-      if (owner) {
-        await engine.editMutation(selectedMutation)
-      } else {
-        await engine.createMutation(selectedMutation)
-      }
+      await engine.createMutation(selectedMutation)
     } catch (err) {
       console.log(err)
     }
   }
 
-  const handleEditMutationId = (e, accountId) => {
+  const handleMutationEdit = async () => {
+    try {
+      await engine.editMutation(selectedMutation)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const handleEditMutationId = (newMutationId: string) => {
     const deleteNonLatin = (text) => {
       return text.replace(/[^A-Za-z]/gi, '')
     }
@@ -285,7 +289,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     if (!selectedMutation) {
       updatedMutation = {
-        id: deleteNonLatin(e.target.value),
+        id: deleteNonLatin(newMutationId),
         apps: [],
         targets: [],
         metadata: {
@@ -299,10 +303,9 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     } else {
       updatedMutation = {
         ...selectedMutation,
-        id: deleteNonLatin(e.target.value),
+        id: deleteNonLatin(newMutationId),
       }
     }
-  
 
     setSelectedMutation(updatedMutation)
   }
@@ -354,18 +357,20 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       {widgetsName && (
         <div>
           <Widget
-            src={'bos.dapplets.near/widget/ModalSelectedMutationEditor'}
+            src="bos.dapplets.near/widget/ModalSelectedMutationEditor"
             props={{
+              mutationId: selectedMutation ? selectedMutation.id : null,
               mutationName: selectedMutation ? selectedMutation.metadata.name : widgetsName,
-              apps: applications,
+              allApps: applications,
               selectedApps: selectedMutation ? selectedMutation.apps : null,
-              onClose: handleCloseMutation,
-              handleResetMutation: handleRevertChanges,
-              handleEditMutationName: handleEditMutationName,
-              handleEditMutationApps: handleEditMutationApps,
               selectedMutation: selectedMutation ? selectedMutation : null,
-              handleSaveMutation: handleSaveMutation,
-              handleEditMutationId: handleEditMutationId,
+              onClose: handleModalClose,
+              onMutationReset: handleRevertChanges,
+              onMutationNameChange: handleMutationNameChange,
+              onMutationAppsChange: handleMutationAppsChange,
+              onMutationCreate: handleMutationCreate,
+              onMutationEdit: handleMutationEdit,
+              onMutationIdChange: handleEditMutationId,
             }}
           />
         </div>
