@@ -121,7 +121,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     selectedMutation && selectedMutation.settings.isFavorite ? selectedMutation.id : null
   )
   const [applications, setApplications] = useState<AppMetadata[] | null>(null)
-
+  const [isRevertDisable, setRevertDisable] = useState(true)
+  const [isVisibleInputId, setVisibleInputId] = useState(false)
   useEffect(() => {
     init()
   }, [engine, isFavorite])
@@ -203,7 +204,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   const handleMutationNameChange = (newMutationName: string) => {
     let updatedMutation
-
+    setRevertDisable(false)
     if (!selectedMutation) {
       updatedMutation = {
         id: '',
@@ -233,11 +234,12 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const handleRevertChanges = async () => {
     const mutation = await engine.getCurrentMutation()
     setSelectedMutation(mutation)
+    setRevertDisable(true)
   }
 
   const handleMutationAppsChange = (newApp) => {
     let updatedMutation
-
+    setRevertDisable(false)
     if (!selectedMutation) {
       updatedMutation = {
         id: '',
@@ -270,6 +272,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       await engine.createMutation(selectedMutation)
     } catch (err) {
       console.log(err)
+    } finally {
+      setRevertDisable(true)
     }
   }
 
@@ -278,18 +282,22 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       await engine.editMutation(selectedMutation)
     } catch (err) {
       console.log(err)
+    } finally {
+      setRevertDisable(true)
     }
   }
 
-  const handleEditMutationId = (newMutationId: string) => {
+  const handleEditMutationId = (newMutationId: string, loggedInAccountId) => {
     const deleteNonLatin = (text) => {
       return text.replace(/[^A-Za-z]/gi, '')
     }
     let updatedMutation
+    setRevertDisable(false)
+    setVisibleInputId(true)
 
     if (!selectedMutation) {
       updatedMutation = {
-        id: deleteNonLatin(newMutationId),
+        id: loggedInAccountId + '/' + deleteNonLatin(newMutationId),
         apps: [],
         targets: [],
         metadata: {
@@ -303,7 +311,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     } else {
       updatedMutation = {
         ...selectedMutation,
-        id: deleteNonLatin(newMutationId),
+        id: loggedInAccountId + '/' + deleteNonLatin(newMutationId),
       }
     }
 
@@ -371,6 +379,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
               onMutationCreate: handleMutationCreate,
               onMutationEdit: handleMutationEdit,
               onMutationIdChange: handleEditMutationId,
+              isRevertDisable: isRevertDisable,
+              isVisibleInputId: isVisibleInputId,
             }}
           />
         </div>
