@@ -98,6 +98,8 @@ async function main() {
       eventEmitter.emit('signedIn', message.params)
     } else if (message.type === 'SIGNED_OUT') {
       eventEmitter.emit('signedOut')
+    } else if (message.type === 'OPEN_NEW_MUTATION_POPUP') {
+      eventEmitter.emit('openMutationPopup')
     }
   })
 
@@ -105,7 +107,7 @@ async function main() {
   container.style.display = 'flex'
   document.body.appendChild(container)
   const root = createRoot(container)
-  root.render(<MultitablePanel engine={engine} />)
+  root.render(<MultitablePanel engine={engine} eventEmitter={eventEmitter} />)
 
   return engine
 }

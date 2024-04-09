@@ -1,3 +1,4 @@
+import { EventEmitter as NEventEmitter } from 'events'
 import { Engine } from 'mutable-web-engine'
 import { AppMetadata, MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import { Widget } from 'near-social-vm'
@@ -7,6 +8,7 @@ import styled from 'styled-components'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
+
 const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
   width: 100%;
   right: 0;
@@ -108,9 +110,10 @@ const iconDrag = (
 
 interface MultitablePanelProps {
   engine: Engine
+  eventEmitter: NEventEmitter
 }
 
-export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
+export const MultitablePanel: FC<MultitablePanelProps> = ({ engine, eventEmitter }) => {
   const [visible, setVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
   const [isDragging, setIsDragging] = useState(false)
@@ -133,6 +136,19 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     return () => clearTimeout(timer)
   }, [isPin])
+
+  useEffect(() => {
+    const fn = () => {
+      console.log('Mutate')
+      console.log('selectedMutation?.id', selectedMutation?.id)
+      setWidgetsName(selectedMutation?.id)
+    }
+    eventEmitter.on('openMutationPopup', fn)
+    return () => {
+      eventEmitter.off('openMutationPopup', fn)
+    }
+  }, [eventEmitter, selectedMutation])
+
   const init = async () => {
     const mutations = await engine.getMutations()
     setMutations(mutations)
@@ -142,6 +158,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     const mutation = await engine.getCurrentMutation()
     setSelectedMutation(mutation)
   }
+
   const handleStartDrag = () => {
     setIsDragging(true)
   }
@@ -185,9 +202,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setPin(!isPin)
   }
 
-  if (mutations.length === 0) {
-    return null
-  }
+  // if (mutations.length === 0) {
+  //   return null
+  // }
+
   const handleCloseMutation = () => {
     setWidgetsName(null)
   }
@@ -264,6 +282,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setSelectedMutation(updatedMutation)
   }
 
+  console.log('widgetsName', widgetsName)
+  console.log('selectedMutation', selectedMutation)
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutable-panel">
       <Draggable
