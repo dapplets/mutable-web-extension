@@ -128,6 +128,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   )
   const [isSaveDisabled, setSaveDisabled] = useState(false)
   const [saveTooltype, setSaveTooltype] = useState<null | string>(null)
+  const [isVisibleInput, setVisibleInput] = useState(false)
+
   useEffect(() => {
     init()
   }, [engine, isFavorite])
@@ -139,6 +141,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     return () => clearTimeout(timer)
   }, [isPin])
+
   const init = async () => {
     const mutations = await engine.getMutations()
     setMutations(mutations)
@@ -196,10 +199,12 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     return null
   }
   const handleModalClose = () => {
+    setVisibleInput(false)
     setWidgetsName(null)
   }
 
   const handleResetMutation = async (setIsOpen?) => {
+    setEditingMutation(null)
     setSelectedMutation(null)
     seIsFavorite(null)
     engine.stop()
@@ -294,6 +299,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       console.log(err)
     } finally {
       setRevertDisable(true)
+      setVisibleInput(false)
     }
   }
 
@@ -308,6 +314,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       console.log(err)
     } finally {
       setRevertDisable(true)
+      setVisibleInput(false)
     }
   }
 
@@ -424,6 +431,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
               saveTooltype: saveTooltype,
               setSaveDisabled: setSaveDisabled,
               setSaveTooltype: setSaveTooltype,
+              isVisibleInput: isVisibleInput,
+              setVisibleInput: setVisibleInput,
             }}
           />
         </div>
