@@ -269,7 +269,23 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   const handleMutationCreate = async () => {
     try {
-      await engine.createMutation(selectedMutation)
+      const updatedMutation = {
+        ...selectedMutation,
+        targets: [
+          {
+            namespace: 'engine',
+            contextType: 'website',
+            if: {
+              id: {
+                in: [window.location.hostname],
+              },
+            },
+          },
+        ],
+      }
+
+      setSelectedMutation(updatedMutation)
+      await engine.createMutation(updatedMutation)
     } catch (err) {
       console.log(err)
     } finally {
@@ -297,7 +313,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     if (!selectedMutation) {
       updatedMutation = {
-        id: loggedInAccountId + '/' + deleteNonLatin(newMutationId),
+        id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
         apps: [],
         targets: [],
         metadata: {
@@ -311,9 +327,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     } else {
       updatedMutation = {
         ...selectedMutation,
-        id: loggedInAccountId + '/' + deleteNonLatin(newMutationId),
+        id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
       }
     }
+    console.log(updatedMutation)
 
     setSelectedMutation(updatedMutation)
   }
