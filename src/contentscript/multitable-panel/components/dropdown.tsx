@@ -53,6 +53,7 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
   setWidgetsName: (x) => void
   isFavorite: string | null
   handleResetMutation: (x) => void
+  lastFiveMutations: MutationWithSettings[]
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
@@ -66,6 +67,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     setWidgetsName,
     isFavorite,
     handleResetMutation,
+    lastFiveMutations,
   } = props
 
   const [isAvalible, setAvalible] = useState(false)
@@ -81,18 +83,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const changeAvalibleMutations = () => {
     setAvalible(!isAvalible)
   }
-
-  const sortedMitations = mutations.sort((a, b) => {
-    const dateA = a.settings.lastUsage ? new Date(a.settings.lastUsage).getTime() : null
-    const dateB = b.settings.lastUsage ? new Date(b.settings.lastUsage).getTime() : null
-
-    if (!dateA) return 1
-    if (!dateB) return -1
-
-    return dateB - dateB
-  })
-
-  const lastFiveMutations = sortedMitations.slice(0, 5)
 
   return (
     <WrapperDropdown
@@ -177,9 +167,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                   <InputBlock
                     $enable={mut.settings.isFavorite && 'rgba(56, 75, 255, 0.1)'}
                     $enableBefore={mut.settings.isFavorite && '#34d31a'}
-                    onClick={() => {
-                      onMutationChange(mut.id)
-                    }}
                     key={i}
                   >
                     <ImageBlock>
@@ -192,7 +179,11 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                         }
                       />
                     </ImageBlock>
-                    <InputInfoWrapper>
+                    <InputInfoWrapper
+                      onClick={() => {
+                        onMutationChange(mut.id)
+                      }}
+                    >
                       {/* todo: mocked classname */}
                       <InputMutation
                         className={mut.id === selectedMutation?.id ? 'inputMutationSelected' : ''}
@@ -249,7 +240,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     className="avalibleMutationsInput"
                   >
                     <ImageBlock>
-                    <img
+                      <img
                         src={
                           mut.metadata.image && mut.metadata.image.ipfs_cid
                             ? ipfs + mut.metadata.image.ipfs_cid
