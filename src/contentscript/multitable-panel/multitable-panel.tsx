@@ -207,7 +207,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const handleMutationNameChange = (newMutationName: string) => {
     let updatedMutation
     setRevertDisable(false)
-    if (!selectedMutation) {
+    if (!editingMutation) {
       updatedMutation = {
         id: '',
         apps: [],
@@ -222,9 +222,9 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       }
     } else {
       updatedMutation = {
-        ...selectedMutation,
+        ...editingMutation,
         metadata: {
-          ...selectedMutation.metadata,
+          ...editingMutation.metadata,
           name: newMutationName,
         },
       }
@@ -243,7 +243,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const handleMutationAppsChange = (newApp) => {
     let updatedMutation
     setRevertDisable(false)
-    if (!selectedMutation) {
+    if (!editingMutation) {
       updatedMutation = {
         id: '',
         apps: [newApp],
@@ -257,12 +257,12 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
         },
       }
     } else {
-      const updatedApps = selectedMutation.apps.includes(newApp)
-        ? selectedMutation.apps.filter((app) => app !== newApp)
-        : [...selectedMutation.apps, newApp]
+      const updatedApps = editingMutation.apps.includes(newApp)
+        ? editingMutation.apps.filter((app) => app !== newApp)
+        : [...editingMutation.apps, newApp]
 
       updatedMutation = {
-        ...selectedMutation,
+        ...editingMutation,
         apps: updatedApps,
       }
     }
@@ -273,7 +273,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const handleMutationCreate = async () => {
     try {
       const updatedMutation = {
-        ...selectedMutation,
+        ...editingMutation,
         targets: [
           {
             namespace: 'engine',
@@ -286,8 +286,6 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
           },
         ],
       }
-      console.log('create')
-      console.log(updatedMutation)
       setSelectedMutation(updatedMutation)
       await engine.createMutation(updatedMutation)
     } catch (err) {
@@ -299,9 +297,11 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   const handleMutationEdit = async () => {
     try {
-      console.log(selectedMutation)
-      console.log('edit')
-      await engine.editMutation(selectedMutation)
+      let updatedMutation = {
+        ...editingMutation,
+        id: selectedMutation.id,
+      }
+      await engine.editMutation(updatedMutation)
     } catch (err) {
       console.log(err)
     } finally {
@@ -317,7 +317,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     setRevertDisable(false)
     setVisibleInputId(true)
 
-    if (!selectedMutation) {
+    if (!editingMutation) {
       updatedMutation = {
         id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
         apps: [],
@@ -332,11 +332,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       }
     } else {
       updatedMutation = {
-        ...selectedMutation,
+        ...editingMutation,
         id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
       }
     }
-    console.log(updatedMutation)
 
     setEditingMutation(updatedMutation)
   }
@@ -352,7 +351,6 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   })
 
   const lastFiveMutations = sortedMitations.slice(0, 5)
-  console.log(editingMutation, 'editingMutation')
 
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutable-panel">
