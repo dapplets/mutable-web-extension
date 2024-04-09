@@ -165,7 +165,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               <ButtonMutation
                 onClick={() => {
                   setIsOpen(!isOpen)
-                  setWidgetsName(selectedMutation?selectedMutation.id:'Some Mutation Name')
+                  setWidgetsName(selectedMutation ? selectedMutation.id : 'Some Mutation Name')
                 }}
               >
                 Mutate{mutate}
@@ -184,7 +184,13 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                   >
                     <ImageBlock>
                       {' '}
-                      <img src={ipfs + mut.metadata.image.ipfs_cid} />
+                      <img
+                        src={
+                          mut.metadata.image && mut.metadata.image.ipfs_cid
+                            ? ipfs + mut.metadata.image.ipfs_cid
+                            : null
+                        }
+                      />
                     </ImageBlock>
                     <InputInfoWrapper>
                       {/* todo: mocked classname */}
@@ -243,7 +249,13 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     className="avalibleMutationsInput"
                   >
                     <ImageBlock>
-                      <img src={ipfs + mut.metadata.image.ipfs_cid} />
+                    <img
+                        src={
+                          mut.metadata.image && mut.metadata.image.ipfs_cid
+                            ? ipfs + mut.metadata.image.ipfs_cid
+                            : null
+                        }
+                      />
                     </ImageBlock>
                     <InputInfoWrapper>
                       <InputMutation>{mut.metadata.name}</InputMutation>

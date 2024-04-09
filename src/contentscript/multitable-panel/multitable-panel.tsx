@@ -283,6 +283,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
           },
         ],
       }
+      console.log('create')
 
       setSelectedMutation(updatedMutation)
       await engine.createMutation(updatedMutation)
@@ -295,6 +296,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   const handleMutationEdit = async () => {
     try {
+      console.log('edit')
       await engine.editMutation(selectedMutation)
     } catch (err) {
       console.log(err)
