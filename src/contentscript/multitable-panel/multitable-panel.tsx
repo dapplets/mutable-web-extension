@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
+
 const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
   width: 100%;
   right: 0;
@@ -14,6 +15,7 @@ const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
   z-index: 5000;
   top: 0;
   background: transparent;
+  height: 5px;
 
   &::before {
     content: '';
@@ -126,6 +128,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [editingMutation, setEditingMutation] = useState<MutationWithSettings | null>(
     JSON.parse(JSON.stringify(selectedMutation))
   )
+
   useEffect(() => {
     init()
   }, [engine, isFavorite])
@@ -137,6 +140,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     return () => clearTimeout(timer)
   }, [isPin])
+
   const init = async () => {
     const mutations = await engine.getMutations()
     setMutations(mutations)
@@ -146,6 +150,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     const mutation = await engine.getCurrentMutation()
     setSelectedMutation(mutation)
   }
+
   const handleStartDrag = () => {
     setIsDragging(true)
   }
@@ -193,11 +198,12 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   if (mutations.length === 0) {
     return null
   }
+
   const handleModalClose = () => {
     setWidgetsName(null)
   }
 
-  const handleResetMutation = async (setIsOpen?) => {
+  const handleResetMutation = async () => {
     setSelectedMutation(null)
     seIsFavorite(null)
     engine.stop()
@@ -362,40 +368,42 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
         onStop={handleStopDrag}
         defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
       >
-        {/* ToDo: refactor className */}
-        <NorthPanel
-          data-testid="north-panel"
-          className={
-            isPin
-              ? 'visible-pin'
-              : visible && !isDragging
-              ? 'visible-north-panel'
-              : 'visible-default'
-          }
-          $isAnimated={!isDragging}
-        >
-          <DragWrapper className="dragWrapper">
-            <DragIconWrapper>
-              {/* ToDo: replace with one icon */}
-              {iconDrag}
-              {iconDrag}
-              {iconDrag}
-            </DragIconWrapper>
-          </DragWrapper>
-          <Dropdown
-            mutations={mutations}
-            selectedMutation={selectedMutation}
-            onMutationChange={handleMutationChange}
-            setVisible={setVisible}
-            changeSelected={changeSelected}
-            engine={engine}
-            setWidgetsName={setWidgetsName}
-            isFavorite={isFavorite}
-            handleResetMutation={handleResetMutation}
-            lastFiveMutations={lastFiveMutations}
-          />
-          <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
-        </NorthPanel>
+        <span style={{ position: 'fixed', height: 5 }}>
+          {/* ToDo: refactor className */}
+          <NorthPanel
+            data-testid="north-panel"
+            className={
+              isPin
+                ? 'visible-pin'
+                : visible && !isDragging
+                ? 'visible-north-panel'
+                : 'visible-default'
+            }
+            $isAnimated={!isDragging}
+          >
+            <DragWrapper className="dragWrapper">
+              <DragIconWrapper>
+                {/* ToDo: replace with one icon */}
+                {iconDrag}
+                {iconDrag}
+                {iconDrag}
+              </DragIconWrapper>
+            </DragWrapper>
+            <Dropdown
+              mutations={mutations}
+              selectedMutation={selectedMutation}
+              onMutationChange={handleMutationChange}
+              setVisible={setVisible}
+              changeSelected={changeSelected}
+              engine={engine}
+              setWidgetsName={setWidgetsName}
+              isFavorite={isFavorite}
+              handleResetMutation={handleResetMutation}
+              lastFiveMutations={lastFiveMutations}
+            />
+            <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
+          </NorthPanel>
+        </span>
       </Draggable>
       {widgetsName && (
         <div>
