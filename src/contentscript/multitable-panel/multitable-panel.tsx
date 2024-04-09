@@ -126,6 +126,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   const [editingMutation, setEditingMutation] = useState<MutationWithSettings | null>(
     JSON.parse(JSON.stringify(selectedMutation))
   )
+  const [isSaveDisabled, setSaveDisabled] = useState(false)
+  const [saveTooltype, setSaveTooltype] = useState<null | string>(null)
   useEffect(() => {
     init()
   }, [engine, isFavorite])
@@ -418,6 +420,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
               isVisibleInputId: isVisibleInputId,
               setVisibleInputId: setVisibleInputId,
               editingMutation: editingMutation ? editingMutation : null,
+              isSaveDisabled: isSaveDisabled,
+              saveTooltype: saveTooltype,
+              setSaveDisabled: setSaveDisabled,
+              setSaveTooltype: setSaveTooltype,
             }}
           />
         </div>
