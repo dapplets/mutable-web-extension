@@ -114,16 +114,15 @@ export const OpenList = styled.span`
     }
   }
 `
-export const InfoWrapper = styled.span`
-  cursor: pointer;
-  display: inline-block;
-  padding-top: 4px;
-`
 
 export const StarSelectedMutationWrapper = styled.span`
   cursor: pointer;
   display: inline-block;
   padding-top: 4px;
+  transition: all 0.2s ease;
+  &:hover {
+    transform: scale(1.2);
+  }
 `
 
 export const MutationsList = styled.div`
@@ -197,8 +196,13 @@ export const ButtonBack = styled.div`
   cursor: pointer;
   z-index: 1;
   width: 40%;
+  height: 100%;
+  transition: all 0.2s ease;
   svg {
     margin-right: 5px;
+  }
+  &:hover {
+    background: rgba(56, 75, 255, 0.1);
   }
 `
 
@@ -214,8 +218,13 @@ export const ButtonMutation = styled.div`
   cursor: pointer;
   z-index: 1;
   width: 40%;
+  height: 100%;
+  transition: all 0.2s ease;
   svg {
     margin-left: 5px;
+  }
+  &:hover {
+    background: rgba(56, 75, 255, 0.1);
   }
 `
 
@@ -250,8 +259,12 @@ export const InputBlock = styled.div<{ isActive?: boolean }>`
 export const InputIconWrapper = styled.span`
   display: inline-block;
   padding-right: 3px;
+  transition: all 0.2s ease;
   svg {
     margin-top: 5px;
+  }
+  &:hover {
+    transform: scale(1.2);
   }
 `
 
@@ -300,6 +313,9 @@ export const AvalibleMutations = styled.div<{ $enable?: string; $enableBefore?: 
     border-radius: 4px;
     padding: 2px 4px;
     margin-bottom: 3px;
+    &:hover {
+      background: rgba(24, 121, 206, 0.08);
+    }
   }
 `
 
@@ -328,6 +344,8 @@ export const AvalibleArrowBlock = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: all 0.2s ease;
+  cursor: pointer;
   svg {
     margin-left: 10px;
     transform: rotate(180deg);
