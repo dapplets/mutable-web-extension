@@ -7,8 +7,10 @@ export type MutableWebContextState = {
   apps: AppMetadata[]
   selectedMutation: MutationWithSettings | null
   isLoading: boolean
+  favoriteMutationId: string | null
   stopEngine: () => void
   switchMutation: (mutationId: string) => void
+  setFavoriteMutation: (mutationId: string | null) => void
 }
 
 export const contextDefaultValues: MutableWebContextState = {
@@ -17,8 +19,10 @@ export const contextDefaultValues: MutableWebContextState = {
   apps: [],
   isLoading: false,
   selectedMutation: null,
+  favoriteMutationId: null,
   stopEngine: () => undefined,
   switchMutation: () => undefined,
+  setFavoriteMutation: () => undefined,
 }
 
 export const MutableWebContext = createContext<MutableWebContextState>(contextDefaultValues)

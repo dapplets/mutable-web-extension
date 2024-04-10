@@ -115,18 +115,15 @@ const DragIcon = () => (
 )
 
 export const MultitablePanel: FC = () => {
-  const { engine, mutations, apps, selectedMutation, switchMutation, stopEngine } = useMutableWeb()
-  const [visible, setVisible] = useState(false)
+  const { mutations, apps, selectedMutation, switchMutation, stopEngine } = useMutableWeb()
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
   const [isDragging, setIsDragging] = useState(false)
-  const [widgetsName, setWidgetsName] = useState<string | null>(null)
-  const [isFavorite, seIsFavorite] = useState<string | null>(
-    selectedMutation && selectedMutation.settings.isFavorite ? selectedMutation.id : null
-  )
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setVisible(true)
+      setIsDropdownVisible(true)
     }, 5000)
 
     return () => clearTimeout(timer)
@@ -142,29 +139,7 @@ export const MultitablePanel: FC = () => {
 
   const handleMutationChange = async (mutationId: string) => {
     switchMutation(mutationId)
-  }
-
-  const changeSelected = async (mutationId: string) => {
-    if (
-      selectedMutation &&
-      mutationId === selectedMutation.id &&
-      selectedMutation.settings.isFavorite
-    ) {
-      await engine.setFavoriteMutation(null)
-      seIsFavorite(null)
-      // await init()
-    } else if (
-      selectedMutation &&
-      mutationId === selectedMutation.id &&
-      !selectedMutation.settings.isFavorite
-    ) {
-      await engine.setFavoriteMutation(mutationId)
-      seIsFavorite(mutationId)
-      // await init()
-    } else {
-      await engine.removeMutationFromRecents(mutationId)
-      // await init()
-    }
+    setIsDropdownVisible(false)
   }
 
   const handlePin = () => {
@@ -179,13 +154,19 @@ export const MultitablePanel: FC = () => {
   if (mutations.length === 0) {
     return null
   }
-  const handleModalClose = () => {
-    setWidgetsName(null)
+
+  const handleMutateButtonClick = () => {
+    setIsModalOpen(true)
+    setIsDropdownVisible(false)
   }
 
-  const handleResetMutation = async () => {
-    seIsFavorite(null)
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+  }
+
+  const handleOriginalButtonClick = async () => {
     stopEngine()
+    setIsDropdownVisible(false)
   }
 
   const sortedMitations = mutations.sort((a, b) => {
@@ -216,7 +197,7 @@ export const MultitablePanel: FC = () => {
           className={
             isPin
               ? 'visible-pin'
-              : visible && !isDragging
+              : isDropdownVisible && !isDragging
               ? 'visible-north-panel'
               : 'visible-default'
           }
@@ -228,29 +209,24 @@ export const MultitablePanel: FC = () => {
             </DragIconWrapper>
           </DragWrapper>
           <Dropdown
-            mutations={mutations}
-            selectedMutation={selectedMutation}
-            onMutationChange={handleMutationChange}
-            setVisible={setVisible}
-            changeSelected={changeSelected}
-            engine={engine}
-            setWidgetsName={setWidgetsName}
-            isFavorite={isFavorite}
-            handleResetMutation={handleResetMutation}
+            isVisible={isDropdownVisible}
             lastFiveMutations={lastFiveMutations}
+            onVisibilityChange={setIsDropdownVisible}
+            onMutationChange={handleMutationChange}
+            onMutateButtonClick={handleMutateButtonClick}
+            onOriginalButtonClick={handleOriginalButtonClick}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>
       </Draggable>
-      {widgetsName && (
-        <div>
-          <MutationEditorModal
-            apps={apps}
-            baseMutation={selectedMutation}
-            onClose={handleModalClose}
-          />
-        </div>
-      )}
+
+      {isModalOpen ? (
+        <MutationEditorModal
+          apps={apps}
+          baseMutation={selectedMutation}
+          onClose={handleModalClose}
+        />
+      ) : null}
     </WrapperPanel>
   )
 }

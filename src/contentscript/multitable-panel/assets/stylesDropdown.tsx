@@ -227,7 +227,7 @@ export const ListMutations = styled.div`
   margin-bottom: 10px;
 `
 
-export const InputBlock = styled.div<{ $enable?: string; $enableBefore?: string }>`
+export const InputBlock = styled.div<{ isActive?: boolean }>`
   display: flex;
 
   padding: 2px 4px;
@@ -236,11 +236,11 @@ export const InputBlock = styled.div<{ $enable?: string; $enableBefore?: string 
   align-items: center;
   width: 100%;
 
-  background: ${(props) => props.$enable || '#fff'};
+  background: ${(props) => (props.isActive ? 'rgba(56, 75, 255, 0.1)' : '#fff')};
   border-radius: 4px;
 
   .inputMutation {
-    background: ${(props) => props.$enable || '#fff'};
+    background: ${(props) => (props.isActive ? 'rgba(56, 75, 255, 0.1)' : '#fff')};
   }
 
   &:hover {

@@ -97,7 +97,7 @@ const createEmptyMutation = (accountId: string): Mutation => ({
   id: `${accountId}/mutation/Untitled`,
   apps: [],
   metadata: {
-    name: 'New mutation',
+    name: '',
   },
   targets: [
     {

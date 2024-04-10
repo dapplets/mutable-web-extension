@@ -12,16 +12,20 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
   const [selectedMutation, setSelectedMutation] = useState<MutationWithSettings | null>(null)
   const [mutations, setMutations] = useState<MutationWithSettings[]>([])
   const [apps, setApps] = useState<AppMetadata[]>([])
+  const [favoriteMutationId, setFavoriteMutationId] = useState<string | null>(null)
 
   const loadMutations = async (engine: Engine) => {
-    const mutations = await engine.getMutations()
+    const [mutations, allApps, selectedMutation, favoriteMutationId] = await Promise.all([
+      engine.getMutations(),
+      engine.getApplications(),
+      engine.getCurrentMutation(),
+      engine.getFavoriteMutation(),
+    ])
+
     setMutations(mutations)
-
-    const allApps = await engine.getApplications()
     setApps(allApps)
-
-    const mutation = await engine.getCurrentMutation()
-    setSelectedMutation(mutation)
+    setSelectedMutation(selectedMutation)
+    setFavoriteMutationId(favoriteMutationId)
   }
 
   useEffect(() => {
@@ -61,14 +65,28 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
     window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
   }
 
+  const setFavoriteMutation = async (mutationId: string | null) => {
+    const previousFavoriteMutationId = favoriteMutationId
+
+    try {
+      setFavoriteMutationId(mutationId)
+      await engine.setFavoriteMutation(mutationId)
+    } catch (err) {
+      console.error(err)
+      setFavoriteMutationId(previousFavoriteMutationId)
+    }
+  }
+
   const state: MutableWebContextState = {
     engine,
     mutations,
     apps,
     selectedMutation,
     isLoading,
+    favoriteMutationId,
     stopEngine,
     switchMutation,
+    setFavoriteMutation,
   }
 
   return <MutableWebContext.Provider value={state}>{children}</MutableWebContext.Provider>

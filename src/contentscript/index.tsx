@@ -10,7 +10,6 @@ import Background from './background'
 import { MutableWebProvider } from './contexts/mutable-web-context'
 import { ExtensionStorage } from './extension-storage'
 import { MultitablePanel } from './multitable-panel/multitable-panel'
-import { getCurrentMutationId, setCurrentMutationId } from './storage'
 import { setupWallet } from './wallet'
 
 const eventEmitter = new NEventEmitter()
@@ -55,11 +54,6 @@ async function main() {
   createRoot(document.createElement('div')).render(<App />)
 
   const tabState = await Background.popTabState()
-
-  if (tabState?.mutationId) {
-    setCurrentMutationId(tabState?.mutationId)
-  }
-
   const selector = await selectorPromise
 
   const engine = new Engine({
@@ -69,13 +63,13 @@ async function main() {
     storage: new ExtensionStorage('mutableweb'),
   })
 
-  const mutationId = getCurrentMutationId()
+  const mutationIdToLoad = tabState?.mutationId
 
   console.log('Mutable Web Engine is initializing...')
 
-  if (mutationId) {
+  if (mutationIdToLoad) {
     try {
-      await engine.start(mutationId)
+      await engine.start(mutationIdToLoad)
     } catch (err) {
       console.error(err)
       await engine.start()
