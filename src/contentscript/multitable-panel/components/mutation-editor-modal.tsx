@@ -182,6 +182,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       } else if (mode === MutationModalMode.Editing) {
         await engine.editMutation(editingMutation)
       }
+
+      onClose()
     } catch (err) {
       console.error(err)
     } finally {
