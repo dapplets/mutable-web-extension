@@ -50,9 +50,9 @@ export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HT
   setVisible: (visible: boolean) => void
   changeSelected: (mutationId: string, isFavorite: string | null) => void
   engine: Engine
-  setWidgetsName: (x) => void
+  setWidgetsName: (x: string | null) => void
   isFavorite: string | null
-  handleResetMutation: (x) => void
+  handleResetMutation: () => void
   lastFiveMutations: MutationWithSettings[]
 }
 
@@ -99,7 +99,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
         data-testid="selected-mutation-block"
       >
         <SelectedMutationInfo>
-          {selectedMutation ? (
+          {selectedMutation && selectedMutation.metadata ? (
             <>
               <SelectedMutationDescription>
                 {selectedMutation.metadata.name}
@@ -148,9 +148,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
           {' '}
           <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
             <ButtonListBlock>
-              <ButtonBack onClick={() => handleResetMutation(setIsOpen)}>
-                {back}to Original
-              </ButtonBack>
+              <ButtonBack onClick={handleResetMutation}>{back}to Original</ButtonBack>
               <ButtonMutation
                 onClick={() => {
                   setIsOpen(!isOpen)
@@ -172,9 +170,9 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                       {' '}
                       <img
                         src={
-                          mut.metadata.image && mut.metadata.image.ipfs_cid
+                          mut.metadata && mut.metadata.image && mut.metadata.image.ipfs_cid
                             ? ipfs + mut.metadata.image.ipfs_cid
-                            : null
+                            : undefined
                         }
                       />
                     </ImageBlock>
@@ -187,7 +185,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                       <InputMutation
                         className={mut.id === selectedMutation?.id ? 'inputMutationSelected' : ''}
                       >
-                        {mut.metadata.name}
+                        {mut.metadata ? mut.metadata.name : ''}
                       </InputMutation>
                       {/* todo: mocked classname */}
                       <AuthorMutation
@@ -237,14 +235,14 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                     <ImageBlock>
                       <img
                         src={
-                          mut.metadata.image && mut.metadata.image.ipfs_cid
+                          mut.metadata && mut.metadata.image && mut.metadata.image.ipfs_cid
                             ? ipfs + mut.metadata.image.ipfs_cid
-                            : null
+                            : undefined
                         }
                       />
                     </ImageBlock>
                     <InputInfoWrapper>
-                      <InputMutation>{mut.metadata.name}</InputMutation>
+                      <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
                       <AuthorMutation>{mut.id}</AuthorMutation>
                     </InputInfoWrapper>
                   </InputBlock>
