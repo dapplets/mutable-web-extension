@@ -9,7 +9,6 @@ const Card = styled.div`
   border-radius: 10px;
   background: #fff;
   border: 1px solid #eceef0;
-  box-sizing: border-box;
   font-family: sans-serif;
   &:hover {
     background: rgba(24, 121, 206, 0.1);
@@ -100,7 +99,7 @@ const ButtonLink = styled.button`
   }
 `
 
-const PlusIcon = () => (
+const UncheckedIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
     <rect
       x="3.75"
@@ -128,7 +127,7 @@ const PlusIcon = () => (
   </svg>
 )
 
-const SelectIcon = () => (
+const CheckedIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
     <path
       d="M3.75 0C2.75544 0 1.80161 0.395088 1.09835 1.09835C0.395088 1.80161 0 2.75544 0 3.75V14.25C0 15.2446 0.395088 16.1984 1.09835 16.9016C1.80161 17.6049 2.75544 18 3.75 18H14.25C15.2446 18 16.1984 17.6049 16.9016 16.9016C17.6049 16.1984 18 15.2446 18 14.25V3.75C18 2.75544 17.6049 1.80161 16.9016 1.09835C16.1984 0.395088 15.2446 0 14.25 0H3.75ZM13.281 7.281L8.031 12.531C7.96133 12.6008 7.87857 12.6563 7.78745 12.6941C7.69633 12.7319 7.59865 12.7513 7.5 12.7513C7.40135 12.7513 7.30367 12.7319 7.21255 12.6941C7.12143 12.6563 7.03867 12.6008 6.969 12.531L4.719 10.281C4.64927 10.2113 4.59395 10.1285 4.55621 10.0374C4.51848 9.94627 4.49905 9.84862 4.49905 9.75C4.49905 9.65138 4.51848 9.55373 4.55621 9.46262C4.59395 9.37152 4.64927 9.28873 4.719 9.219C4.85983 9.07817 5.05084 8.99905 5.25 8.99905C5.34862 8.99905 5.44627 9.01848 5.53738 9.05622C5.62848 9.09395 5.71127 9.14927 5.781 9.219L7.5 10.9395L12.219 6.219C12.3598 6.07817 12.5508 5.99905 12.75 5.99905C12.9492 5.99905 13.1402 6.07817 13.281 6.219C13.4218 6.35983 13.5009 6.55084 13.5009 6.75C13.5009 6.94916 13.4218 7.14017 13.281 7.281Z"
@@ -140,40 +139,40 @@ const SelectIcon = () => (
 export interface Props {
   src: string
   metadata: AppMetadata['metadata']
-  selectedApps: string | null
-  handleEditMutationApps: (appId: string) => void
+  isChecked: boolean
+  onChange: (isChecked: boolean) => void
 }
 
-export const ApplicationCard: React.FC<Props> = (props) => {
-  const [accountId, , widgetName] = props.src.split('/')
+export const ApplicationCard: React.FC<Props> = ({ src, metadata, isChecked, onChange }) => {
+  const [accountId, , widgetName] = src.split('/')
 
   return (
     <Card>
       <CardBody>
         <Thumbnail>
           <Image
-            image={props.metadata.image}
+            image={metadata.image}
             fallbackUrl="https://ipfs.near.social/ipfs/bafkreifc4burlk35hxom3klq4mysmslfirj7slueenbj7ddwg7pc6ixomu"
-            alt={props.metadata.name}
+            alt={metadata.name}
           />
         </Thumbnail>
 
         <CardContent>
           <TextLink bold ellipsis>
-            {props.metadata.name || widgetName}
+            {metadata.name || widgetName}
           </TextLink>
 
           <TextLink small ellipsis>
             @{accountId}
           </TextLink>
         </CardContent>
-        {!props.selectedApps ? (
-          <ButtonLink onClick={() => props.handleEditMutationApps(props.src)}>
-            <PlusIcon />
+        {isChecked ? (
+          <ButtonLink onClick={() => onChange(!isChecked)}>
+            <CheckedIcon />
           </ButtonLink>
         ) : (
-          <ButtonLink onClick={() => props.handleEditMutationApps(props.src)}>
-            <SelectIcon />
+          <ButtonLink onClick={() => onChange(!isChecked)}>
+            <UncheckedIcon />
           </ButtonLink>
         )}
       </CardBody>

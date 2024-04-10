@@ -140,7 +140,6 @@ export const MutationsList = styled.div`
   box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
 
   width: 318px;
-  box-sizing: border-box;
   left: -26px;
   top: 38px;
   border-radius: 0px 0px 10px 10px;
@@ -235,7 +234,6 @@ export const InputBlock = styled.div<{ $enable?: string; $enableBefore?: string 
   cursor: pointer;
 
   align-items: center;
-  box-sizing: border-box;
   width: 100%;
 
   background: ${(props) => props.$enable || '#fff'};
@@ -268,7 +266,6 @@ export const InputInfoWrapper = styled.div`
 
   flex-direction: column;
   align-items: flex-start;
-  box-sizing: border-box;
   width: 100%;
   .inputMutationSelected {
     color: rgba(34, 34, 34, 1);

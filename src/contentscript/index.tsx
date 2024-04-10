@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client'
 import browser from 'webextension-polyfill'
 import { networkConfig } from '../common/networks'
 import Background from './background'
+import { MutableWebProvider } from './contexts/mutable-web-context'
 import { ExtensionStorage } from './extension-storage'
 import { MultitablePanel } from './multitable-panel/multitable-panel'
 import { getCurrentMutationId, setCurrentMutationId } from './storage'
@@ -104,7 +105,11 @@ async function main() {
   container.style.display = 'flex'
   document.body.appendChild(container)
   const root = createRoot(container)
-  root.render(<MultitablePanel engine={engine} />)
+  root.render(
+    <MutableWebProvider engine={engine}>
+      <MultitablePanel />
+    </MutableWebProvider>
+  )
 
   return engine
 }

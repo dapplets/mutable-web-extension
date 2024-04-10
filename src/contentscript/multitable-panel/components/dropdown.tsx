@@ -46,7 +46,7 @@ import 'simplebar-react/dist/simplebar.min.css'
 export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   mutations: MutationWithSettings[]
   selectedMutation: MutationWithSettings | null
-  onMutationChange: (mutationId: string | null) => void
+  onMutationChange: (mutationId: string) => void
   setVisible: (visible: boolean) => void
   changeSelected: (mutationId: string, isFavorite: string | null) => void
   engine: Engine
