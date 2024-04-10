@@ -14,17 +14,17 @@ const SelectedMutationEditorWrapper = styled.div`
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 100px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   padding: 20px;
-  gap: 20px;
+  gap: 10px;
   border-radius: 10px;
   font-family: sans-serif;
   border: 1px solid #02193a;
   background: #f8f9ff;
   width: 400px;
-  max-height: 600px;
+  max-height: 500px;
 `
 
 const Close = styled.span`

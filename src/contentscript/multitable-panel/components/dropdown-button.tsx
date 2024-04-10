@@ -91,7 +91,7 @@ const DropdownButtonItem = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 41px;
+  height: 31px;
   border-radius: 4px;
   cursor: pointer;
   &:hover {
