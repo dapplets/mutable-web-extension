@@ -37,7 +37,6 @@ import {
   starSelectMutationDefault,
   trash,
 } from '../assets/vectors'
-import { ipfs } from '../constants'
 
 import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import 'simplebar-react/dist/simplebar.min.css'
@@ -226,13 +225,7 @@ export const Dropdown: FC<DropdownProps> = ({
                         className="avalibleMutationsInput"
                       >
                         <ImageBlock>
-                          <img
-                            src={
-                              mut.metadata && mut.metadata.image && mut.metadata.image.ipfs_cid
-                                ? ipfs + mut.metadata.image.ipfs_cid
-                                : undefined
-                            }
-                          />
+                          <Image image={mut.metadata.image} />
                         </ImageBlock>
                         <InputInfoWrapper>
                           <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
