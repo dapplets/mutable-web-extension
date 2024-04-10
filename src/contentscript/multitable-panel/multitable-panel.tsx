@@ -121,6 +121,14 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     selectedMutation && selectedMutation.settings.isFavorite ? selectedMutation.id : null
   )
   const [applications, setApplications] = useState<AppMetadata[] | null>(null)
+  const [isRevertDisable, setRevertDisable] = useState(true)
+  const [isVisibleInputId, setVisibleInputId] = useState(false)
+  const [editingMutation, setEditingMutation] = useState<MutationWithSettings | null>(
+    JSON.parse(JSON.stringify(selectedMutation))
+  )
+  const [isSaveDisabled, setSaveDisabled] = useState(false)
+  const [saveTooltype, setSaveTooltype] = useState<null | string>(null)
+  const [isVisibleInput, setVisibleInput] = useState(false)
 
   useEffect(() => {
     init()
@@ -133,6 +141,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
     return () => clearTimeout(timer)
   }, [isPin])
+
   const init = async () => {
     const mutations = await engine.getMutations()
     setMutations(mutations)
@@ -158,9 +167,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     }
 
     setSelectedMutation(mutation)
-
+    setEditingMutation(mutation)
     await engine.switchMutation(mutation.id)
-
     window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
     widgetsName
       ? setWidgetsName(mutation ? mutation.id : 'Some Mutation Name')
@@ -195,10 +203,12 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     return null
   }
   const handleModalClose = () => {
+    setVisibleInput(false)
     setWidgetsName(null)
   }
 
   const handleResetMutation = async (setIsOpen?) => {
+    setEditingMutation(null)
     setSelectedMutation(null)
     seIsFavorite(null)
     engine.stop()
@@ -207,8 +217,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   const handleMutationNameChange = (newMutationName: string) => {
     let updatedMutation
-
-    if (!selectedMutation) {
+    setRevertDisable(false)
+    if (!editingMutation) {
       updatedMutation = {
         id: '',
         apps: [],
@@ -223,26 +233,28 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       }
     } else {
       updatedMutation = {
-        ...selectedMutation,
+        ...editingMutation,
         metadata: {
-          ...selectedMutation.metadata,
+          ...editingMutation.metadata,
           name: newMutationName,
         },
       }
     }
 
-    setSelectedMutation(updatedMutation)
+    setEditingMutation(updatedMutation)
   }
 
   const handleRevertChanges = async () => {
     const mutation = await engine.getCurrentMutation()
     setSelectedMutation(mutation)
+    setEditingMutation(mutation)
+    setRevertDisable(true)
   }
 
   const handleMutationAppsChange = (newApp) => {
     let updatedMutation
-
-    if (!selectedMutation) {
+    setRevertDisable(false)
+    if (!editingMutation) {
       updatedMutation = {
         id: '',
         apps: [newApp],
@@ -256,44 +268,71 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
         },
       }
     } else {
-      const updatedApps = selectedMutation.apps.includes(newApp)
-        ? selectedMutation.apps.filter((app) => app !== newApp)
-        : [...selectedMutation.apps, newApp]
+      const updatedApps = editingMutation.apps.includes(newApp)
+        ? editingMutation.apps.filter((app) => app !== newApp)
+        : [...editingMutation.apps, newApp]
 
       updatedMutation = {
-        ...selectedMutation,
+        ...editingMutation,
         apps: updatedApps,
       }
     }
-
-    setSelectedMutation(updatedMutation)
+    console.log(updatedMutation)
+    setEditingMutation(updatedMutation)
   }
 
   const handleMutationCreate = async () => {
     try {
-      await engine.createMutation(selectedMutation)
+      const updatedMutation = {
+        ...editingMutation,
+        targets: [
+          {
+            namespace: 'engine',
+            contextType: 'website',
+            if: {
+              id: {
+                in: [window.location.hostname],
+              },
+            },
+          },
+        ],
+      }
+      setSelectedMutation(updatedMutation)
+      await engine.createMutation(updatedMutation)
     } catch (err) {
       console.log(err)
+    } finally {
+      setRevertDisable(true)
+      setVisibleInput(false)
     }
   }
 
   const handleMutationEdit = async () => {
     try {
-      await engine.editMutation(selectedMutation)
+      let updatedMutation = {
+        ...editingMutation,
+        id: selectedMutation.id,
+      }
+      await engine.editMutation(updatedMutation)
     } catch (err) {
       console.log(err)
+    } finally {
+      setRevertDisable(true)
+      setVisibleInput(false)
     }
   }
 
-  const handleEditMutationId = (newMutationId: string) => {
+  const handleEditMutationId = (newMutationId: string, loggedInAccountId) => {
     const deleteNonLatin = (text) => {
       return text.replace(/[^A-Za-z]/gi, '')
     }
     let updatedMutation
+    setRevertDisable(false)
+    setVisibleInputId(true)
 
-    if (!selectedMutation) {
+    if (!editingMutation) {
       updatedMutation = {
-        id: deleteNonLatin(newMutationId),
+        id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
         apps: [],
         targets: [],
         metadata: {
@@ -306,13 +345,25 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       }
     } else {
       updatedMutation = {
-        ...selectedMutation,
-        id: deleteNonLatin(newMutationId),
+        ...editingMutation,
+        id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
       }
     }
 
-    setSelectedMutation(updatedMutation)
+    setEditingMutation(updatedMutation)
   }
+
+  const sortedMitations = mutations.sort((a, b) => {
+    const dateA = a.settings.lastUsage ? new Date(a.settings.lastUsage).getTime() : null
+    const dateB = b.settings.lastUsage ? new Date(b.settings.lastUsage).getTime() : null
+
+    if (!dateA) return 1
+    if (!dateB) return -1
+
+    return dateB - dateB
+  })
+
+  const lastFiveMutations = sortedMitations.slice(0, 5)
 
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutable-panel">
@@ -354,6 +405,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
             setWidgetsName={setWidgetsName}
             isFavorite={isFavorite}
             handleResetMutation={handleResetMutation}
+            lastFiveMutations={lastFiveMutations}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>
@@ -363,10 +415,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
           <Widget
             src="bos.dapplets.near/widget/ModalSelectedMutationEditor"
             props={{
-              mutationId: selectedMutation ? selectedMutation.id : null,
-              mutationName: selectedMutation ? selectedMutation.metadata.name : widgetsName,
+              mutationId: editingMutation ? editingMutation.id : null,
+              mutationName: editingMutation ? editingMutation.metadata.name : widgetsName,
               allApps: applications,
-              selectedApps: selectedMutation ? selectedMutation.apps : null,
+              selectedApps: editingMutation ? editingMutation.apps : null,
               selectedMutation: selectedMutation ? selectedMutation : null,
               onClose: handleModalClose,
               onMutationReset: handleRevertChanges,
@@ -375,6 +427,16 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
               onMutationCreate: handleMutationCreate,
               onMutationEdit: handleMutationEdit,
               onMutationIdChange: handleEditMutationId,
+              isRevertDisable: isRevertDisable,
+              isVisibleInputId: isVisibleInputId,
+              setVisibleInputId: setVisibleInputId,
+              editingMutation: editingMutation ? editingMutation : null,
+              isSaveDisabled: isSaveDisabled,
+              saveTooltype: saveTooltype,
+              setSaveDisabled: setSaveDisabled,
+              setSaveTooltype: setSaveTooltype,
+              isVisibleInput: isVisibleInput,
+              setVisibleInput: setVisibleInput,
             }}
           />
         </div>
