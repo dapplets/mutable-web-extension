@@ -174,8 +174,6 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   }
 
   const handleSaveClick = async () => {
-    console.log(editingMutation)
-
     try {
       setIsSaving(true)
 

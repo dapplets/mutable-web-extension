@@ -11,6 +11,7 @@ export type MutableWebContextState = {
   stopEngine: () => void
   switchMutation: (mutationId: string) => void
   setFavoriteMutation: (mutationId: string | null) => void
+  removeMutationFromRecents: (mutationId: string) => void
 }
 
 export const contextDefaultValues: MutableWebContextState = {
@@ -23,6 +24,7 @@ export const contextDefaultValues: MutableWebContextState = {
   stopEngine: () => undefined,
   switchMutation: () => undefined,
   setFavoriteMutation: () => undefined,
+  removeMutationFromRecents: () => undefined,
 }
 
 export const MutableWebContext = createContext<MutableWebContextState>(contextDefaultValues)

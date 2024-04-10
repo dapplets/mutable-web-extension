@@ -59,6 +59,7 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
       console.error(err)
       // ToDo: save previous mutation and switch back if failed
     } finally {
+      setMutations(await engine.getMutations())
       setIsLoading(false)
     }
 
@@ -77,6 +78,15 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
     }
   }
 
+  const removeMutationFromRecents = async (mutationId: string) => {
+    try {
+      await engine.removeMutationFromRecents(mutationId)
+      setMutations(await engine.getMutations())
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const state: MutableWebContextState = {
     engine,
     mutations,
@@ -87,6 +97,7 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
     stopEngine,
     switchMutation,
     setFavoriteMutation,
+    removeMutationFromRecents,
   }
 
   return <MutableWebContext.Provider value={state}>{children}</MutableWebContext.Provider>

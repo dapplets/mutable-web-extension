@@ -115,7 +115,7 @@ const DragIcon = () => (
 )
 
 export const MultitablePanel: FC = () => {
-  const { mutations, apps, selectedMutation, switchMutation, stopEngine } = useMutableWeb()
+  const { mutations, apps, selectedMutation } = useMutableWeb()
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
   const [isDragging, setIsDragging] = useState(false)
@@ -135,11 +135,6 @@ export const MultitablePanel: FC = () => {
 
   const handleStopDrag = () => {
     setIsDragging(false)
-  }
-
-  const handleMutationChange = async (mutationId: string) => {
-    switchMutation(mutationId)
-    setIsDropdownVisible(false)
   }
 
   const handlePin = () => {
@@ -163,23 +158,6 @@ export const MultitablePanel: FC = () => {
   const handleModalClose = () => {
     setIsModalOpen(false)
   }
-
-  const handleOriginalButtonClick = async () => {
-    stopEngine()
-    setIsDropdownVisible(false)
-  }
-
-  const sortedMitations = mutations.sort((a, b) => {
-    const dateA = a.settings.lastUsage ? new Date(a.settings.lastUsage).getTime() : null
-    const dateB = b.settings.lastUsage ? new Date(b.settings.lastUsage).getTime() : null
-
-    if (!dateA) return 1
-    if (!dateB) return -1
-
-    return dateB - dateB
-  })
-
-  const lastFiveMutations = sortedMitations.slice(0, 5)
 
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutable-panel">
@@ -210,11 +188,8 @@ export const MultitablePanel: FC = () => {
           </DragWrapper>
           <Dropdown
             isVisible={isDropdownVisible}
-            lastFiveMutations={lastFiveMutations}
             onVisibilityChange={setIsDropdownVisible}
-            onMutationChange={handleMutationChange}
             onMutateButtonClick={handleMutateButtonClick}
-            onOriginalButtonClick={handleOriginalButtonClick}
           />
           <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
         </NorthPanel>
