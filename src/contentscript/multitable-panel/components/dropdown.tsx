@@ -62,7 +62,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     onMutationChange,
     setVisible,
     changeSelected,
-    engine,
     setWidgetsName,
     isFavorite,
     handleResetMutation,
@@ -165,7 +164,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               <ButtonMutation
                 onClick={() => {
                   setIsOpen(!isOpen)
-                  setWidgetsName(selectedMutation?selectedMutation.id:'Some Mutation Name')
+                  setWidgetsName(selectedMutation ? selectedMutation.id : 'Some Mutation Name')
                 }}
               >
                 Mutate{mutate}
@@ -175,8 +174,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               {lastFiveMutations.length &&
                 lastFiveMutations.map((mut, i) => (
                   <InputBlock
-                    $enable={mut.settings.isFavorite && 'rgba(56, 75, 255, 0.1)'}
-                    $enableBefore={mut.settings.isFavorite && '#34d31a'}
+                    $enable={mut.settings.isFavorite ? 'rgba(56, 75, 255, 0.1)' : ''}
+                    $enableBefore={mut.settings.isFavorite ? '#34d31a' : ''}
                     onClick={() => {
                       onMutationChange(mut.id)
                     }}
@@ -205,11 +204,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                       </AuthorMutation>
                     </InputInfoWrapper>
                     {/* todo: mocked */}
-                    <InputIconWrapper
-                      onClick={(e) => {
-                        changeSelected(mut.id, isFavorite)
-                      }}
-                    >
+                    <InputIconWrapper onClick={() => changeSelected(mut.id, isFavorite)}>
                       {mut.settings.isFavorite
                         ? starMutationList
                         : mut.id === selectedMutation?.id
@@ -236,8 +231,8 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
                 mutations.length &&
                 mutations.map((mut, i) => (
                   <InputBlock
-                    $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
-                    $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
+                    $enable={mut.id === selectedMutation?.id ? 'rgba(56, 75, 255, 0.1)' : ''}
+                    $enableBefore={mut.id === selectedMutation?.id ? '#34d31a' : ''}
                     onClick={() => handleMutationClick(mut.id)}
                     key={i}
                     className="avalibleMutationsInput"

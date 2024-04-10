@@ -1,8 +1,8 @@
+import { SignInParams } from '@near-wallet-selector/core'
 import { setupMessageListener } from 'chrome-extension-message-wrapper'
 import browser from 'webextension-polyfill'
 import { MUTATION_LINK_URL } from '../common/constants'
 import { networkConfig } from '../common/networks'
-import { MessageWrapperRequest } from '../common/types'
 import { debounce } from './helpers'
 import { TabStateService } from './services/tab-state-service'
 import { WalletImpl } from './wallet'
@@ -21,7 +21,7 @@ export const bgFunctions = {
   near_getAccounts: near.getAccounts.bind(near),
   near_signAndSendTransaction: near.signAndSendTransaction.bind(near),
   near_signAndSendTransactions: near.signAndSendTransactions.bind(near),
-  popTabState: (req?: MessageWrapperRequest) => tabStateService.pop(req?.sender?.tab?.id),
+  popTabState: tabStateService.popForTab.bind(tabStateService),
 }
 
 export type BgFunctions = typeof bgFunctions
@@ -30,13 +30,15 @@ browser.runtime.onMessage.addListener(setupMessageListener(bgFunctions))
 
 // Context menu actions
 
-const setClipboard = async (tab: browser.Tabs.Tab, address: string): Promise<void> =>
-  browser.tabs.sendMessage(tab.id, { type: 'COPY', address })
+const setClipboard = async (tab: browser.Tabs.Tab, address: string): Promise<void> => {
+  if (!tab.id) return
+  await browser.tabs.sendMessage(tab.id, { type: 'COPY', address })
+}
 
 const connectWallet = async (): Promise<void> => {
-  const params = {
+  const params: Partial<SignInParams> = {
     // ToDo: Another contract will be rejected by near-social-vm. It will sign out the user
-    contractId: networkConfig.socialDbContract,
+    contractId: 'social.dapplets.near',
     methodNames: [],
   }
   const accounts = await near.signIn(params)
@@ -44,6 +46,7 @@ const connectWallet = async (): Promise<void> => {
   // send events to all tabs
   browser.tabs.query({}).then((tabs) =>
     tabs.map((tab) => {
+      if (!tab.id) return
       browser.tabs.sendMessage(tab.id, {
         type: 'SIGNED_IN',
         params: {
@@ -63,6 +66,7 @@ const disconnect = async (): Promise<void> => {
   // send events to all tabs
   browser.tabs.query({}).then((tabs) =>
     tabs.map((tab) => {
+      if (!tab.id) return
       browser.tabs.sendMessage(tab.id, { type: 'SIGNED_OUT' })
     })
   )
@@ -141,7 +145,10 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 // Context menu actions routing
 
-function handleContextMenuClick(info: browser.Menus.OnClickData, tab: browser.Tabs.Tab) {
+function handleContextMenuClick(
+  info: browser.Menus.OnClickData,
+  tab: browser.Tabs.Tab | undefined
+) {
   switch (info.menuItemId) {
     case 'connect':
       return connectWallet()
@@ -149,8 +156,12 @@ function handleContextMenuClick(info: browser.Menus.OnClickData, tab: browser.Ta
     case 'disconnect':
       return disconnect()
 
-    case 'copy':
-      return copy(info, tab)
+    case 'copy': {
+      if (tab) {
+        return copy(info, tab)
+      }
+      break
+    }
 
     default:
       break
@@ -159,11 +170,13 @@ function handleContextMenuClick(info: browser.Menus.OnClickData, tab: browser.Ta
 browser.contextMenus.onClicked.addListener(handleContextMenuClick)
 
 // Redirect from share link with mutations
-const mutationLinkListener = async (tabId: number) => {
+const mutationLinkListener = async (tabId: number | undefined) => {
+  if (!tabId) return
+
   const tab = await browser.tabs.get(tabId)
 
   // Prevent concurrency
-  if (tab.status !== 'complete') return
+  if (!tab || tab.status !== 'complete' || !tab.url) return
 
   if (tab?.url.startsWith(MUTATION_LINK_URL)) {
     const url = new URL(tab.url)

@@ -1,13 +1,12 @@
 import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { EventEmitter as NEventEmitter } from 'events'
 import { DappletOverlay, Engine } from 'mutable-web-engine'
 import { useInitNear } from 'near-social-vm'
 import React, { FC, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import browser from 'webextension-polyfill'
-import { BgFunctions } from '../background'
 import { networkConfig } from '../common/networks'
+import Background from './background'
 import { ExtensionStorage } from './extension-storage'
 import { MultitablePanel } from './multitable-panel/multitable-panel'
 import { getCurrentMutationId, setCurrentMutationId } from './storage'
@@ -54,7 +53,7 @@ async function main() {
   // It's necessary for widgets from near-social-vm
   createRoot(document.createElement('div')).render(<App />)
 
-  const tabState = await initBGFunctions(browser).then((x: BgFunctions) => x.popTabState())
+  const tabState = await Background.popTabState()
 
   if (tabState?.mutationId) {
     setCurrentMutationId(tabState?.mutationId)
