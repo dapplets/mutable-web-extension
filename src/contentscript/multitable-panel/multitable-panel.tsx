@@ -1,13 +1,14 @@
-import { Engine } from 'mutable-web-engine'
-import { AppMetadata, MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
-import { Widget } from 'near-social-vm'
+import { AppMetadata, Engine, MutationWithSettings } from 'mutable-web-engine'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
+import { MutationEditorModal } from './components/mutation-editor-modal'
+
 const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
+  font-family: 'Segoe UI', sans-serif;
   width: 100%;
   right: 0;
   position: fixed;
@@ -317,7 +318,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   const handleMutationEdit = async () => {
     try {
-      let updatedMutation:MutationWithSettings = {
+      const updatedMutation: MutationWithSettings = {
         ...editingMutation!,
         id: selectedMutation!.id,
       }
@@ -330,8 +331,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
     }
   }
 
-  const handleEditMutationId = (newMutationId: string, loggedInAccountId:string) => {
-    const deleteNonLatin = (text:string) => {
+  const handleEditMutationId = (newMutationId: string, loggedInAccountId: string) => {
+    const deleteNonLatin = (text: string) => {
       return text.replace(/[^A-Za-z]/gi, '')
     }
     let updatedMutation
@@ -420,32 +421,33 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
       </Draggable>
       {widgetsName && (
         <div>
-          <Widget
-            src="bos.dapplets.near/widget/ModalSelectedMutationEditor"
-            props={{
-              mutationId: editingMutation ? editingMutation.id : null,
-              mutationName: editingMutation && editingMutation.metadata ? editingMutation.metadata.name : widgetsName,
-              allApps: applications,
-              selectedApps: editingMutation ? editingMutation.apps : null,
-              selectedMutation: selectedMutation ? selectedMutation : null,
-              onClose: handleModalClose,
-              onMutationReset: handleRevertChanges,
-              onMutationNameChange: handleMutationNameChange,
-              onMutationAppsChange: handleMutationAppsChange,
-              onMutationCreate: handleMutationCreate,
-              onMutationEdit: handleMutationEdit,
-              onMutationIdChange: handleEditMutationId,
-              isRevertDisable: isRevertDisable,
-              isVisibleInputId: isVisibleInputId,
-              setVisibleInputId: setVisibleInputId,
-              editingMutation: editingMutation ? editingMutation : null,
-              isSaveDisabled: isSaveDisabled,
-              saveTooltype: saveTooltype,
-              setSaveDisabled: setSaveDisabled,
-              setSaveTooltype: setSaveTooltype,
-              isVisibleInput: isVisibleInput,
-              setVisibleInput: setVisibleInput,
-            }}
+          <MutationEditorModal
+            mutationId={editingMutation ? editingMutation.id : null}
+            mutationName={
+              editingMutation && editingMutation.metadata
+                ? editingMutation.metadata.name
+                : widgetsName
+            }
+            allApps={applications ?? []}
+            selectedApps={editingMutation ? editingMutation.apps : []}
+            selectedMutation={selectedMutation ? selectedMutation : null}
+            onClose={handleModalClose}
+            onMutationReset={handleRevertChanges}
+            onMutationNameChange={handleMutationNameChange}
+            onMutationAppsChange={handleMutationAppsChange}
+            onMutationCreate={handleMutationCreate}
+            onMutationEdit={handleMutationEdit}
+            onMutationIdChange={handleEditMutationId}
+            isRevertDisable={isRevertDisable}
+            isVisibleInputId={isVisibleInputId}
+            setVisibleInputId={setVisibleInputId}
+            editingMutation={editingMutation ? editingMutation : null}
+            isSaveDisabled={isSaveDisabled}
+            saveTooltype={saveTooltype}
+            setSaveDisabled={setSaveDisabled}
+            setSaveTooltype={setSaveTooltype}
+            isVisibleInput={isVisibleInput}
+            setVisibleInput={setVisibleInput}
           />
         </div>
       )}

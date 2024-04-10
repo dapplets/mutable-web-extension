@@ -39,7 +39,6 @@ export const SelectedMutationInfo = styled.div`
   width: 181px;
 `
 export const SelectedMutationDescription = styled.div`
-  font-family: 'Segoe UI', sans-serif;
   font-size: 12px;
   line-height: 149%;
   color: #fff;
@@ -51,7 +50,6 @@ export const SelectedMutationDescription = styled.div`
 `
 
 export const SelectedMutationId = styled.div`
-  font-family: 'Segoe UI', sans-serif;
   font-size: 10px;
   line-height: 100%;
   color: rgba(255, 255, 255, 0.6);
@@ -193,7 +191,6 @@ export const ButtonBack = styled.div`
   background: #f8f9ff;
   align-items: center;
   justify-content: center;
-  font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 20.86px;
@@ -212,7 +209,6 @@ export const ButtonMutation = styled.div`
   align-items: center;
   justify-content: center;
   color: #384bff;
-  font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 20.86px;
@@ -324,7 +320,6 @@ export const AvalibleLableBlock = styled.div`
 `
 
 export const AvalibleLable = styled.span`
-  font-family: Roboto;
   font-size: 8px;
   font-weight: 700;
   line-height: 8px;
@@ -343,16 +338,13 @@ export const AvalibleArrowBlock = styled.div`
 `
 
 export const AvalibleArrowLable = styled.span`
-  font-family: Roboto;
   font-size: 8px;
   font-weight: 700;
   line-height: 11.92px;
-
   color: #7a818b;
 `
 
 export const InputMutation = styled.span`
-  font-family: 'Segoe UI', sans-serif;
   font-size: 12px;
   line-height: 149%;
 
@@ -365,8 +357,6 @@ export const InputMutation = styled.span`
 `
 
 export const AuthorMutation = styled.div`
-  font-family: 'Segoe UI', sans-serif;
-
   font-size: 10px;
   line-height: 100%;
   color: rgba(34, 34, 34, 0.6);
