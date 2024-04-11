@@ -217,7 +217,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       />
 
       <Input
-        label="Name"
+        label="Mutation Name"
         value={editingMutation.metadata.name ?? ''}
         placeholder="My Mutation"
         onChange={handleMutationNameChange}
