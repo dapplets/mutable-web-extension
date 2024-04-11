@@ -1,5 +1,5 @@
 import { AppMetadata, Engine, MutationWithSettings } from 'mutable-web-engine'
-import React, { FC, ReactElement, useEffect, useState } from 'react'
+import React, { FC, ReactElement, useEffect, useMemo, useState } from 'react'
 import { MutableWebContext, MutableWebContextState } from './mutable-web-context'
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 
 const MutableWebProvider: FC<Props> = ({ children, engine }) => {
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedMutation, setSelectedMutation] = useState<MutationWithSettings | null>(null)
+  const [selectedMutationId, setSelectedMutationId] = useState<string | null>(null)
   const [mutations, setMutations] = useState<MutationWithSettings[]>([])
   const [apps, setApps] = useState<AppMetadata[]>([])
   const [favoriteMutationId, setFavoriteMutationId] = useState<string | null>(null)
@@ -24,36 +24,35 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
 
     setMutations(mutations)
     setApps(allApps)
-    setSelectedMutation(selectedMutation)
+    setSelectedMutationId(selectedMutation?.id ?? null)
     setFavoriteMutationId(favoriteMutationId)
   }
+
+  const selectedMutation = useMemo(
+    () => mutations.find((mut) => mut.id === selectedMutationId) ?? null,
+    [mutations, selectedMutationId]
+  )
 
   useEffect(() => {
     loadMutations(engine)
   }, [engine])
 
   const stopEngine = () => {
-    setSelectedMutation(null)
+    setSelectedMutationId(null)
     engine.stop()
-    window.sessionStorage.setItem('mutableweb:mutationId', '')
   }
 
+  // ToDo: move to separate hook
   const switchMutation = async (mutationId: string) => {
-    const mutation = mutations.find((mutation) => mutation.id === mutationId)
-
-    if (!mutation) {
-      throw new Error(`Mutation with this ID is not found: ${mutationId}`)
-    }
-
-    setSelectedMutation(mutation)
+    setSelectedMutationId(mutationId)
 
     try {
       setIsLoading(true)
 
       if (engine.started) {
-        await engine.switchMutation(mutation.id)
+        await engine.switchMutation(mutationId)
       } else {
-        await engine.start(mutation.id)
+        await engine.start(mutationId)
       }
     } catch (err) {
       console.error(err)
@@ -62,10 +61,9 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
       setMutations(await engine.getMutations())
       setIsLoading(false)
     }
-
-    window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
   }
 
+  // ToDo: move to separate hook
   const setFavoriteMutation = async (mutationId: string | null) => {
     const previousFavoriteMutationId = favoriteMutationId
 
@@ -78,6 +76,7 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
     }
   }
 
+  // ToDo: move to separate hook
   const removeMutationFromRecents = async (mutationId: string) => {
     try {
       await engine.removeMutationFromRecents(mutationId)
@@ -98,6 +97,7 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
     switchMutation,
     setFavoriteMutation,
     removeMutationFromRecents,
+    setMutations,
   }
 
   return <MutableWebContext.Provider value={state}>{children}</MutableWebContext.Provider>

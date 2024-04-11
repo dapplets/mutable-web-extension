@@ -12,6 +12,7 @@ export type MutableWebContextState = {
   switchMutation: (mutationId: string) => void
   setFavoriteMutation: (mutationId: string | null) => void
   removeMutationFromRecents: (mutationId: string) => void
+  setMutations: React.Dispatch<React.SetStateAction<MutationWithSettings[]>>
 }
 
 export const contextDefaultValues: MutableWebContextState = {
@@ -25,6 +26,7 @@ export const contextDefaultValues: MutableWebContextState = {
   switchMutation: () => undefined,
   setFavoriteMutation: () => undefined,
   removeMutationFromRecents: () => undefined,
+  setMutations: () => undefined,
 }
 
 export const MutableWebContext = createContext<MutableWebContextState>(contextDefaultValues)

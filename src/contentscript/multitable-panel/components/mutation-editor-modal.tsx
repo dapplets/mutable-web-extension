@@ -2,7 +2,8 @@ import { AppMetadata, Mutation } from 'mutable-web-engine'
 import { useAccountId } from 'near-social-vm'
 import React, { FC, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { useMutableWeb } from '../../contexts/mutable-web-context'
+import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
+import { useEditMutation } from '../../contexts/mutable-web-context/use-edit-mutation'
 import { cloneDeep, compareDeep, mergeDeep } from '../../helpers'
 import { useEscape } from '../../hooks/use-escape'
 import { ApplicationCard } from './application-card'
@@ -121,13 +122,12 @@ export enum MutationModalMode {
 }
 
 export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) => {
-  const { engine } = useMutableWeb()
-  const [isSaving, setIsSaving] = useState(false)
+  const loggedInAccountId = useAccountId()
+  const { createMutation, isLoading: isCreating } = useCreateMutation()
+  const { editMutation, isLoading: isEditing } = useEditMutation()
 
   // Close modal with escape key
   useEscape(onClose)
-
-  const loggedInAccountId: string | null = useAccountId()
 
   const originalMutation = useMemo(
     () => baseMutation ?? createEmptyMutation(loggedInAccountId ?? 'dapplets.near'),
@@ -152,7 +152,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     [baseMutation, editingMutation]
   )
 
-  const isFormDisabled = !isModified || isSaving
+  const isFormDisabled = !isModified || isCreating || isEditing
 
   const handleMutationIdChange = (id: string) => {
     setEditingMutation((mut) => mergeDeep(cloneDeep(mut), { id }))
@@ -173,21 +173,11 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     setEditingMutation(cloneDeep(originalMutation))
   }
 
-  const handleSaveClick = async () => {
-    try {
-      setIsSaving(true)
-
-      if (mode === MutationModalMode.Creating || mode === MutationModalMode.Forking) {
-        await engine.createMutation(editingMutation)
-      } else if (mode === MutationModalMode.Editing) {
-        await engine.editMutation(editingMutation)
-      }
-
-      onClose()
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setIsSaving(false)
+  const handleSaveClick = () => {
+    if (mode === MutationModalMode.Creating || mode === MutationModalMode.Forking) {
+      createMutation(editingMutation).then(() => onClose())
+    } else if (mode === MutationModalMode.Editing) {
+      editMutation(editingMutation).then(() => onClose())
     }
   }
 
