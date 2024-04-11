@@ -128,7 +128,7 @@ export const StarSelectedMutationWrapper = styled.span`
 export const MutationsList = styled.div`
   position: absolute;
   z-index: 3;
-
+  outline: none;
   display: flex;
   flex-direction: column;
 
@@ -162,6 +162,26 @@ export const MutationsList = styled.div`
   }
   animation: listVisible 0.2s ease forwards;
   transition: all 0.3s;
+
+  .simplebar-wrapper {
+    outline: none;
+  }
+
+  .simplebar-mask {
+    outline: none;
+  }
+
+  .simplebar-offset {
+    outline: none;
+  }
+
+  .simplebar-content-wrapper {
+    outline: none;
+  }
+
+  .simplebar-content {
+    outline: none;
+  }
 `
 export const ButtonListBlock = styled.div`
   display: flex;
