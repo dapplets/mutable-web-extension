@@ -21,6 +21,7 @@ const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
   z-index: 5000;
   top: 0;
   background: transparent;
+  height: 5px;
 
   &::before {
     content: '';
@@ -48,6 +49,12 @@ const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
     transform: translateY(0);
   }
 `
+
+const NorthPanelWrapper = styled.span`
+  position: fixed;
+  height: 5px;
+`
+
 const NorthPanel = styled.div<{ $isAnimated?: boolean }>`
   position: relative;
 
@@ -170,30 +177,32 @@ export const MultitablePanel: FC = () => {
           onStop={handleStopDrag}
           defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
         >
-          {/* ToDo: refactor className */}
-          <NorthPanel
-            data-testid="north-panel"
-            className={
-              isPin
-                ? 'visible-pin'
-                : isDropdownVisible && !isDragging
-                ? 'visible-north-panel'
-                : 'visible-default'
-            }
-            $isAnimated={!isDragging}
-          >
-            <DragWrapper className="dragWrapper">
-              <DragIconWrapper>
-                <DragIcon />
-              </DragIconWrapper>
-            </DragWrapper>
-            <Dropdown
-              isVisible={isDropdownVisible}
-              onVisibilityChange={setIsDropdownVisible}
-              onMutateButtonClick={handleMutateButtonClick}
-            />
-            <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
-          </NorthPanel>
+          <NorthPanelWrapper>
+            {/* ToDo: refactor className */}
+            <NorthPanel
+              data-testid="north-panel"
+              className={
+                isPin
+                  ? 'visible-pin'
+                  : isDropdownVisible && !isDragging
+                  ? 'visible-north-panel'
+                  : 'visible-default'
+              }
+              $isAnimated={!isDragging}
+            >
+              <DragWrapper className="dragWrapper">
+                <DragIconWrapper>
+                  <DragIcon />
+                </DragIconWrapper>
+              </DragWrapper>
+              <Dropdown
+                isVisible={isDropdownVisible}
+                onVisibilityChange={setIsDropdownVisible}
+                onMutateButtonClick={handleMutateButtonClick}
+              />
+              <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
+            </NorthPanel>
+          </NorthPanelWrapper>
         </Draggable>
       ) : null}
 
