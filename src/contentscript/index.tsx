@@ -1,16 +1,15 @@
 import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { EventEmitter as NEventEmitter } from 'events'
 import { DappletOverlay, Engine } from 'mutable-web-engine'
 import { useInitNear } from 'near-social-vm'
 import React, { FC, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import browser from 'webextension-polyfill'
-import { BgFunctions } from '../background'
 import { networkConfig } from '../common/networks'
+import Background from './background'
+import { MutableWebProvider } from './contexts/mutable-web-context'
 import { ExtensionStorage } from './extension-storage'
 import { MultitablePanel } from './multitable-panel/multitable-panel'
-import { getCurrentMutationId, setCurrentMutationId } from './storage'
 import { setupWallet } from './wallet'
 
 const eventEmitter = new NEventEmitter()
@@ -54,12 +53,7 @@ async function main() {
   // It's necessary for widgets from near-social-vm
   createRoot(document.createElement('div')).render(<App />)
 
-  const tabState = await initBGFunctions(browser).then((x: BgFunctions) => x.popTabState())
-
-  if (tabState?.mutationId) {
-    setCurrentMutationId(tabState?.mutationId)
-  }
-
+  const tabState = await Background.popTabState()
   const selector = await selectorPromise
 
   const engine = new Engine({
@@ -69,13 +63,13 @@ async function main() {
     storage: new ExtensionStorage('mutableweb'),
   })
 
-  const mutationId = getCurrentMutationId()
+  const mutationIdToLoad = tabState?.mutationId
 
   console.log('Mutable Web Engine is initializing...')
 
-  if (mutationId) {
+  if (mutationIdToLoad) {
     try {
-      await engine.start(mutationId)
+      await engine.start(mutationIdToLoad)
     } catch (err) {
       console.error(err)
       await engine.start()
@@ -105,7 +99,11 @@ async function main() {
   container.style.display = 'flex'
   document.body.appendChild(container)
   const root = createRoot(container)
-  root.render(<MultitablePanel engine={engine} />)
+  root.render(
+    <MutableWebProvider engine={engine}>
+      <MultitablePanel />
+    </MutableWebProvider>
+  )
 
   return engine
 }

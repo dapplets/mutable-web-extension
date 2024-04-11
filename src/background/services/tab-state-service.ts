@@ -1,3 +1,5 @@
+import { MessageWrapperRequest } from '../../common/types'
+
 type TabId = number
 
 type TabState = {
@@ -14,6 +16,11 @@ export class TabStateService {
   pop(tabId: TabId): TabState | null {
     const state = this._state.get(tabId)
     this._state.delete(tabId)
-    return state
+    return state ?? null
+  }
+
+  async popForTab(req?: MessageWrapperRequest) {
+    const tabId = req?.sender?.tab?.id
+    return tabId ? this.pop(tabId) : null
   }
 }

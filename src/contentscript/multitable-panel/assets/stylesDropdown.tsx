@@ -39,7 +39,6 @@ export const SelectedMutationInfo = styled.div`
   width: 181px;
 `
 export const SelectedMutationDescription = styled.div`
-  font-family: 'Segoe UI', sans-serif;
   font-size: 12px;
   line-height: 149%;
   color: #fff;
@@ -51,7 +50,6 @@ export const SelectedMutationDescription = styled.div`
 `
 
 export const SelectedMutationId = styled.div`
-  font-family: 'Segoe UI', sans-serif;
   font-size: 10px;
   line-height: 100%;
   color: rgba(255, 255, 255, 0.6);
@@ -116,22 +114,21 @@ export const OpenList = styled.span`
     }
   }
 `
-export const InfoWrapper = styled.span`
-  cursor: pointer;
-  display: inline-block;
-  padding-top: 4px;
-`
 
 export const StarSelectedMutationWrapper = styled.span`
   cursor: pointer;
   display: inline-block;
   padding-top: 4px;
+  transition: all 0.2s ease;
+  &:hover {
+    transform: scale(1.2);
+  }
 `
 
 export const MutationsList = styled.div`
   position: absolute;
   z-index: 3;
-
+  outline: none;
   display: flex;
   flex-direction: column;
 
@@ -142,7 +139,6 @@ export const MutationsList = styled.div`
   box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
 
   width: 318px;
-  box-sizing: border-box;
   left: -26px;
   top: 38px;
   border-radius: 0px 0px 10px 10px;
@@ -166,6 +162,26 @@ export const MutationsList = styled.div`
   }
   animation: listVisible 0.2s ease forwards;
   transition: all 0.3s;
+
+  .simplebar-wrapper {
+    outline: none;
+  }
+
+  .simplebar-mask {
+    outline: none;
+  }
+
+  .simplebar-offset {
+    outline: none;
+  }
+
+  .simplebar-content-wrapper {
+    outline: none;
+  }
+
+  .simplebar-content {
+    outline: none;
+  }
 `
 export const ButtonListBlock = styled.div`
   display: flex;
@@ -193,7 +209,6 @@ export const ButtonBack = styled.div`
   background: #f8f9ff;
   align-items: center;
   justify-content: center;
-  font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 20.86px;
@@ -201,8 +216,14 @@ export const ButtonBack = styled.div`
   cursor: pointer;
   z-index: 1;
   width: 40%;
+  height: 70%;
+  transition: all 0.2s ease;
   svg {
     margin-right: 5px;
+  }
+  &:hover {
+    background: rgba(56, 75, 255, 0.1);
+    border-radius: 4px;
   }
 `
 
@@ -212,15 +233,20 @@ export const ButtonMutation = styled.div`
   align-items: center;
   justify-content: center;
   color: #384bff;
-  font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 20.86px;
   cursor: pointer;
   z-index: 1;
   width: 40%;
+  height: 70%;
+  transition: all 0.2s ease;
   svg {
     margin-left: 5px;
+  }
+  &:hover {
+    background: rgba(56, 75, 255, 0.1);
+    border-radius: 4px;
   }
 `
 
@@ -232,21 +258,20 @@ export const ListMutations = styled.div`
   margin-bottom: 10px;
 `
 
-export const InputBlock = styled.div<{ $enable?: string; $enableBefore?: string }>`
+export const InputBlock = styled.div<{ isActive?: boolean }>`
   display: flex;
 
   padding: 2px 4px;
   cursor: pointer;
 
   align-items: center;
-  box-sizing: border-box;
   width: 100%;
 
-  background: ${(props) => props.$enable || '#fff'};
+  background: ${(props) => (props.isActive ? 'rgba(56, 75, 255, 0.1)' : '#fff')};
   border-radius: 4px;
 
   .inputMutation {
-    background: ${(props) => props.$enable || '#fff'};
+    background: ${(props) => (props.isActive ? 'rgba(56, 75, 255, 0.1)' : '#fff')};
   }
 
   &:hover {
@@ -256,8 +281,12 @@ export const InputBlock = styled.div<{ $enable?: string; $enableBefore?: string 
 export const InputIconWrapper = styled.span`
   display: inline-block;
   padding-right: 3px;
+  transition: all 0.2s ease;
   svg {
     margin-top: 5px;
+  }
+  &:hover {
+    transform: scale(1.2);
   }
 `
 
@@ -272,7 +301,6 @@ export const InputInfoWrapper = styled.div`
 
   flex-direction: column;
   align-items: flex-start;
-  box-sizing: border-box;
   width: 100%;
   .inputMutationSelected {
     color: rgba(34, 34, 34, 1);
@@ -302,11 +330,13 @@ export const AvalibleMutations = styled.div<{ $enable?: string; $enableBefore?: 
   padding: 10px;
   .avalibleMutationsInput {
     background: rgba(248, 249, 255, 1);
-    margin-left: 10px;
-    width: 250px;
+    width: 100%;
     border-radius: 4px;
     padding: 2px 4px;
     margin-bottom: 3px;
+    &:hover {
+      background: rgba(24, 121, 206, 0.08);
+    }
   }
 `
 
@@ -324,7 +354,6 @@ export const AvalibleLableBlock = styled.div`
 `
 
 export const AvalibleLable = styled.span`
-  font-family: Roboto;
   font-size: 8px;
   font-weight: 700;
   line-height: 8px;
@@ -336,6 +365,8 @@ export const AvalibleArrowBlock = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: all 0.2s ease;
+  cursor: pointer;
   svg {
     margin-left: 10px;
     transform: rotate(180deg);
@@ -343,16 +374,13 @@ export const AvalibleArrowBlock = styled.div`
 `
 
 export const AvalibleArrowLable = styled.span`
-  font-family: Roboto;
   font-size: 8px;
   font-weight: 700;
   line-height: 11.92px;
-
   color: #7a818b;
 `
 
 export const InputMutation = styled.span`
-  font-family: 'Segoe UI', sans-serif;
   font-size: 12px;
   line-height: 149%;
 
@@ -365,8 +393,6 @@ export const InputMutation = styled.span`
 `
 
 export const AuthorMutation = styled.div`
-  font-family: 'Segoe UI', sans-serif;
-
   font-size: 10px;
   line-height: 100%;
   color: rgba(34, 34, 34, 0.6);

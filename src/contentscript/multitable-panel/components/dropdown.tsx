@@ -1,5 +1,4 @@
-import { Engine } from 'mutable-web-engine'
-import React, { DetailedHTMLProps, FC, HTMLAttributes, useState } from 'react'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, useMemo, useState } from 'react'
 import SimpleBar from 'simplebar-react'
 import {
   AuthorMutation,
@@ -38,69 +37,92 @@ import {
   starSelectMutationDefault,
   trash,
 } from '../assets/vectors'
-import { ipfs } from '../constants'
 
 import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import 'simplebar-react/dist/simplebar.min.css'
+import { useMutableWeb } from '../../contexts/mutable-web-context'
+import { Image } from './image'
 
 export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
-  mutations: MutationWithSettings[]
-  selectedMutation: MutationWithSettings | null
-  onMutationChange: (mutationId: string | null) => void
-  setVisible: (visible: boolean) => void
-  changeSelected: (mutationId: string, isFavorite: string | null) => void
-  engine: Engine
-  setWidgetsName: (x) => void
-  isFavorite: string | null
-  handleResetMutation: (x) => void
-  lastFiveMutations: MutationWithSettings[]
+  isVisible: boolean
+  onVisibilityChange: (visible: boolean) => void
+  onMutateButtonClick: () => void
 }
 
-export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
+export const Dropdown: FC<DropdownProps> = ({
+  isVisible,
+  onVisibilityChange,
+  onMutateButtonClick,
+}: DropdownProps) => {
   const {
-    selectedMutation,
     mutations,
-    onMutationChange,
-    setVisible,
-    changeSelected,
-    engine,
-    setWidgetsName,
-    isFavorite,
-    handleResetMutation,
-    lastFiveMutations,
-  } = props
+    selectedMutation,
+    favoriteMutationId,
+    setFavoriteMutation,
+    switchMutation,
+    stopEngine,
+    removeMutationFromRecents,
+  } = useMutableWeb()
 
-  const [isAvalible, setAvalible] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
+  const [isAccordeonExpanded, setIsAccordeonExpanded] = useState(false)
+
+  const recentlyUsedMutations = useMemo(
+    () =>
+      mutations
+        .filter((mut) => mut.settings.lastUsage)
+        .sort((a, b) => {
+          const dateA = a.settings.lastUsage ? new Date(a.settings.lastUsage).getTime() : null
+          const dateB = b.settings.lastUsage ? new Date(b.settings.lastUsage).getTime() : null
+
+          if (!dateA) return 1
+          if (!dateB) return -1
+
+          return dateB - dateB
+        }),
+    [mutations]
+  )
+
+  const unusedMutations = useMemo(
+    () => mutations.filter((mut) => !mut.settings.lastUsage),
+    [mutations]
+  )
 
   const handleMutationClick = (mutationId: string) => {
-    setIsOpen(false)
-    isOpen ? setVisible(true) : setVisible(false)
-    onMutationChange(mutationId)
+    onVisibilityChange(false)
+    switchMutation(mutationId)
   }
 
   // todo: mock
-  const changeAvalibleMutations = () => {
-    setAvalible(!isAvalible)
+  const handleAccordeonClick = () => {
+    setIsAccordeonExpanded((val) => !val)
+  }
+
+  const handleMutateButtonClick = () => {
+    onVisibilityChange(false)
+    onMutateButtonClick()
+  }
+
+  const handleFavoriteButtonClick = (mutation: MutationWithSettings) => {
+    setFavoriteMutation(mutation.id === favoriteMutationId ? null : mutation.id)
+  }
+
+  const handleOriginalButtonClick = async () => {
+    onVisibilityChange(false)
+    stopEngine()
+  }
+
+  const handleRemoveFromRecentlyUsedClick = async (mut: MutationWithSettings) => {
+    removeMutationFromRecents(mut.id)
   }
 
   return (
-    <WrapperDropdown
-      // onBlur={() => {
-      //   setVisible(false)
-      //   setIsOpen(false)
-      // }}
-      tabIndex={0}
-    >
+    <WrapperDropdown>
       <SelectedMutationBlock
-        onClick={() => {
-          isOpen ? setVisible(true) : setVisible(false)
-          setIsOpen(!isOpen)
-        }}
+        onClick={() => onVisibilityChange(!isVisible)}
         data-testid="selected-mutation-block"
       >
         <SelectedMutationInfo>
-          {selectedMutation ? (
+          {selectedMutation && selectedMutation.metadata ? (
             <>
               <SelectedMutationDescription>
                 {selectedMutation.metadata.name}
@@ -108,153 +130,112 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               <SelectedMutationId>{selectedMutation.id}</SelectedMutationId>
             </>
           ) : (
-            <>
-              <SelectedMutationDescription>No mutations applied</SelectedMutationDescription>
-            </>
+            <SelectedMutationDescription>No mutations applied</SelectedMutationDescription>
           )}
         </SelectedMutationInfo>
+
         {selectedMutation ? (
-          <StarSelectedMutationWrapper
-            onClick={() => changeSelected(selectedMutation.id, isFavorite)}
-          >
-            {selectedMutation && selectedMutation.settings.isFavorite
+          <StarSelectedMutationWrapper onClick={() => handleFavoriteButtonClick(selectedMutation)}>
+            {selectedMutation.id === favoriteMutationId
               ? starSelectMutation
               : starSelectMutationDefault}
           </StarSelectedMutationWrapper>
         ) : null}
 
-        {isOpen ? (
-          <OpenList
-            onClick={() => {
-              isOpen ? setVisible(true) : setVisible(false)
-              setIsOpen(!isOpen)
-            }}
-          >
-            {iconDropdown}
-          </OpenList>
+        {isVisible ? (
+          <OpenList onClick={() => onVisibilityChange(!isVisible)}>{iconDropdown}</OpenList>
         ) : (
-          <OpenListDefault
-            onClick={() => {
-              isOpen ? setVisible(true) : setVisible(false)
-              setIsOpen(!isOpen)
-            }}
-          >
+          <OpenListDefault onClick={() => onVisibilityChange(!isVisible)}>
             {iconDropdown}
           </OpenListDefault>
         )}
       </SelectedMutationBlock>
 
-      {isOpen && (
+      {isVisible && (
         <MutationsList>
-          {' '}
           <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
             <ButtonListBlock>
-              <ButtonBack onClick={() => handleResetMutation(setIsOpen)}>
-                {back}to Original
-              </ButtonBack>
-              <ButtonMutation
-                onClick={() => {
-                  setIsOpen(!isOpen)
-                  setWidgetsName(selectedMutation ? selectedMutation.id : 'Some Mutation Name')
-                }}
-              >
-                Mutate{mutate}
-              </ButtonMutation>
+              <ButtonBack onClick={handleOriginalButtonClick}>{back}to Original</ButtonBack>
+              <ButtonMutation onClick={handleMutateButtonClick}>Mutate{mutate}</ButtonMutation>
             </ButtonListBlock>
-            <ListMutations>
-              {lastFiveMutations.length &&
-                lastFiveMutations.map((mut, i) => (
-                  <InputBlock
-                    $enable={mut.settings.isFavorite && 'rgba(56, 75, 255, 0.1)'}
-                    $enableBefore={mut.settings.isFavorite && '#34d31a'}
-                    key={i}
-                  >
-                    <ImageBlock>
-                      {' '}
-                      <img
-                        src={
-                          mut.metadata.image && mut.metadata.image.ipfs_cid
-                            ? ipfs + mut.metadata.image.ipfs_cid
-                            : null
-                        }
-                      />
-                    </ImageBlock>
-                    <InputInfoWrapper
-                      onClick={() => {
-                        onMutationChange(mut.id)
-                      }}
-                    >
-                      {/* todo: mocked classname */}
-                      <InputMutation
-                        className={mut.id === selectedMutation?.id ? 'inputMutationSelected' : ''}
-                      >
-                        {mut.metadata.name}
-                      </InputMutation>
-                      {/* todo: mocked classname */}
-                      <AuthorMutation
-                        className={
-                          mut.id === selectedMutation?.id && mut.id === isFavorite
-                            ? 'authorMutationSelected'
-                            : ''
-                        }
-                      >
-                        {mut.id}
-                      </AuthorMutation>
-                    </InputInfoWrapper>
-                    {/* todo: mocked */}
-                    <InputIconWrapper
-                      onClick={(e) => {
-                        changeSelected(mut.id, isFavorite)
-                      }}
-                    >
-                      {mut.settings.isFavorite
-                        ? starMutationList
-                        : mut.id === selectedMutation?.id
-                        ? starMutationListDefault
-                        : trash}
-                    </InputIconWrapper>
-                  </InputBlock>
-                ))}
-            </ListMutations>
-            <AvalibleMutations>
-              <AvalibleLableBlock>
-                <AvalibleLable>available</AvalibleLable>
-                {/* todo: mock */}
-                <AvalibleArrowBlock
-                  className={isAvalible ? 'iconRotate' : ''}
-                  onClick={changeAvalibleMutations}
-                >
-                  <AvalibleArrowLable>{mutations.length} mutations</AvalibleArrowLable>
-                  {availableIcon}
-                </AvalibleArrowBlock>
-              </AvalibleLableBlock>
 
-              {isAvalible &&
-                mutations.length &&
-                mutations.map((mut, i) => (
-                  <InputBlock
-                    $enable={mut.id === selectedMutation?.id && 'rgba(56, 75, 255, 0.1)'}
-                    $enableBefore={mut.id === selectedMutation?.id && '#34d31a'}
-                    onClick={() => handleMutationClick(mut.id)}
-                    key={i}
-                    className="avalibleMutationsInput"
+            <ListMutations>
+              {recentlyUsedMutations.map((mut) => (
+                <InputBlock key={mut.id} isActive={mut.id === selectedMutation?.id}>
+                  <ImageBlock>
+                    <Image image={mut.metadata.image} />
+                  </ImageBlock>
+                  <InputInfoWrapper onClick={() => handleMutationClick(mut.id)}>
+                    {/* todo: mocked classname */}
+                    <InputMutation
+                      className={mut.id === selectedMutation?.id ? 'inputMutationSelected' : ''}
+                    >
+                      {mut.metadata ? mut.metadata.name : ''}
+                    </InputMutation>
+                    {/* todo: mocked classname */}
+                    <AuthorMutation
+                      className={
+                        mut.id === selectedMutation?.id && mut.id === favoriteMutationId
+                          ? 'authorMutationSelected'
+                          : ''
+                      }
+                    >
+                      {mut.id}
+                    </AuthorMutation>
+                  </InputInfoWrapper>
+                  {/* todo: mocked */}
+
+                  {mut.id === favoriteMutationId ? (
+                    <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
+                      {starMutationList}
+                    </InputIconWrapper>
+                  ) : mut.id === selectedMutation?.id ? (
+                    <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
+                      {starMutationListDefault}
+                    </InputIconWrapper>
+                  ) : (
+                    <InputIconWrapper onClick={() => handleRemoveFromRecentlyUsedClick(mut)}>
+                      {trash}
+                    </InputIconWrapper>
+                  )}
+                </InputBlock>
+              ))}
+            </ListMutations>
+
+            {unusedMutations.length > 0 ? (
+              <AvalibleMutations>
+                <AvalibleLableBlock>
+                  <AvalibleLable>available</AvalibleLable>
+                  {/* todo: mock */}
+                  <AvalibleArrowBlock
+                    className={isAccordeonExpanded ? 'iconRotate' : ''}
+                    onClick={handleAccordeonClick}
                   >
-                    <ImageBlock>
-                      <img
-                        src={
-                          mut.metadata.image && mut.metadata.image.ipfs_cid
-                            ? ipfs + mut.metadata.image.ipfs_cid
-                            : null
-                        }
-                      />
-                    </ImageBlock>
-                    <InputInfoWrapper>
-                      <InputMutation>{mut.metadata.name}</InputMutation>
-                      <AuthorMutation>{mut.id}</AuthorMutation>
-                    </InputInfoWrapper>
-                  </InputBlock>
-                ))}
-            </AvalibleMutations>
+                    <AvalibleArrowLable>{unusedMutations.length} mutations</AvalibleArrowLable>
+                    {availableIcon}
+                  </AvalibleArrowBlock>
+                </AvalibleLableBlock>
+
+                {isAccordeonExpanded
+                  ? unusedMutations.map((mut) => (
+                      <InputBlock
+                        key={mut.id}
+                        isActive={mut.id === selectedMutation?.id}
+                        onClick={() => handleMutationClick(mut.id)}
+                        className="avalibleMutationsInput"
+                      >
+                        <ImageBlock>
+                          <Image image={mut.metadata.image} />
+                        </ImageBlock>
+                        <InputInfoWrapper>
+                          <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
+                          <AuthorMutation>{mut.id}</AuthorMutation>
+                        </InputInfoWrapper>
+                      </InputBlock>
+                    ))
+                  : null}
+              </AvalibleMutations>
+            ) : null}
           </SimpleBar>
         </MutationsList>
       )}

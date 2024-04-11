@@ -1,14 +1,20 @@
-import { Engine } from 'mutable-web-engine'
-import { AppMetadata, MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
-import { Widget } from 'near-social-vm'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
+import { useMutableWeb } from '../contexts/mutable-web-context'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
 import { iconPin, iconPinDefault } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
+import { MutationEditorModal } from './components/mutation-editor-modal'
 
 const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
+  // Global Styles
+  font-family: 'Segoe UI', sans-serif;
+  * {
+    box-sizing: border-box;
+  }
+  // End Global Styles
+
   width: 100%;
   right: 0;
   position: fixed;
@@ -60,7 +66,6 @@ const NorthPanel = styled.div<{ $isAnimated?: boolean }>`
   padding-top: 0;
   border-radius: 0 0 6px 6px;
   background: #384bff;
-  box-sizing: border-box;
   box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
   opacity: 0;
   transform: translateY(-100%);
@@ -102,54 +107,28 @@ const DragIconWrapper = styled.div`
   height: 8px;
 `
 
-const iconDrag = (
-  <svg xmlns="http://www.w3.org/2000/svg" width="8" height="1.5" viewBox="0 0 6 1" fill="none">
-    <rect width="8" height="1.5" rx="0.5" fill="white" />
+const DragIcon = () => (
+  <svg width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect y="0.75" width="8" height="1.5" rx="0.75" fill="white" />
+    <rect y="4.25" width="8" height="1.5" rx="0.75" fill="white" />
+    <rect y="7.75" width="8" height="1.5" rx="0.75" fill="white" />
   </svg>
 )
 
-interface MultitablePanelProps {
-  engine: Engine
-}
-
-export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
-  const [visible, setVisible] = useState(false)
+export const MultitablePanel: FC = () => {
+  const { mutations, apps, selectedMutation } = useMutableWeb()
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false)
   const [isPin, setPin] = useState(getPanelPinned() ? true : false)
   const [isDragging, setIsDragging] = useState(false)
-  const [widgetsName, setWidgetsName] = useState(null)
-  const [mutations, setMutations] = useState<MutationWithSettings[]>([])
-  const [selectedMutation, setSelectedMutation] = useState<MutationWithSettings | null>(null)
-  const [isFavorite, seIsFavorite] = useState<string | null>(
-    selectedMutation && selectedMutation.settings.isFavorite ? selectedMutation.id : null
-  )
-  const [applications, setApplications] = useState<AppMetadata[] | null>(null)
-  const [isRevertDisable, setRevertDisable] = useState(true)
-  const [isVisibleInputId, setVisibleInputId] = useState(false)
-  const [editingMutation, setEditingMutation] = useState<MutationWithSettings | null>(
-    JSON.parse(JSON.stringify(selectedMutation))
-  )
-
-  useEffect(() => {
-    init()
-  }, [engine, isFavorite])
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setVisible(true)
+      setIsDropdownVisible(true)
     }, 5000)
 
     return () => clearTimeout(timer)
   }, [isPin])
-
-  const init = async () => {
-    const mutations = await engine.getMutations()
-    setMutations(mutations)
-    const allApplications = await engine.getApplications()
-    setApplications(allApplications)
-
-    const mutation = await engine.getCurrentMutation()
-    setSelectedMutation(mutation)
-  }
 
   const handleStartDrag = () => {
     setIsDragging(true)
@@ -157,33 +136,6 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
 
   const handleStopDrag = () => {
     setIsDragging(false)
-  }
-
-  const handleMutationChange = async (mutationId: string) => {
-    const mutation = mutations.find((mutation) => mutation.id === mutationId)
-
-    setSelectedMutation(mutation)
-    setEditingMutation(mutation)
-    await engine.switchMutation(mutation.id)
-    window.sessionStorage.setItem('mutableweb:mutationId', mutation.id)
-    widgetsName
-      ? setWidgetsName(mutation ? mutation.id : 'Some Mutation Name')
-      : setWidgetsName(null)
-  }
-
-  const changeSelected = async (mutationId: string) => {
-    if (mutationId === selectedMutation.id && selectedMutation.settings.isFavorite) {
-      await engine.setFavoriteMutation(null)
-      seIsFavorite(null)
-      await init()
-    } else if (mutationId === selectedMutation.id && !selectedMutation.settings.isFavorite) {
-      await engine.setFavoriteMutation(mutationId)
-      seIsFavorite(mutationId)
-      await init()
-    } else {
-      await engine.removeMutationFromRecents(mutationId)
-      await init()
-    }
   }
 
   const handlePin = () => {
@@ -200,236 +152,56 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine }) => {
   }
 
   const handleModalClose = () => {
-    setWidgetsName(null)
+    setIsModalOpen(false)
   }
-
-  const handleResetMutation = async () => {
-    setSelectedMutation(null)
-    seIsFavorite(null)
-    engine.stop()
-    window.sessionStorage.setItem('mutableweb:mutationId', null)
-  }
-
-  const handleMutationNameChange = (newMutationName: string) => {
-    let updatedMutation
-    setRevertDisable(false)
-    if (!editingMutation) {
-      updatedMutation = {
-        id: '',
-        apps: [],
-        targets: [],
-        metadata: {
-          name: newMutationName,
-        },
-        settings: {
-          isFavorite: false,
-          lastUsage: null,
-        },
-      }
-    } else {
-      updatedMutation = {
-        ...editingMutation,
-        metadata: {
-          ...editingMutation.metadata,
-          name: newMutationName,
-        },
-      }
-    }
-
-    setEditingMutation(updatedMutation)
-  }
-
-  const handleRevertChanges = async () => {
-    const mutation = await engine.getCurrentMutation()
-    setSelectedMutation(mutation)
-    setEditingMutation(mutation)
-    setRevertDisable(true)
-  }
-
-  const handleMutationAppsChange = (newApp) => {
-    let updatedMutation
-    setRevertDisable(false)
-    if (!editingMutation) {
-      updatedMutation = {
-        id: '',
-        apps: [newApp],
-        targets: [],
-        metadata: {
-          name: 'Some Mutation Name',
-        },
-        settings: {
-          isFavorite: false,
-          lastUsage: null,
-        },
-      }
-    } else {
-      const updatedApps = editingMutation.apps.includes(newApp)
-        ? editingMutation.apps.filter((app) => app !== newApp)
-        : [...editingMutation.apps, newApp]
-
-      updatedMutation = {
-        ...editingMutation,
-        apps: updatedApps,
-      }
-    }
-    console.log(updatedMutation)
-    setEditingMutation(updatedMutation)
-  }
-
-  const handleMutationCreate = async () => {
-    try {
-      const updatedMutation = {
-        ...editingMutation,
-        targets: [
-          {
-            namespace: 'engine',
-            contextType: 'website',
-            if: {
-              id: {
-                in: [window.location.hostname],
-              },
-            },
-          },
-        ],
-      }
-      setSelectedMutation(updatedMutation)
-      await engine.createMutation(updatedMutation)
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setRevertDisable(true)
-    }
-  }
-
-  const handleMutationEdit = async () => {
-    try {
-      let updatedMutation = {
-        ...editingMutation,
-        id: selectedMutation.id,
-      }
-      await engine.editMutation(updatedMutation)
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setRevertDisable(true)
-    }
-  }
-
-  const handleEditMutationId = (newMutationId: string, loggedInAccountId) => {
-    const deleteNonLatin = (text) => {
-      return text.replace(/[^A-Za-z]/gi, '')
-    }
-    let updatedMutation
-    setRevertDisable(false)
-    setVisibleInputId(true)
-
-    if (!editingMutation) {
-      updatedMutation = {
-        id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
-        apps: [],
-        targets: [],
-        metadata: {
-          name: 'Some Mutation Name',
-        },
-        settings: {
-          isFavorite: false,
-          lastUsage: null,
-        },
-      }
-    } else {
-      updatedMutation = {
-        ...editingMutation,
-        id: loggedInAccountId + '/' + 'mutation/' + deleteNonLatin(newMutationId),
-      }
-    }
-
-    setEditingMutation(updatedMutation)
-  }
-
-  const sortedMitations = mutations.sort((a, b) => {
-    const dateA = a.settings.lastUsage ? new Date(a.settings.lastUsage).getTime() : null
-    const dateB = b.settings.lastUsage ? new Date(b.settings.lastUsage).getTime() : null
-
-    if (!dateA) return 1
-    if (!dateB) return -1
-
-    return dateB - dateB
-  })
-
-  const lastFiveMutations = sortedMitations.slice(0, 5)
 
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutable-panel">
-      <Draggable
-        axis="x"
-        bounds="parent"
-        handle=".dragWrapper"
-        onStart={handleStartDrag}
-        onStop={handleStopDrag}
-        defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
-      >
-        <span style={{ position: 'fixed', height: 5 }}>
-          {/* ToDo: refactor className */}
-          <NorthPanel
-            data-testid="north-panel"
-            className={
-              isPin
-                ? 'visible-pin'
-                : visible && !isDragging
-                ? 'visible-north-panel'
-                : 'visible-default'
-            }
-            $isAnimated={!isDragging}
-          >
-            <DragWrapper className="dragWrapper">
-              <DragIconWrapper>
-                {/* ToDo: replace with one icon */}
-                {iconDrag}
-                {iconDrag}
-                {iconDrag}
-              </DragIconWrapper>
-            </DragWrapper>
-            <Dropdown
-              mutations={mutations}
-              selectedMutation={selectedMutation}
-              onMutationChange={handleMutationChange}
-              setVisible={setVisible}
-              changeSelected={changeSelected}
-              engine={engine}
-              setWidgetsName={setWidgetsName}
-              isFavorite={isFavorite}
-              handleResetMutation={handleResetMutation}
-              lastFiveMutations={lastFiveMutations}
-            />
-            <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
-          </NorthPanel>
-        </span>
-      </Draggable>
-      {widgetsName && (
-        <div>
-          <Widget
-            src="bos.dapplets.near/widget/ModalSelectedMutationEditor"
-            props={{
-              mutationId: editingMutation ? editingMutation.id : null,
-              mutationName: editingMutation ? editingMutation.metadata.name : widgetsName,
-              allApps: applications,
-              selectedApps: editingMutation ? editingMutation.apps : null,
-              selectedMutation: selectedMutation ? selectedMutation : null,
-              onClose: handleModalClose,
-              onMutationReset: handleRevertChanges,
-              onMutationNameChange: handleMutationNameChange,
-              onMutationAppsChange: handleMutationAppsChange,
-              onMutationCreate: handleMutationCreate,
-              onMutationEdit: handleMutationEdit,
-              onMutationIdChange: handleEditMutationId,
-              isRevertDisable: isRevertDisable,
-              isVisibleInputId: isVisibleInputId,
-              setVisibleInputId: setVisibleInputId,
-              editingMutation: editingMutation ? editingMutation : null,
-            }}
-          />
-        </div>
-      )}
+      {!isModalOpen ? (
+        <Draggable
+          axis="x"
+          bounds="parent"
+          handle=".dragWrapper"
+          onStart={handleStartDrag}
+          onStop={handleStopDrag}
+          defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
+        >
+          <span style={{ position: 'fixed', height: 5 }}>
+            {/* ToDo: refactor className */}
+            <NorthPanel
+              data-testid="north-panel"
+              className={
+                isPin
+                  ? 'visible-pin'
+                  : isDropdownVisible && !isDragging
+                  ? 'visible-north-panel'
+                  : 'visible-default'
+              }
+              $isAnimated={!isDragging}
+            >
+              <DragWrapper className="dragWrapper">
+                <DragIconWrapper>
+                  <DragIcon />
+                </DragIconWrapper>
+              </DragWrapper>
+              <Dropdown
+                isVisible={isDropdownVisible}
+                onVisibilityChange={setIsDropdownVisible}
+                onMutateButtonClick={handleMutateButtonClick}
+              />
+              <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
+            </NorthPanel>
+          </span>
+        </Draggable>
+      ) : null}
+
+      {isModalOpen ? (
+        <MutationEditorModal
+          apps={apps}
+          baseMutation={selectedMutation}
+          onClose={handleModalClose}
+        />
+      ) : null}
     </WrapperPanel>
   )
 }
