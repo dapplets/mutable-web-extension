@@ -94,7 +94,7 @@ export const Dropdown: FC<DropdownProps> = ({
 
   // todo: mock
   const handleAccordeonClick = () => {
-    setIsAccordeonExpanded((val) => !val)
+    setIsAccordeonExpanded(!isAccordeonExpanded)
   }
 
   const handleMutateButtonClick = () => {

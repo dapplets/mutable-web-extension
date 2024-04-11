@@ -125,13 +125,14 @@ const DragIcon = () => (
 export const MultitablePanel: FC = () => {
   const { mutations, apps, selectedMutation } = useMutableWeb()
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
-  const [isPin, setPin] = useState(getPanelPinned() ? true : false)
+  const [isPin, setPin] = useState(!!getPanelPinned())
   const [isDragging, setIsDragging] = useState(false)
+  const [isPanelDisplayed, setIsPanelDisplayed] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsDropdownVisible(true)
+      setIsPanelDisplayed(false)
     }, 5000)
 
     return () => clearTimeout(timer)
@@ -185,9 +186,9 @@ export const MultitablePanel: FC = () => {
               className={
                 isPin
                   ? 'visible-pin'
-                  : isDropdownVisible && !isDragging
-                    ? 'visible-north-panel'
-                    : 'visible-default'
+                  : isPanelDisplayed || isDropdownVisible || isDragging
+                  ? 'visible-default'
+                  : 'visible-north-panel'
               }
               $isAnimated={!isDragging}
             >
