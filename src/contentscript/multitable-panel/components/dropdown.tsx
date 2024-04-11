@@ -27,15 +27,15 @@ import {
   WrapperDropdown,
 } from '../assets/stylesDropdown'
 import {
-  availableIcon,
-  back,
-  iconDropdown,
-  mutate,
-  starMutationList,
-  starMutationListDefault,
-  starSelectMutation,
-  starSelectMutationDefault,
-  trash,
+  AvailableIcon,
+  Back,
+  IconDropdown,
+  Mutate,
+  StarMutationList,
+  StarMutationListDefault,
+  StarSelectMutation,
+  StarSelectMutationDefault,
+  Trash,
 } from '../assets/vectors'
 
 import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
@@ -136,17 +136,21 @@ export const Dropdown: FC<DropdownProps> = ({
 
         {selectedMutation ? (
           <StarSelectedMutationWrapper onClick={() => handleFavoriteButtonClick(selectedMutation)}>
-            {selectedMutation.id === favoriteMutationId
-              ? starSelectMutation
-              : starSelectMutationDefault}
+            {selectedMutation.id === favoriteMutationId ? (
+              <StarSelectMutation />
+            ) : (
+              <StarSelectMutationDefault />
+            )}
           </StarSelectedMutationWrapper>
         ) : null}
 
         {isVisible ? (
-          <OpenList onClick={() => onVisibilityChange(!isVisible)}>{iconDropdown}</OpenList>
+          <OpenList onClick={() => onVisibilityChange(!isVisible)}>
+            <IconDropdown />
+          </OpenList>
         ) : (
           <OpenListDefault onClick={() => onVisibilityChange(!isVisible)}>
-            {iconDropdown}
+            <IconDropdown />
           </OpenListDefault>
         )}
       </SelectedMutationBlock>
@@ -155,8 +159,8 @@ export const Dropdown: FC<DropdownProps> = ({
         <MutationsList>
           <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
             <ButtonListBlock>
-              <ButtonBack onClick={handleOriginalButtonClick}>{back}to Original</ButtonBack>
-              <ButtonMutation onClick={handleMutateButtonClick}>Mutate{mutate}</ButtonMutation>
+              <ButtonBack onClick={handleOriginalButtonClick}>{<Back />} to Original</ButtonBack>
+              <ButtonMutation onClick={handleMutateButtonClick}>Mutate {<Mutate />}</ButtonMutation>
             </ButtonListBlock>
 
             <ListMutations>
@@ -187,15 +191,15 @@ export const Dropdown: FC<DropdownProps> = ({
 
                   {mut.id === favoriteMutationId ? (
                     <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
-                      {starMutationList}
+                      <StarMutationList />
                     </InputIconWrapper>
                   ) : mut.id === selectedMutation?.id ? (
                     <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
-                      {starMutationListDefault}
+                      <StarMutationListDefault />
                     </InputIconWrapper>
                   ) : (
                     <InputIconWrapper onClick={() => handleRemoveFromRecentlyUsedClick(mut)}>
-                      {trash}
+                      <Trash />
                     </InputIconWrapper>
                   )}
                 </InputBlock>
@@ -212,7 +216,7 @@ export const Dropdown: FC<DropdownProps> = ({
                     onClick={handleAccordeonClick}
                   >
                     <AvalibleArrowLable>{unusedMutations.length} mutations</AvalibleArrowLable>
-                    {availableIcon}
+                    <AvailableIcon />
                   </AvalibleArrowBlock>
                 </AvalibleLableBlock>
 

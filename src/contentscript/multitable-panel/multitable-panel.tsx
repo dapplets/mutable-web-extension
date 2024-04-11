@@ -3,7 +3,8 @@ import Draggable from 'react-draggable'
 import styled from 'styled-components'
 import { useMutableWeb } from '../contexts/mutable-web-context'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
-import { iconPin, iconPinDefault } from './assets/vectors'
+
+import { PinOutlineIcon, PinSolidIcon } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
 import { MutationEditorModal } from './components/mutation-editor-modal'
 
@@ -185,8 +186,8 @@ export const MultitablePanel: FC = () => {
                 isPin
                   ? 'visible-pin'
                   : isDropdownVisible && !isDragging
-                  ? 'visible-north-panel'
-                  : 'visible-default'
+                    ? 'visible-north-panel'
+                    : 'visible-default'
               }
               $isAnimated={!isDragging}
             >
@@ -200,7 +201,9 @@ export const MultitablePanel: FC = () => {
                 onVisibilityChange={setIsDropdownVisible}
                 onMutateButtonClick={handleMutateButtonClick}
               />
-              <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
+              <PinWrapper onClick={handlePin}>
+                {isPin ? <PinSolidIcon /> : <PinOutlineIcon />}
+              </PinWrapper>
             </NorthPanel>
           </NorthPanelWrapper>
         </Draggable>
