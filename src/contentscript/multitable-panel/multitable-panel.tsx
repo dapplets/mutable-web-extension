@@ -49,6 +49,12 @@ const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
     transform: translateY(0);
   }
 `
+
+const NorthPanelWrapper = styled.span`
+  position: fixed;
+  height: 5px;
+`
+
 const NorthPanel = styled.div<{ $isAnimated?: boolean }>`
   position: relative;
 
@@ -151,6 +157,11 @@ export const MultitablePanel: FC = () => {
     return null
   }
 
+  const handleMutateButtonClick = () => {
+    setIsModalOpen(true)
+    setIsDropdownVisible(false)
+  }
+
   const handleModalClose = () => {
     setIsModalOpen(false)
   }
@@ -166,7 +177,7 @@ export const MultitablePanel: FC = () => {
           onStop={handleStopDrag}
           defaultPosition={{ x: window.innerWidth / 2 - 159, y: 0 }}
         >
-          <span style={{ position: 'fixed', height: 5 }}>
+          <NorthPanelWrapper>
             {/* ToDo: refactor className */}
             <NorthPanel
               data-testid="north-panel"
@@ -191,7 +202,7 @@ export const MultitablePanel: FC = () => {
               />
               <PinWrapper onClick={handlePin}>{isPin ? iconPin : iconPinDefault}</PinWrapper>
             </NorthPanel>
-          </span>
+          </NorthPanelWrapper>
         </Draggable>
       ) : null}
 
