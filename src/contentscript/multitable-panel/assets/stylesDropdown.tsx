@@ -196,13 +196,14 @@ export const ButtonBack = styled.div`
   cursor: pointer;
   z-index: 1;
   width: 40%;
-  height: 100%;
+  height: 70%;
   transition: all 0.2s ease;
   svg {
     margin-right: 5px;
   }
   &:hover {
     background: rgba(56, 75, 255, 0.1);
+    border-radius: 4px;
   }
 `
 
@@ -218,13 +219,14 @@ export const ButtonMutation = styled.div`
   cursor: pointer;
   z-index: 1;
   width: 40%;
-  height: 100%;
+  height: 70%;
   transition: all 0.2s ease;
   svg {
     margin-left: 5px;
   }
   &:hover {
     background: rgba(56, 75, 255, 0.1);
+    border-radius: 4px;
   }
 `
 
@@ -308,8 +310,7 @@ export const AvalibleMutations = styled.div<{ $enable?: string; $enableBefore?: 
   padding: 10px;
   .avalibleMutationsInput {
     background: rgba(248, 249, 255, 1);
-    margin-left: 10px;
-    width: 250px;
+    width: 100%;
     border-radius: 4px;
     padding: 2px 4px;
     margin-bottom: 3px;
