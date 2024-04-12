@@ -208,7 +208,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   const [originalMutation, setOriginalMutation] = useState(preOriginalMutation)
   const [editingMutation, setEditingMutation] = useState(originalMutation)
 
-  const [mutationAuthorId] = editingMutation.id.split('/')
+  const [mutationAuthorId] = preOriginalMutation.id.split('/')
   const isOwn = mutationAuthorId === loggedInAccountId
 
   const [mode, setMode] = useState(
