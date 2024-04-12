@@ -145,7 +145,7 @@ export const MutationsList = styled.div`
   max-height: 500px;
 
   overflow: hidden;
-
+  overflow-y: auto;
   gap: 10px;
   @keyframes listVisible {
     0% {
@@ -163,24 +163,29 @@ export const MutationsList = styled.div`
   animation: listVisible 0.2s ease forwards;
   transition: all 0.3s;
 
-  .simplebar-wrapper {
-    outline: none;
+  &::-webkit-scrollbar {
+    cursor: pointer;
+    width: 4px;
   }
 
-  .simplebar-mask {
-    outline: none;
+  &::-webkit-scrollbar-track {
+    margin-bottom: 10px;
+    margin-top: 40px;
+    background: rgb(244 244 244);
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
   }
 
-  .simplebar-offset {
-    outline: none;
-  }
-
-  .simplebar-content-wrapper {
-    outline: none;
-  }
-
-  .simplebar-content {
-    outline: none;
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    background: #384bff;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
 `
 export const ButtonListBlock = styled.div`
@@ -217,6 +222,8 @@ export const ButtonBack = styled.div`
   z-index: 1;
   width: 40%;
   height: 70%;
+  padding-bottom: 10px;
+  padding-top: 10px;
   transition: all 0.2s ease;
   svg {
     margin-right: 5px;
@@ -240,6 +247,8 @@ export const ButtonMutation = styled.div`
   z-index: 1;
   width: 40%;
   height: 70%;
+  padding-bottom: 10px;
+  padding-top: 10px;
   transition: all 0.2s ease;
   svg {
     margin-left: 5px;
