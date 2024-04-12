@@ -1,11 +1,12 @@
 import { AppMetadata, Mutation } from 'mutable-web-engine'
 import { useAccountId } from 'near-social-vm'
-import React, { FC, useMemo, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
 import { useEditMutation } from '../../contexts/mutable-web-context/use-edit-mutation'
-import { cloneDeep, compareDeep, mergeDeep } from '../../helpers'
+import { cloneDeep, compareMutations, mergeDeep } from '../../helpers'
 import { useEscape } from '../../hooks/use-escape'
+import { Alert, AlertProps } from './alert'
 import { ApplicationCard } from './application-card'
 import { Button } from './button'
 import { DropdownButton } from './dropdown-button'
@@ -25,7 +26,7 @@ const SelectedMutationEditorWrapper = styled.div`
   border: 1px solid #02193a;
   background: #f8f9ff;
   width: 400px;
-  max-height: 500px;
+  max-height: 70vh;
 `
 
 const Close = styled.span`
@@ -121,6 +122,35 @@ export enum MutationModalMode {
   Forking = 'forking',
 }
 
+interface IAlert extends AlertProps {
+  id: string
+  shortText?: string
+}
+
+const alerts: { [name: string]: IAlert } = {
+  noWallet: {
+    id: 'noWallet',
+    text: 'You must connect the NEAR wallet to create the mutation.',
+    severity: 'warning',
+    shortText: 'You must connect the NEAR wallet',
+  },
+  emptyMutation: {
+    id: 'emptyMutation',
+    text: 'The mutation is empty. Add applications to create the mutation.',
+    severity: 'error',
+  },
+  notEditedMutation: {
+    id: 'notEditedMutation',
+    text: 'The mutation fork must be edited. Add or remove applications to create a new mutation.',
+    severity: 'error',
+  },
+  idIsNotUnique: {
+    id: 'idIsNotUnique',
+    text: 'This mutation ID already exists. Add another ID to create a new mutation, or change the NEAR wallet to edit your existing one.',
+    severity: 'error',
+  },
+}
+
 export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) => {
   const loggedInAccountId = useAccountId()
   const { createMutation, isLoading: isCreating } = useCreateMutation()
@@ -148,11 +178,23 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   )
 
   const isModified = useMemo(
-    () => !compareDeep(baseMutation, editingMutation),
+    () => !(baseMutation ? compareMutations(baseMutation, editingMutation) : false),
     [baseMutation, editingMutation]
   )
 
-  const isFormDisabled = !isModified || isCreating || isEditing
+  const [alert, setAlert] = useState<IAlert | null>(null)
+
+  useEffect(() => {
+    const doChecksForAlerts = (): IAlert | null => {
+      if (!loggedInAccountId) return alerts.noWallet
+      if (!editingMutation?.apps || editingMutation?.apps?.length === 0) return alerts.emptyMutation
+      if (!isModified) return alerts.notEditedMutation
+      return null
+    }
+    setAlert(doChecksForAlerts())
+  }, [loggedInAccountId, editingMutation, isModified])
+
+  const isFormDisabled = !isModified || isCreating || isEditing || !!alert
 
   const handleMutationIdChange = (id: string) => {
     setEditingMutation((mut) => mergeDeep(cloneDeep(mut), { id }))
@@ -197,6 +239,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
           <CloseIcon />
         </Close>
       </HeaderEditor>
+
+      {alert ? <Alert severity={alert.severity} text={alert.text} /> : null}
 
       <Input
         label="Mutation ID"
