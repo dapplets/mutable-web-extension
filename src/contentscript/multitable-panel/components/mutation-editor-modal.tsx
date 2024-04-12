@@ -288,6 +288,12 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
 
   const handleSaveClick = () => {
     // validate Name
+    if (editingMutation.id === `${loggedInAccountId}/mutation/`) {
+      setAlert(alerts.noId)
+      return
+    }
+
+    // validate Name
     const name = editingMutation.metadata.name
     if (name !== name?.trim()) {
       if (!name || name.trim() === '') {
