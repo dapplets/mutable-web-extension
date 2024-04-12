@@ -2,6 +2,7 @@ import { AppMetadata, Mutation } from 'mutable-web-engine'
 import { useAccountId } from 'near-social-vm'
 import React, { FC, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
+import { useMutableWeb } from '../../contexts/mutable-web-context'
 import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
 import { useEditMutation } from '../../contexts/mutable-web-context/use-edit-mutation'
 import {
@@ -143,17 +144,17 @@ const alerts: { [name: string]: IAlert } = {
   emptyMutation: {
     id: 'emptyMutation',
     text: 'The mutation is empty. Add applications to create the mutation.',
-    severity: 'error',
+    severity: 'warning',
   },
   notEditedMutation: {
     id: 'notEditedMutation',
     text: 'The mutation fork must be edited. Add or remove applications to create a new mutation.',
-    severity: 'error',
+    severity: 'warning',
   },
   idIsNotUnique: {
     id: 'idIsNotUnique',
     text: 'This mutation ID already exists. Add another ID to create a new mutation, or change the NEAR wallet to edit your existing one.',
-    severity: 'error',
+    severity: 'warning',
   },
 }
 
@@ -161,6 +162,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   const loggedInAccountId = useAccountId()
   const { createMutation, isLoading: isCreating } = useCreateMutation()
   const { editMutation, isLoading: isEditing } = useEditMutation()
+  const { mutations } = useMutableWeb()
 
   // Close modal with escape key
   useEscape(onClose)
@@ -195,10 +197,15 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       if (!loggedInAccountId) return alerts.noWallet
       if (!editingMutation?.apps || editingMutation?.apps?.length === 0) return alerts.emptyMutation
       if (!isModified) return alerts.notEditedMutation
+      if (
+        (mode === MutationModalMode.Forking || mode === MutationModalMode.Creating) &&
+        mutations.map((m) => m.id).includes(editingMutation.id)
+      )
+        return alerts.idIsNotUnique
       return null
     }
     setAlert(doChecksForAlerts())
-  }, [loggedInAccountId, editingMutation, isModified])
+  }, [loggedInAccountId, editingMutation, isModified, mode, mutations])
 
   const isFormDisabled = !isModified || isCreating || isEditing || !!alert
 
