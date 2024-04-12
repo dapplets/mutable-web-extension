@@ -187,11 +187,14 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   // Close modal with escape key
   useEscape(onClose)
 
-  const originalMutation = useMemo(
+  const preOriginalMutation = useMemo(
     () => baseMutation ?? createEmptyMutation(loggedInAccountId ?? 'dapplets.near'),
     [baseMutation, loggedInAccountId]
   )
 
+  // ToDo: refactor it.
+  // Too much mutations: baseMutation, preOriginalMutation, originalMutation, editingMutation
+  const [originalMutation, setOriginalMutation] = useState(preOriginalMutation)
   const [editingMutation, setEditingMutation] = useState(originalMutation)
 
   const [mutationAuthorId] = editingMutation.id.split('/')
@@ -204,6 +207,19 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       ? MutationModalMode.Editing
       : MutationModalMode.Forking
   )
+
+  useEffect(() => {
+    // Replace ID when forking
+    if (mode === MutationModalMode.Forking && loggedInAccountId) {
+      const [, , mutLocalId] = preOriginalMutation.id.split('/')
+      const newId = `${loggedInAccountId}/mutation/${mutLocalId}`
+      setOriginalMutation(mergeDeep(cloneDeep(preOriginalMutation), { id: newId }))
+    } else {
+      setOriginalMutation(preOriginalMutation)
+    }
+  }, [preOriginalMutation, mode, loggedInAccountId])
+
+  useEffect(() => setEditingMutation(originalMutation), [originalMutation])
 
   const isModified = useMemo(
     () => !(baseMutation ? compareMutations(baseMutation, editingMutation) : false),
@@ -226,6 +242,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
 
   const handleMutationIdChange = (id: string) => {
     if (!isValidSocialIdCharacters(id)) return
+    if (!id.startsWith(`${loggedInAccountId}/mutation/`)) return
     setEditingMutation((mut) => mergeDeep(cloneDeep(mut), { id }))
   }
 
