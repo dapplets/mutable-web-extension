@@ -43,12 +43,13 @@ const TextSave = styled.div`
   text-align: center;
 `
 
-const RightButton = styled.div<{ isOpened: boolean }>`
+const RightButton = styled.button<{ isOpened: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   width: 42px;
   height: 42px;
+  border: none;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(56, 75, 255, 1);
   cursor: pointer;
@@ -130,9 +131,17 @@ export interface Props {
   onClick: (itemId: string) => void
   onChange: (itemId: string) => void
   disabled: boolean
+  disabledAll: boolean
 }
 
-export const DropdownButton: FC<Props> = ({ value, items, disabled, onClick, onChange }) => {
+export const DropdownButton: FC<Props> = ({
+  value,
+  items,
+  disabled,
+  disabledAll,
+  onClick,
+  onChange,
+}) => {
   const [isOpened, setIsOpened] = useState(false)
 
   const visibleItems = useMemo(() => items.filter((item) => item.visible), [items])
@@ -166,7 +175,7 @@ export const DropdownButton: FC<Props> = ({ value, items, disabled, onClick, onC
           <TextSave onClick={handleMainButtonClick}>{currentItem.title}</TextSave>
         </LeftButton>
         {visibleItems.length > 1 ? (
-          <RightButton isOpened={isOpened} onClick={handleDropdownToggle}>
+          <RightButton disabled={disabledAll} isOpened={isOpened} onClick={handleDropdownToggle}>
             <ArrowIcon />
           </RightButton>
         ) : null}
