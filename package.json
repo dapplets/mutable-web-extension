@@ -47,8 +47,6 @@
     "sass": "^1.60.0",
     "sass-loader": "^13.2.2",
     "semantic-release": "^19.0.5",
-    "simplebar": "^6.2.5",
-    "simplebar-react": "^3.2.4",
     "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.2",
     "stylelint": "^14.16.1",

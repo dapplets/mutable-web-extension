@@ -1,5 +1,4 @@
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useMemo, useState } from 'react'
-import SimpleBar from 'simplebar-react'
 import {
   AuthorMutation,
   AvalibleArrowBlock,
@@ -157,7 +156,7 @@ export const Dropdown: FC<DropdownProps> = ({
 
       {isVisible && (
         <MutationsList>
-          <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}>
+          {/* <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}> */}
             <ButtonListBlock>
               <ButtonBack onClick={handleOriginalButtonClick}>{<Back />} to Original</ButtonBack>
               <ButtonMutation onClick={handleMutateButtonClick}>Mutate {<Mutate />}</ButtonMutation>
@@ -238,9 +237,27 @@ export const Dropdown: FC<DropdownProps> = ({
                       </InputBlock>
                     ))
                   : null}
+                     {isAccordeonExpanded
+                  ? unusedMutations.map((mut) => (
+                      <InputBlock
+                        key={mut.id}
+                        isActive={mut.id === selectedMutation?.id}
+                        onClick={() => handleMutationClick(mut.id)}
+                        className="avalibleMutationsInput"
+                      >
+                        <ImageBlock>
+                          <Image image={mut.metadata.image} />
+                        </ImageBlock>
+                        <InputInfoWrapper>
+                          <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
+                          <AuthorMutation>{mut.id}</AuthorMutation>
+                        </InputInfoWrapper>
+                      </InputBlock>
+                    ))
+                  : null}
               </AvalibleMutations>
             ) : null}
-          </SimpleBar>
+          {/* </SimpleBar> */}
         </MutationsList>
       )}
     </WrapperDropdown>
