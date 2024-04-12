@@ -38,7 +38,6 @@ import {
 } from '../assets/vectors'
 
 import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
-import 'simplebar-react/dist/simplebar.min.css'
 import { useMutableWeb } from '../../contexts/mutable-web-context'
 import { Image } from './image'
 

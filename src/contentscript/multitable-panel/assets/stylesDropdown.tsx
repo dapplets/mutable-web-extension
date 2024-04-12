@@ -10,18 +10,6 @@ export const WrapperDropdown = styled.div`
   height: 35px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
-
-  .simplebar-scrollbar::before {
-    background-color: #384bff;
-    width: 4px;
-    border-radius: 10px;
-  }
-  .simplebar-vertical {
-    margin-top: 10px;
-    width: 2px;
-    background: transparent;
-    margin-right: -5px;
-  }
 `
 
 export const SelectedMutationBlock = styled.div`
