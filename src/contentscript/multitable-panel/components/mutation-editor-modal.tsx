@@ -263,7 +263,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     })
   }, [isModified])
 
-  const isFormDisabled = !isModified || isCreating || isEditing || !!alert
+  const isFormDisabled = isCreating || isEditing
+  const isSubmitDisabled = !isModified || isCreating || isEditing || !!alert
 
   const handleMutationIdChange = (id: string) => {
     if (!isValidSocialIdCharacters(id)) return
@@ -341,7 +342,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
         value={editingMutation.id}
         placeholder="dapplets.near/mutation/web"
         onChange={handleMutationIdChange}
-        disabled={mode === MutationModalMode.Editing}
+        disabled={isFormDisabled || mode === MutationModalMode.Editing}
       />
 
       <Input
@@ -349,6 +350,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
         value={editingMutation.metadata.name ?? ''}
         placeholder="My Mutation"
         onChange={handleMutationNameChange}
+        disabled={isFormDisabled}
       />
 
       <AppsList>
@@ -359,12 +361,13 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
             metadata={app.metadata}
             isChecked={editingMutation.apps.includes(app.id)}
             onChange={(val) => handleAppCheckboxChange(app.id, val)}
+            disabled={isFormDisabled}
           />
         ))}
       </AppsList>
 
       <ButtonsBlock>
-        <Button disabled={isFormDisabled} onClick={handleRevertClick}>
+        <Button disabled={isSubmitDisabled} onClick={handleRevertClick}>
           Revert changes
         </Button>
         <DropdownButton
@@ -376,7 +379,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
           ]}
           onClick={handleSaveClick}
           onChange={handleSaveDropdownChange}
-          disabled={isFormDisabled}
+          disabled={isSubmitDisabled}
+          disabledAll={isFormDisabled}
         />
       </ButtonsBlock>
     </SelectedMutationEditorWrapper>
