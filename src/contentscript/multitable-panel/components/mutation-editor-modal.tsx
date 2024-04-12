@@ -1,6 +1,6 @@
 import { AppMetadata, Mutation } from 'mutable-web-engine'
 import { useAccountId } from 'near-social-vm'
-import React, { FC, useEffect, useMemo, useState } from 'react'
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { useMutableWeb } from '../../contexts/mutable-web-context'
 import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
@@ -153,30 +153,38 @@ export enum MutationModalMode {
 
 interface IAlert extends AlertProps {
   id: string
-  shortText?: string
 }
 
 const alerts: { [name: string]: IAlert } = {
   noWallet: {
     id: 'noWallet',
-    text: 'You must connect the NEAR wallet to create the mutation.',
+    text: 'Connect the NEAR wallet to create the mutation.',
     severity: 'warning',
-    shortText: 'You must connect the NEAR wallet',
   },
   emptyMutation: {
     id: 'emptyMutation',
-    text: 'The mutation is empty. Add applications to create the mutation.',
+    text: 'A mutation cannot be empty.',
     severity: 'warning',
   },
   notEditedMutation: {
     id: 'notEditedMutation',
-    text: 'The mutation fork must be edited. Add or remove applications to create a new mutation.',
+    text: 'No changes found!',
     severity: 'warning',
   },
   idIsNotUnique: {
     id: 'idIsNotUnique',
-    text: 'This mutation ID already exists. Add another ID to create a new mutation, or change the NEAR wallet to edit your existing one.',
+    text: 'This mutation ID already exists.',
     severity: 'warning',
+  },
+  noId: {
+    id: 'noId',
+    text: 'ID must be specified.',
+    severity: 'error',
+  },
+  noName: {
+    id: 'noName',
+    text: 'Name must be specified.',
+    severity: 'error',
   },
 }
 
@@ -185,6 +193,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   const { createMutation, isLoading: isCreating } = useCreateMutation()
   const { editMutation, isLoading: isEditing } = useEditMutation()
   const { mutations } = useMutableWeb()
+  const [isModified, setIsModified] = useState(true)
 
   // Close modal with escape key
   useEscape(onClose)
@@ -223,7 +232,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
 
   useEffect(() => setEditingMutation(originalMutation), [originalMutation])
 
-  const isModified = useMemo(
+  const checkIfModified = useCallback(
     () => !(baseMutation ? compareMutations(baseMutation, editingMutation) : false),
     [baseMutation, editingMutation]
   )
@@ -234,7 +243,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     const doChecksForAlerts = (): IAlert | null => {
       if (!loggedInAccountId) return alerts.noWallet
       if (!editingMutation?.apps || editingMutation?.apps?.length === 0) return alerts.emptyMutation
-      if (!isModified) return alerts.notEditedMutation
+      if (!editingMutation.id) return alerts.noId
+      if (!editingMutation.metadata.name) return alerts.noName
       if (
         (mode === MutationModalMode.Forking || mode === MutationModalMode.Creating) &&
         mutations.map((m) => m.id).includes(editingMutation.id)
@@ -242,8 +252,16 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
         return alerts.idIsNotUnique
       return null
     }
+    setIsModified(true)
     setAlert(doChecksForAlerts())
-  }, [loggedInAccountId, editingMutation, isModified, mode, mutations])
+  }, [loggedInAccountId, editingMutation, mode, mutations])
+
+  useEffect(() => {
+    setAlert((val) => {
+      if (!isModified) return alerts.notEditedMutation
+      return !val || val?.id === 'notEditedMutation' ? null : val
+    })
+  }, [isModified])
 
   const isFormDisabled = !isModified || isCreating || isEditing || !!alert
 
@@ -269,6 +287,23 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   }
 
   const handleSaveClick = () => {
+    // validate Name
+    const name = editingMutation.metadata.name
+    if (name !== name?.trim()) {
+      if (!name || name.trim() === '') {
+        handleMutationNameChange('')
+        return
+      }
+      editingMutation.metadata.name = name?.trim()
+    }
+
+    // validate changes
+    const hasChanges = checkIfModified()
+    if (!hasChanges) {
+      setIsModified(false)
+      return
+    }
+
     if (mode === MutationModalMode.Creating || mode === MutationModalMode.Forking) {
       createMutation(editingMutation).then(() => onClose())
     } else if (mode === MutationModalMode.Editing) {
