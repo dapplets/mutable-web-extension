@@ -4,7 +4,7 @@ import React, { FC, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
 import { useEditMutation } from '../../contexts/mutable-web-context/use-edit-mutation'
-import { cloneDeep, compareDeep, mergeDeep } from '../../helpers'
+import { cloneDeep, compareDeep, isValidSocialIdCharacters, mergeDeep } from '../../helpers'
 import { useEscape } from '../../hooks/use-escape'
 import { ApplicationCard } from './application-card'
 import { Button } from './button'
@@ -155,6 +155,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   const isFormDisabled = !isModified || isCreating || isEditing
 
   const handleMutationIdChange = (id: string) => {
+    if (!isValidSocialIdCharacters(id)) return
     setEditingMutation((mut) => mergeDeep(cloneDeep(mut), { id }))
   }
 

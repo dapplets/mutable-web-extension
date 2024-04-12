@@ -41,3 +41,7 @@ export function mergeDeep<T extends object>(target: T, source: Partial<T>): T {
 
   return target
 }
+
+export function isValidSocialIdCharacters(value: string): boolean {
+  return /^[a-zA-Z0-9_.\-/]*$/.test(value)
+}
