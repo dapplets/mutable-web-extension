@@ -45,3 +45,6 @@ export function mergeDeep<T extends object>(target: T, source: Partial<T>): T {
 export function isValidSocialIdCharacters(value: string): boolean {
   return /^[a-zA-Z0-9_.\-/]*$/.test(value)
 }
+
+export const generateRandomHex = (size: number) =>
+  [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')

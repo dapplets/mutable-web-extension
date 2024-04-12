@@ -4,7 +4,13 @@ import React, { FC, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
 import { useEditMutation } from '../../contexts/mutable-web-context/use-edit-mutation'
-import { cloneDeep, compareDeep, isValidSocialIdCharacters, mergeDeep } from '../../helpers'
+import {
+  cloneDeep,
+  compareDeep,
+  generateRandomHex,
+  isValidSocialIdCharacters,
+  mergeDeep,
+} from '../../helpers'
 import { useEscape } from '../../hooks/use-escape'
 import { ApplicationCard } from './application-card'
 import { Button } from './button'
@@ -95,7 +101,7 @@ const CloseIcon = () => (
 )
 
 const createEmptyMutation = (accountId: string): Mutation => ({
-  id: `${accountId}/mutation/Untitled`,
+  id: `${accountId}/mutation/Untitled-${generateRandomHex(6)}`,
   apps: [],
   metadata: {
     name: '',
