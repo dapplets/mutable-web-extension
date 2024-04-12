@@ -1,11 +1,19 @@
 import { AppMetadata, Mutation } from 'mutable-web-engine'
 import { useAccountId } from 'near-social-vm'
-import React, { FC, useMemo, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
+import { useMutableWeb } from '../../contexts/mutable-web-context'
 import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
 import { useEditMutation } from '../../contexts/mutable-web-context/use-edit-mutation'
-import { cloneDeep, compareDeep, mergeDeep } from '../../helpers'
+import {
+  cloneDeep,
+  compareMutations,
+  generateRandomHex,
+  isValidSocialIdCharacters,
+  mergeDeep,
+} from '../../helpers'
 import { useEscape } from '../../hooks/use-escape'
+import { Alert, AlertProps } from './alert'
 import { ApplicationCard } from './application-card'
 import { Button } from './button'
 import { DropdownButton } from './dropdown-button'
@@ -25,7 +33,7 @@ const SelectedMutationEditorWrapper = styled.div`
   border: 1px solid #02193a;
   background: #f8f9ff;
   width: 400px;
-  max-height: 500px;
+  max-height: 70vh;
 `
 
 const Close = styled.span`
@@ -67,6 +75,28 @@ const AppsList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 5px;
+  &::-webkit-scrollbar {
+    cursor: pointer;
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgb(244 244 244);
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    background: #384bff;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+  }
 `
 
 const ButtonsBlock = styled.div`
@@ -95,7 +125,7 @@ const CloseIcon = () => (
 )
 
 const createEmptyMutation = (accountId: string): Mutation => ({
-  id: `${accountId}/mutation/Untitled`,
+  id: `${accountId}/mutation/Untitled-${generateRandomHex(6)}`,
   apps: [],
   metadata: {
     name: '',
@@ -121,19 +151,52 @@ export enum MutationModalMode {
   Forking = 'forking',
 }
 
+interface IAlert extends AlertProps {
+  id: string
+  shortText?: string
+}
+
+const alerts: { [name: string]: IAlert } = {
+  noWallet: {
+    id: 'noWallet',
+    text: 'You must connect the NEAR wallet to create the mutation.',
+    severity: 'warning',
+    shortText: 'You must connect the NEAR wallet',
+  },
+  emptyMutation: {
+    id: 'emptyMutation',
+    text: 'The mutation is empty. Add applications to create the mutation.',
+    severity: 'warning',
+  },
+  notEditedMutation: {
+    id: 'notEditedMutation',
+    text: 'The mutation fork must be edited. Add or remove applications to create a new mutation.',
+    severity: 'warning',
+  },
+  idIsNotUnique: {
+    id: 'idIsNotUnique',
+    text: 'This mutation ID already exists. Add another ID to create a new mutation, or change the NEAR wallet to edit your existing one.',
+    severity: 'warning',
+  },
+}
+
 export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) => {
   const loggedInAccountId = useAccountId()
   const { createMutation, isLoading: isCreating } = useCreateMutation()
   const { editMutation, isLoading: isEditing } = useEditMutation()
+  const { mutations } = useMutableWeb()
 
   // Close modal with escape key
   useEscape(onClose)
 
-  const originalMutation = useMemo(
+  const preOriginalMutation = useMemo(
     () => baseMutation ?? createEmptyMutation(loggedInAccountId ?? 'dapplets.near'),
     [baseMutation, loggedInAccountId]
   )
 
+  // ToDo: refactor it.
+  // Too much mutations: baseMutation, preOriginalMutation, originalMutation, editingMutation
+  const [originalMutation, setOriginalMutation] = useState(preOriginalMutation)
   const [editingMutation, setEditingMutation] = useState(originalMutation)
 
   const [mutationAuthorId] = editingMutation.id.split('/')
@@ -147,14 +210,46 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       : MutationModalMode.Forking
   )
 
+  useEffect(() => {
+    // Replace ID when forking
+    if (mode === MutationModalMode.Forking && loggedInAccountId) {
+      const [, , mutLocalId] = preOriginalMutation.id.split('/')
+      const newId = `${loggedInAccountId}/mutation/${mutLocalId}`
+      setOriginalMutation(mergeDeep(cloneDeep(preOriginalMutation), { id: newId }))
+    } else {
+      setOriginalMutation(preOriginalMutation)
+    }
+  }, [preOriginalMutation, mode, loggedInAccountId])
+
+  useEffect(() => setEditingMutation(originalMutation), [originalMutation])
+
   const isModified = useMemo(
-    () => !compareDeep(baseMutation, editingMutation),
+    () => !(baseMutation ? compareMutations(baseMutation, editingMutation) : false),
     [baseMutation, editingMutation]
   )
 
-  const isFormDisabled = !isModified || isCreating || isEditing
+  const [alert, setAlert] = useState<IAlert | null>(null)
+
+  useEffect(() => {
+    const doChecksForAlerts = (): IAlert | null => {
+      if (!loggedInAccountId) return alerts.noWallet
+      if (!editingMutation?.apps || editingMutation?.apps?.length === 0) return alerts.emptyMutation
+      if (!isModified) return alerts.notEditedMutation
+      if (
+        (mode === MutationModalMode.Forking || mode === MutationModalMode.Creating) &&
+        mutations.map((m) => m.id).includes(editingMutation.id)
+      )
+        return alerts.idIsNotUnique
+      return null
+    }
+    setAlert(doChecksForAlerts())
+  }, [loggedInAccountId, editingMutation, isModified, mode, mutations])
+
+  const isFormDisabled = !isModified || isCreating || isEditing || !!alert
 
   const handleMutationIdChange = (id: string) => {
+    if (!isValidSocialIdCharacters(id)) return
+    if (!id.startsWith(`${loggedInAccountId}/mutation/`)) return
     setEditingMutation((mut) => mergeDeep(cloneDeep(mut), { id }))
   }
 
@@ -197,6 +292,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
           <CloseIcon />
         </Close>
       </HeaderEditor>
+
+      {alert ? <Alert severity={alert.severity} text={alert.text} /> : null}
 
       <Input
         label="Mutation ID"

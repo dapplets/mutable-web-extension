@@ -1,3 +1,5 @@
+import { Mutation } from 'mutable-web-engine'
+
 /**
  * Simple object check.
  * @param item
@@ -21,6 +23,20 @@ export const cloneDeep = <T>(obj: T): T => JSON.parse(JSON.stringify(obj))
 export const compareDeep = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
 /**
+ * Compare two Mutations.
+ * @param m1
+ * @param m2
+ */
+export const compareMutations = (m1: Mutation, m2: Mutation): boolean =>
+  !(
+    m1.id !== m2.id ||
+    !compareDeep(m1.targets, m2.targets) ||
+    !compareDeep(m1.metadata, m2.metadata) ||
+    m1.apps.length !== m2.apps.length ||
+    !compareDeep(m1.apps.sort(), m2.apps.sort())
+  )
+
+/**
  * Deep merge two objects.
  * @param target
  * @param source
@@ -41,3 +57,10 @@ export function mergeDeep<T extends object>(target: T, source: Partial<T>): T {
 
   return target
 }
+
+export function isValidSocialIdCharacters(value: string): boolean {
+  return /^[a-zA-Z0-9_.\-/]*$/.test(value)
+}
+
+export const generateRandomHex = (size: number) =>
+  [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')

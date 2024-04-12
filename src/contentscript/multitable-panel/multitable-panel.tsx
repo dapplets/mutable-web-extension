@@ -65,6 +65,11 @@ const NorthPanel = styled.div<{ $isAnimated?: boolean }>`
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: none;
+  -webkit-overflow-scrolling: touch;
 
   width: 318px;
   height: 45px;
