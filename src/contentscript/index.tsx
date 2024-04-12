@@ -9,6 +9,7 @@ import { networkConfig } from '../common/networks'
 import Background from './background'
 import { MutableWebProvider } from './contexts/mutable-web-context'
 import { ExtensionStorage } from './extension-storage'
+import { ShadowDomWrapper } from './multitable-panel/components/shadow-dom-wrapper'
 import { MultitablePanel } from './multitable-panel/multitable-panel'
 import { setupWallet } from './wallet'
 
@@ -101,7 +102,9 @@ async function main() {
   const root = createRoot(container)
   root.render(
     <MutableWebProvider engine={engine}>
-      <MultitablePanel />
+      <ShadowDomWrapper>
+        <MultitablePanel />
+      </ShadowDomWrapper>
     </MutableWebProvider>
   )
 
