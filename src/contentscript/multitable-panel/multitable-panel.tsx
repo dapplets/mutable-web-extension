@@ -1,11 +1,9 @@
 import { EventEmitter as NEventEmitter } from 'events'
-import { Engine } from 'mutable-web-engine'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
 import { useMutableWeb } from '../contexts/mutable-web-context'
 import { getPanelPinned, removePanelPinned, setPanelPinned } from '../storage'
-
 import { PinOutlineIcon, PinSolidIcon } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
 import { MutationEditorModal } from './components/mutation-editor-modal'
@@ -130,12 +128,11 @@ const DragIcon = () => (
 )
 
 interface MultitablePanelProps {
-  engine: Engine
   eventEmitter: NEventEmitter
 }
 
 export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
-  const { mutations, apps, selectedMutation } = useMutableWeb()
+  const { apps, selectedMutation } = useMutableWeb()
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
   const [isPin, setPin] = useState(!!getPanelPinned())
   const [isDragging, setIsDragging] = useState(false)
@@ -154,7 +151,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
     const fn = () => {
       console.log('Mutate')
       console.log('selectedMutation?.id', selectedMutation?.id)
-      setWidgetsName(selectedMutation?.id)
+      // setWidgetsName(selectedMutation?.id)
     }
     eventEmitter.on('openMutationPopup', fn)
     return () => {
@@ -182,10 +179,6 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
   // if (mutations.length === 0) {
   //   return null
   // }
-
-  const handleCloseMutation = () => {
-    setWidgetsName(null)
-  }
 
   const handleMutateButtonClick = () => {
     setIsModalOpen(true)
