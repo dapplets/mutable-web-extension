@@ -104,9 +104,9 @@ async function main() {
   document.body.appendChild(container)
   const root = createRoot(container)
   root.render(
-    <MutableWebProvider engine={engine} eventEmitter={eventEmitter}>
+    <MutableWebProvider engine={engine}>
       <ShadowDomWrapper>
-        <MultitablePanel />
+        <MultitablePanel eventEmitter={eventEmitter} />
       </ShadowDomWrapper>
     </MutableWebProvider>
   )

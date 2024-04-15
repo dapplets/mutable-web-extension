@@ -1,5 +1,4 @@
 import { EventEmitter as NEventEmitter } from 'events'
-import { Engine } from 'mutable-web-engine'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
@@ -130,15 +129,13 @@ const DragIcon = () => (
 )
 
 interface MultitablePanelProps {
-  engine: Engine
   eventEmitter: NEventEmitter
 }
 
-export const MultitablePanel: FC<MultitablePanelProps> = ({ engine, eventEmitter }) => {
+export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
   const { mutations, apps, selectedMutation } = useMutableWeb()
   const [isDropdownVisible, setIsDropdownVisible] = useState(false)
   const [isPin, setPin] = useState(!!getPanelPinned())
-  const [visible, setVisible] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [isPanelDisplayed, setIsPanelDisplayed] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -155,23 +152,13 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine, eventEmitter
     const fn = () => {
       console.log('Mutate')
       console.log('selectedMutation?.id', selectedMutation?.id)
-      setWidgetsName(selectedMutation?.id)
+      // setWidgetsName(selectedMutation?.id)
     }
     eventEmitter.on('openMutationPopup', fn)
     return () => {
       eventEmitter.off('openMutationPopup', fn)
     }
   }, [eventEmitter, selectedMutation])
-
-  const init = async () => {
-    const mutations = await engine.getMutations()
-    setMutations(mutations)
-    const allApplications = await engine.getApplications()
-    setApplications(allApplications)
-
-    const mutation = await engine.getCurrentMutation()
-    setSelectedMutation(mutation)
-  }
 
   const handleStartDrag = () => {
     setIsDragging(true)
@@ -199,15 +186,10 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ engine, eventEmitter
     setIsDropdownVisible(false)
   }
 
-  const handleCloseMutation = () => {
-    setWidgetsName(null)
-  }
-
   const handleModalClose = () => {
     setIsModalOpen(false)
   }
 
-  console.log('widgetsName', widgetsName)
   console.log('selectedMutation', selectedMutation)
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutable-panel">
