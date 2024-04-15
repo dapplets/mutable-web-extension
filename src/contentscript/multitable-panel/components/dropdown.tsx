@@ -113,23 +113,6 @@ export const Dropdown: FC<DropdownProps> = ({
     removeMutationFromRecents(mut.id)
   }
 
-  // todo: mock
-  const changeAvalibleMutations = () => {
-    setAvalible(!isAvalible)
-  }
-
-  const sortedMitations = mutations.sort((a, b) => {
-    const dateA = a.settings.lastUsage ? new Date(a.settings.lastUsage).getTime() : null
-    const dateB = b.settings.lastUsage ? new Date(b.settings.lastUsage).getTime() : null
-
-    if (!dateA) return 1
-    if (!dateB) return -1
-
-    return dateB - dateB
-  })
-
-  const lastFiveMutations = sortedMitations.slice(0, 5)
-
   return (
     <WrapperDropdown>
       <SelectedMutationBlock
