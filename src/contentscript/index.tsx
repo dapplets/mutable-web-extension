@@ -94,6 +94,8 @@ async function main() {
       eventEmitter.emit('signedIn', message.params)
     } else if (message.type === 'SIGNED_OUT') {
       eventEmitter.emit('signedOut')
+    } else if (message.type === 'OPEN_NEW_MUTATION_POPUP') {
+      eventEmitter.emit('openMutationPopup')
     }
   })
 
@@ -102,7 +104,7 @@ async function main() {
   document.body.appendChild(container)
   const root = createRoot(container)
   root.render(
-    <MutableWebProvider engine={engine}>
+    <MutableWebProvider engine={engine} eventEmitter={eventEmitter}>
       <ShadowDomWrapper>
         <MultitablePanel />
       </ShadowDomWrapper>
