@@ -78,7 +78,7 @@ const copy = async (info: browser.Menus.OnClickData, tab: browser.Tabs.Tab) => {
 }
 
 const openNewMutationPopup = (tab: browser.Tabs.Tab) => {
-  browser.tabs.sendMessage(tab.id, { type: 'OPEN_NEW_MUTATION_POPUP' })
+  tab?.id && browser.tabs.sendMessage(tab.id, { type: 'OPEN_NEW_MUTATION_POPUP' })
 }
 
 // Context menu updaters
@@ -178,10 +178,13 @@ function handleContextMenuClick(
     }
 
     case 'mutate':
-      return openNewMutationPopup(tab)
+      if (tab) {
+        return openNewMutationPopup(tab)
+      }
+      break
 
     default:
-      break
+      console.log('There is no such a menu command')
   }
 }
 browser.contextMenus.onClicked.addListener(handleContextMenuClick)
