@@ -1,4 +1,4 @@
-import type { Account, Action, SignInParams } from '@near-wallet-selector/core'
+import type { Account, Action, SignInParams, Transaction } from '@near-wallet-selector/core'
 import {
   BridgeWallet,
   WalletBehaviourFactory,
@@ -13,14 +13,9 @@ import { CustomWalletConnection } from './wallet-connection'
 
 const LOCAL_STORAGE_KEY_SUFFIX = '_wallet_auth_key'
 
-export interface BrowserWalletSignInParams extends SignInParams {
-  successUrl?: string
-  failureUrl?: string
-}
-
 export interface SignAndSendTransactionParams {
   signerId?: string
-  receiverId?: string
+  receiverId: string
   actions: Array<Action>
 }
 
@@ -46,12 +41,7 @@ export class WalletImpl {
     this._statePromise = this._setupWalletState()
   }
 
-  signIn = async ({
-    contractId,
-    methodNames,
-    successUrl,
-    failureUrl,
-  }: BrowserWalletSignInParams): Promise<Account[]> => {
+  signIn = async ({ contractId, methodNames }: Partial<SignInParams>): Promise<Account[]> => {
     const _state = await this._statePromise
     const existingAccounts = await this.getAccounts()
 
@@ -62,8 +52,6 @@ export class WalletImpl {
     await _state.wallet.requestSignIn({
       contractId,
       methodNames,
-      successUrl,
-      failureUrl,
     })
 
     return this.getAccounts()
@@ -114,6 +102,10 @@ export class WalletImpl {
 
     const account = _state.wallet.account()
 
+    if (!account) {
+      throw new Error('Not logged in')
+    }
+
     return account.signAndSendTransaction({
       receiverId: receiverId,
       actions: actions.map((action) => createAction(action)),
@@ -122,6 +114,8 @@ export class WalletImpl {
 
   signAndSendTransactions = async ({
     transactions,
+  }: {
+    transactions: Transaction[]
   }): Promise<nearAPI.providers.FinalExecutionOutcome[]> => {
     // ToDo: implement batch transactions
     if (transactions.length > 1) {
@@ -133,6 +127,10 @@ export class WalletImpl {
     const _state = await this._statePromise
 
     const account = _state.wallet.account()
+
+    if (!account) {
+      throw new Error('Not logged in')
+    }
 
     const finalExecutionOutcome = await account.signAndSendTransaction({
       receiverId: transaction.receiverId,
