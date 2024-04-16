@@ -167,7 +167,7 @@ export const Dropdown: FC<DropdownProps> = ({
               {recentlyUsedMutations.map((mut) => (
                 <InputBlock key={mut.id} isActive={mut.id === selectedMutation?.id}>
                   <ImageBlock>
-                    <Image image={mut.metadata.image ? mut.metadata.image : defaultIcon} />
+                    <Image image={mut.metadata.image} fallbackUrl={defaultIcon} />
                   </ImageBlock>
                   <InputInfoWrapper onClick={() => handleMutationClick(mut.id)}>
                     {/* todo: mocked classname */}
@@ -230,7 +230,7 @@ export const Dropdown: FC<DropdownProps> = ({
                       className="avalibleMutationsInput"
                     >
                       <ImageBlock>
-                        <Image image={mut.metadata.image ? mut.metadata.image : defaultIcon} />
+                        <Image image={mut.metadata.image} fallbackUrl={defaultIcon} />
                       </ImageBlock>
                       <InputInfoWrapper>
                         <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
@@ -248,7 +248,7 @@ export const Dropdown: FC<DropdownProps> = ({
                       className="avalibleMutationsInput"
                     >
                       <ImageBlock>
-                        <Image image={mut.metadata.image ? mut.metadata.image : defaultIcon} />
+                        <Image image={mut.metadata.image} fallbackUrl={defaultIcon} />
                       </ImageBlock>
                       <InputInfoWrapper>
                         <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
