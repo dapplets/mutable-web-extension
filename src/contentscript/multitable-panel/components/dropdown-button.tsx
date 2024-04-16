@@ -5,13 +5,11 @@ const DropdownWrapper = styled.div`
   position: relative;
 `
 
-const ButtonsSave = styled.button`
+const LeftButton = styled.button`
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 175px;
-  height: 42px;
-  border-radius: 10px;
   border: none;
   background: rgba(56, 75, 255, 1);
   color: #fff;
@@ -45,14 +43,30 @@ const TextSave = styled.div`
   text-align: center;
 `
 
-const ArrowWrapper = styled.div<{ isOpened: boolean }>`
+const RightButton = styled.button<{ isOpened: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   width: 42px;
   height: 42px;
-  margin-left: auto;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(56, 75, 255, 1);
+  cursor: pointer;
   transform: ${(props) => (props.isOpened ? 'rotate(180deg)' : 'rotate(0deg)')};
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: auto;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.75;
+  }
+
+  &:active:not(:disabled) {
+    opacity: 0.5;
+  }
 `
 
 const ItemGroup = styled.div`
@@ -100,6 +114,15 @@ const DropdownButtonItem = styled.div`
   }
 `
 
+const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 175px;
+  height: 42px;
+  border-radius: 10px;
+  overflow: hidden;
+`
+
 type ItemProps = { value: string; title: string; visible?: boolean }
 
 export interface Props {
@@ -108,9 +131,17 @@ export interface Props {
   onClick: (itemId: string) => void
   onChange: (itemId: string) => void
   disabled: boolean
+  disabledAll: boolean
 }
 
-export const DropdownButton: FC<Props> = ({ value, items, disabled, onClick, onChange }) => {
+export const DropdownButton: FC<Props> = ({
+  value,
+  items,
+  disabled,
+  disabledAll,
+  onClick,
+  onChange,
+}) => {
   const [isOpened, setIsOpened] = useState(false)
 
   const visibleItems = useMemo(() => items.filter((item) => item.visible), [items])
@@ -139,15 +170,16 @@ export const DropdownButton: FC<Props> = ({ value, items, disabled, onClick, onC
 
   return (
     <DropdownWrapper>
-      <ButtonsSave disabled={disabled}>
-        <TextSave onClick={handleMainButtonClick}>{currentItem.title}</TextSave>
-
+      <ButtonGroup>
+        <LeftButton disabled={disabled}>
+          <TextSave onClick={handleMainButtonClick}>{currentItem.title}</TextSave>
+        </LeftButton>
         {visibleItems.length > 1 ? (
-          <ArrowWrapper isOpened={isOpened} onClick={handleDropdownToggle}>
+          <RightButton disabled={disabledAll} isOpened={isOpened} onClick={handleDropdownToggle}>
             <ArrowIcon />
-          </ArrowWrapper>
+          </RightButton>
         ) : null}
-      </ButtonsSave>
+      </ButtonGroup>
 
       {isOpened ? (
         <ItemGroup>

@@ -13,6 +13,12 @@ const Card = styled.div`
   &:hover {
     background: rgba(24, 121, 206, 0.1);
   }
+  &.disabled {
+    opacity: 0.7;
+  }
+  &.disabled:hover {
+    background: #fff;
+  }
 `
 
 const CardBody = styled.div`
@@ -97,6 +103,9 @@ const ButtonLink = styled.button`
     border: none;
     background: inherit;
   }
+  &.disabled {
+    cursor: default;
+  }
 `
 
 const UncheckedIcon = () => (
@@ -141,13 +150,20 @@ export interface Props {
   metadata: AppMetadata['metadata']
   isChecked: boolean
   onChange: (isChecked: boolean) => void
+  disabled: boolean
 }
 
-export const ApplicationCard: React.FC<Props> = ({ src, metadata, isChecked, onChange }) => {
+export const ApplicationCard: React.FC<Props> = ({
+  src,
+  metadata,
+  isChecked,
+  onChange,
+  disabled,
+}) => {
   const [accountId, , widgetName] = src.split('/')
 
   return (
-    <Card>
+    <Card className={disabled ? 'disabled' : ''}>
       <CardBody>
         <Thumbnail>
           <Image
@@ -166,15 +182,13 @@ export const ApplicationCard: React.FC<Props> = ({ src, metadata, isChecked, onC
             @{accountId}
           </TextLink>
         </CardContent>
-        {isChecked ? (
-          <ButtonLink onClick={() => onChange(!isChecked)}>
-            <CheckedIcon />
-          </ButtonLink>
-        ) : (
-          <ButtonLink onClick={() => onChange(!isChecked)}>
-            <UncheckedIcon />
-          </ButtonLink>
-        )}
+        <ButtonLink
+          className={disabled ? 'disabled' : ''}
+          disabled={disabled}
+          onClick={() => onChange(!isChecked)}
+        >
+          {isChecked ? <CheckedIcon /> : <UncheckedIcon />}
+        </ButtonLink>
       </CardBody>
     </Card>
   )

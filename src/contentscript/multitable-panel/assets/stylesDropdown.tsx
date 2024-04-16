@@ -183,7 +183,6 @@ export const ButtonListBlock = styled.div`
   justify-content: space-evenly;
   width: 100%;
   align-items: center;
-  margin-bottom: 10px;
   position: relative;
   &::before {
     content: '';
@@ -252,7 +251,6 @@ export const ListMutations = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3px;
-  margin-bottom: 10px;
 `
 
 export const InputBlock = styled.div<{ isActive?: boolean }>`
