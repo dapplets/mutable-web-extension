@@ -63,6 +63,7 @@ async function main() {
     gatewayId: 'mutable-web-extension',
     selector,
     storage: new ExtensionStorage('mutableweb'),
+    bosElementStyleSrc: browser.runtime.getURL('bootstrap.min.css'),
   })
 
   const mutationIdToLoad = tabState?.mutationId

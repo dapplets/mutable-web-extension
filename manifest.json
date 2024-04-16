@@ -43,7 +43,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "callback.html"
+        "callback.html",
+        "bootstrap.min.css"
       ],
       "matches": [
         "*://*/*"
