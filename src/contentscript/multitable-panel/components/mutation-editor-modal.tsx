@@ -1,6 +1,8 @@
 import { AppMetadata, Mutation } from 'mutable-web-engine'
 import { useAccountId } from 'near-social-vm'
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import BsButton from 'react-bootstrap/Button'
+import BsSpinner from 'react-bootstrap/Spinner'
 import styled from 'styled-components'
 import { useMutableWeb } from '../../contexts/mutable-web-context'
 import { useCreateMutation } from '../../contexts/mutable-web-context/use-create-mutation'
@@ -383,6 +385,14 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
           disabledAll={isFormDisabled}
         />
       </ButtonsBlock>
+
+      {/* ToDo: remove*/}
+      <div>
+        <BsButton variant="primary" disabled>
+          <BsSpinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+          Loading...
+        </BsButton>
+      </div>
     </SelectedMutationEditorWrapper>
   )
 }
