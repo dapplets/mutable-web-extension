@@ -1,12 +1,5 @@
 import React, { FC, useState } from 'react'
 
-export interface ImageProps {
-  cid: {
-    ipfs_cid?: string
-    url?: string
-  }
-}
-
 export interface Props {
   image?:
     | {

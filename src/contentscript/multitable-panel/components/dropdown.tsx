@@ -39,7 +39,7 @@ import {
 
 import { MutationWithSettings } from 'mutable-web-engine/dist/providers/provider'
 import { useMutableWeb } from '../../contexts/mutable-web-context'
-import defaultIcon from '../assets/images/default.png'
+import defaultIcon from '../assets/images/default.svg'
 import { Image } from './image'
 
 export type DropdownProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
