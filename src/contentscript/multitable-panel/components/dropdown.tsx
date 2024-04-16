@@ -16,6 +16,7 @@ import {
   InputMutation,
   ListMutations,
   MutationsList,
+  MutationsListWrapper,
   OpenList,
   OpenListDefault,
   SelectedMutationBlock,
@@ -155,110 +156,107 @@ export const Dropdown: FC<DropdownProps> = ({
 
       {isVisible && (
         <MutationsList>
-          {/* <SimpleBar style={{ maxHeight: 500, overflowX: 'hidden' }}> */}
-          <ButtonListBlock>
-            <ButtonBack onClick={handleOriginalButtonClick}>{<Back />} to Original</ButtonBack>
-            <ButtonMutation onClick={handleMutateButtonClick}>Mutate {<Mutate />}</ButtonMutation>
-          </ButtonListBlock>
+          <MutationsListWrapper>
+            <ButtonListBlock>
+              <ButtonBack onClick={handleOriginalButtonClick}>{<Back />} to Original</ButtonBack>
+              <ButtonMutation onClick={handleMutateButtonClick}>Mutate {<Mutate />}</ButtonMutation>
+            </ButtonListBlock>
 
-          {recentlyUsedMutations.length > 0 ? (
-            <ListMutations>
-              {recentlyUsedMutations.map((mut) => (
-                <InputBlock key={mut.id} isActive={mut.id === selectedMutation?.id}>
-                  <ImageBlock>
-                    <Image image={mut.metadata.image} />
-                  </ImageBlock>
-                  <InputInfoWrapper onClick={() => handleMutationClick(mut.id)}>
-                    {/* todo: mocked classname */}
-                    <InputMutation
-                      className={mut.id === selectedMutation?.id ? 'inputMutationSelected' : ''}
-                    >
-                      {mut.metadata ? mut.metadata.name : ''}
-                    </InputMutation>
-                    {/* todo: mocked classname */}
-                    <AuthorMutation
-                      className={
-                        mut.id === selectedMutation?.id && mut.id === favoriteMutationId
-                          ? 'authorMutationSelected'
-                          : ''
-                      }
-                    >
-                      {mut.id}
-                    </AuthorMutation>
-                  </InputInfoWrapper>
-                  {/* todo: mocked */}
+            {recentlyUsedMutations.length > 0 ? (
+              <ListMutations>
+                {recentlyUsedMutations.map((mut) => (
+                  <InputBlock key={mut.id} isActive={mut.id === selectedMutation?.id}>
+                    <ImageBlock>
+                      <Image image={mut.metadata.image} />
+                    </ImageBlock>
+                    <InputInfoWrapper onClick={() => handleMutationClick(mut.id)}>
+                      {/* todo: mocked classname */}
+                      <InputMutation
+                        className={mut.id === selectedMutation?.id ? 'inputMutationSelected' : ''}
+                      >
+                        {mut.metadata ? mut.metadata.name : ''}
+                      </InputMutation>
+                      {/* todo: mocked classname */}
+                      <AuthorMutation
+                        className={
+                          mut.id === selectedMutation?.id && mut.id === favoriteMutationId
+                            ? 'authorMutationSelected'
+                            : ''
+                        }
+                      >
+                        {mut.id}
+                      </AuthorMutation>
+                    </InputInfoWrapper>
+                    {/* todo: mocked */}
 
-                  {mut.id === favoriteMutationId ? (
-                    <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
-                      <StarMutationList />
-                    </InputIconWrapper>
-                  ) : mut.id === selectedMutation?.id ? (
-                    <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
-                      <StarMutationListDefault />
-                    </InputIconWrapper>
-                  ) : (
-                    <InputIconWrapper onClick={() => handleRemoveFromRecentlyUsedClick(mut)}>
-                      <Trash />
-                    </InputIconWrapper>
-                  )}
-                </InputBlock>
-              ))}
-            </ListMutations>
-          ) : null}
+                    {mut.id === favoriteMutationId ? (
+                      <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
+                        <StarMutationList />
+                      </InputIconWrapper>
+                    ) : mut.id === selectedMutation?.id ? (
+                      <InputIconWrapper onClick={() => handleFavoriteButtonClick(mut)}>
+                        <StarMutationListDefault />
+                      </InputIconWrapper>
+                    ) : (
+                      <InputIconWrapper onClick={() => handleRemoveFromRecentlyUsedClick(mut)}>
+                        <Trash />
+                      </InputIconWrapper>
+                    )}
+                  </InputBlock>
+                ))}
+              </ListMutations>
+            ) : null}
 
-          {unusedMutations.length > 0 ? (
-            <AvalibleMutations>
-              <AvalibleLableBlock>
-                <AvalibleLable>available</AvalibleLable>
-                {/* todo: mock */}
-                <AvalibleArrowBlock
-                  className={isAccordeonExpanded ? 'iconRotate' : ''}
-                  onClick={handleAccordeonClick}
-                >
-                  <AvalibleArrowLable>{unusedMutations.length} mutations</AvalibleArrowLable>
-                  <AvailableIcon />
-                </AvalibleArrowBlock>
-              </AvalibleLableBlock>
+            {unusedMutations.length > 0 ? (
+              <AvalibleMutations>
+                <AvalibleLableBlock onClick={handleAccordeonClick}>
+                  <AvalibleLable>available</AvalibleLable>
+                  {/* todo: mock */}
+                  <AvalibleArrowBlock className={isAccordeonExpanded ? 'iconRotate' : ''}>
+                    <AvalibleArrowLable>{unusedMutations.length} mutations</AvalibleArrowLable>
+                    <AvailableIcon />
+                  </AvalibleArrowBlock>
+                </AvalibleLableBlock>
 
-              {isAccordeonExpanded
-                ? unusedMutations.map((mut) => (
-                    <InputBlock
-                      key={mut.id}
-                      isActive={mut.id === selectedMutation?.id}
-                      onClick={() => handleMutationClick(mut.id)}
-                      className="avalibleMutationsInput"
-                    >
-                      <ImageBlock>
-                        <Image image={mut.metadata.image} />
-                      </ImageBlock>
-                      <InputInfoWrapper>
-                        <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
-                        <AuthorMutation>{mut.id}</AuthorMutation>
-                      </InputInfoWrapper>
-                    </InputBlock>
-                  ))
-                : null}
-              {isAccordeonExpanded
-                ? unusedMutations.map((mut) => (
-                    <InputBlock
-                      key={mut.id}
-                      isActive={mut.id === selectedMutation?.id}
-                      onClick={() => handleMutationClick(mut.id)}
-                      className="avalibleMutationsInput"
-                    >
-                      <ImageBlock>
-                        <Image image={mut.metadata.image} />
-                      </ImageBlock>
-                      <InputInfoWrapper>
-                        <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
-                        <AuthorMutation>{mut.id}</AuthorMutation>
-                      </InputInfoWrapper>
-                    </InputBlock>
-                  ))
-                : null}
-            </AvalibleMutations>
-          ) : null}
-          {/* </SimpleBar> */}
+                {isAccordeonExpanded
+                  ? unusedMutations.map((mut) => (
+                      <InputBlock
+                        key={mut.id}
+                        isActive={mut.id === selectedMutation?.id}
+                        onClick={() => handleMutationClick(mut.id)}
+                        className="avalibleMutationsInput"
+                      >
+                        <ImageBlock>
+                          <Image image={mut.metadata.image} />
+                        </ImageBlock>
+                        <InputInfoWrapper>
+                          <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
+                          <AuthorMutation>{mut.id}</AuthorMutation>
+                        </InputInfoWrapper>
+                      </InputBlock>
+                    ))
+                  : null}
+                {isAccordeonExpanded
+                  ? unusedMutations.map((mut) => (
+                      <InputBlock
+                        key={mut.id}
+                        isActive={mut.id === selectedMutation?.id}
+                        onClick={() => handleMutationClick(mut.id)}
+                        className="avalibleMutationsInput"
+                      >
+                        <ImageBlock>
+                          <Image image={mut.metadata.image} />
+                        </ImageBlock>
+                        <InputInfoWrapper>
+                          <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
+                          <AuthorMutation>{mut.id}</AuthorMutation>
+                        </InputInfoWrapper>
+                      </InputBlock>
+                    ))
+                  : null}
+              </AvalibleMutations>
+            ) : null}
+          </MutationsListWrapper>
         </MutationsList>
       )}
     </WrapperDropdown>
