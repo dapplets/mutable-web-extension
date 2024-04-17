@@ -17,7 +17,7 @@ import {
 import { useEscape } from '../../hooks/use-escape'
 import { Alert, AlertProps } from './alert'
 import { ApplicationCard } from './application-card'
-import { Button } from './button'
+import { Button as OldButton } from './button'
 import { DropdownButton } from './dropdown-button'
 import { Input } from './input'
 
@@ -369,21 +369,28 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       </AppsList>
 
       <ButtonsBlock>
-        <Button disabled={isSubmitDisabled} onClick={handleRevertClick}>
+        <OldButton disabled={isSubmitDisabled} onClick={handleRevertClick}>
           Revert changes
-        </Button>
-        <DropdownButton
-          value={mode}
-          items={[
-            { value: MutationModalMode.Forking, title: 'Fork', visible: !!baseMutation },
-            { value: MutationModalMode.Editing, title: 'Save', visible: !!baseMutation && isOwn },
-            { value: MutationModalMode.Creating, title: 'Create', visible: !baseMutation },
-          ]}
-          onClick={handleSaveClick}
-          onChange={handleSaveDropdownChange}
-          disabled={isSubmitDisabled}
-          disabledAll={isFormDisabled}
-        />
+        </OldButton>
+        {isFormDisabled ? (
+          <DropdownButton
+            value={mode}
+            items={[
+              { value: MutationModalMode.Forking, title: 'Fork', visible: !!baseMutation },
+              { value: MutationModalMode.Editing, title: 'Save', visible: !!baseMutation && isOwn },
+              { value: MutationModalMode.Creating, title: 'Create', visible: !baseMutation },
+            ]}
+            onClick={handleSaveClick}
+            onChange={handleSaveDropdownChange}
+            disabled={isSubmitDisabled}
+            disabledAll={isFormDisabled}
+          />
+        ) : (
+          <BsButton style={{ zIndex: 2 }} variant="primary" disabled>
+            <BsSpinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
+            Loading...
+          </BsButton>
+        )}
       </ButtonsBlock>
 
       {/* ToDo: remove*/}
