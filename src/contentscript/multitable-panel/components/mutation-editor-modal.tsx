@@ -17,7 +17,7 @@ import {
 import { useEscape } from '../../hooks/use-escape'
 import { Alert, AlertProps } from './alert'
 import { ApplicationCard } from './application-card'
-import { Button as OldButton } from './button'
+import { Button } from './button'
 import { DropdownButton } from './dropdown-button'
 import { Input } from './input'
 
@@ -369,10 +369,10 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       </AppsList>
 
       <ButtonsBlock>
-        <OldButton disabled={isSubmitDisabled} onClick={handleRevertClick}>
+        <Button disabled={isSubmitDisabled} onClick={handleRevertClick}>
           Revert changes
-        </OldButton>
-        {isFormDisabled ? (
+        </Button>
+        {!isFormDisabled ? (
           <DropdownButton
             value={mode}
             items={[
@@ -386,20 +386,12 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
             disabledAll={isFormDisabled}
           />
         ) : (
-          <BsButton style={{ zIndex: 2 }} variant="primary" disabled>
+          <BsButton style={{ width: 175, height: 42, borderRadius: 10 }} variant="primary" disabled>
             <BsSpinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
             Loading...
           </BsButton>
         )}
       </ButtonsBlock>
-
-      {/* ToDo: remove*/}
-      <div>
-        <BsButton variant="primary" disabled>
-          <BsSpinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
-          Loading...
-        </BsButton>
-      </div>
     </SelectedMutationEditorWrapper>
   )
 }
