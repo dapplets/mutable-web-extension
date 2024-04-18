@@ -95,6 +95,7 @@ async function main() {
     } else if (message.type === 'SIGNED_OUT') {
       eventEmitter.emit('signedOut')
     } else if (message.type === 'OPEN_NEW_MUTATION_POPUP') {
+      // ToDo: eventEmitter is intended for near-wallet-selector
       eventEmitter.emit('openMutationPopup')
     }
   })
