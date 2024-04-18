@@ -106,7 +106,6 @@ export const OpenList = styled.span`
 export const StarSelectedMutationWrapper = styled.span`
   cursor: pointer;
   display: inline-block;
-  padding-top: 4px;
   transition: all 0.2s ease;
   &:hover {
     transform: scale(1.2);
@@ -277,9 +276,6 @@ export const InputIconWrapper = styled.span`
   display: inline-block;
   padding-right: 3px;
   transition: all 0.2s ease;
-  svg {
-    margin-top: 5px;
-  }
   &:hover {
     transform: scale(1.2);
   }
