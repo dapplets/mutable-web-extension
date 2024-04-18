@@ -387,8 +387,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
           />
         ) : (
           <BsButton style={{ width: 175, height: 42, borderRadius: 10 }} variant="primary" disabled>
-            <BsSpinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />
-            Loading...
+            <BsSpinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" />{' '}
+            Sending...
           </BsButton>
         )}
       </ButtonsBlock>
