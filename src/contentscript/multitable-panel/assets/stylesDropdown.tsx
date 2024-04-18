@@ -307,6 +307,7 @@ export const InputInfoWrapper = styled.div`
 export const ImageBlock = styled.div`
   width: 30px;
   height: 30px;
+  border-radius: 4px;
   img {
     width: 100%;
     height: 100%;
