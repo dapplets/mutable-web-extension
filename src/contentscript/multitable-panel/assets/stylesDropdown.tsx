@@ -312,6 +312,7 @@ export const ImageBlock = styled.div`
     width: 100%;
     height: 100%;
     object-fit: fill;
+    border-radius: 4px;
   }
 `
 
