@@ -57,12 +57,15 @@ async function main() {
   const tabState = await Background.popTabState()
   const selector = await selectorPromise
 
+  const bootstrapCssUrl = browser.runtime.getURL('bootstrap.min.css')
+
   // ToDo: move to MutableWebContext
   const engine = new Engine({
     networkId: networkConfig.networkId,
     gatewayId: 'mutable-web-extension',
     selector,
     storage: new ExtensionStorage('mutableweb'),
+    bosElementStyleSrc: bootstrapCssUrl,
   })
 
   const mutationIdToLoad = tabState?.mutationId
@@ -94,6 +97,9 @@ async function main() {
       eventEmitter.emit('signedIn', message.params)
     } else if (message.type === 'SIGNED_OUT') {
       eventEmitter.emit('signedOut')
+    } else if (message.type === 'OPEN_NEW_MUTATION_POPUP') {
+      // ToDo: eventEmitter is intended for near-wallet-selector
+      eventEmitter.emit('openMutationPopup')
     }
   })
 
@@ -103,8 +109,8 @@ async function main() {
   const root = createRoot(container)
   root.render(
     <MutableWebProvider engine={engine}>
-      <ShadowDomWrapper>
-        <MultitablePanel />
+      <ShadowDomWrapper stylesheetSrc={bootstrapCssUrl}>
+        <MultitablePanel eventEmitter={eventEmitter} />
       </ShadowDomWrapper>
     </MutableWebProvider>
   )
