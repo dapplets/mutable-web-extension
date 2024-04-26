@@ -20,6 +20,7 @@ import { ApplicationCard } from './application-card'
 import { Button } from './button'
 import { DropdownButton } from './dropdown-button'
 import { Input } from './input'
+import { InputImage } from './upload-image'
 
 const SelectedMutationEditorWrapper = styled.div`
   display: flex;
@@ -196,6 +197,10 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   const { mutations } = useMutableWeb()
   const [isModified, setIsModified] = useState(true)
 
+  const [image, setImage] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [uploadedImageCID, setUploadedImageCID] = useState(null)
+
   // Close modal with escape key
   useEscape(onClose)
 
@@ -323,6 +328,34 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     setMode(itemId as MutationModalMode)
   }
 
+  const handleImageChange = async (event: any) => {
+    const file = event.target.files[0]
+    setImage(file)
+    await handleUpload(file)
+  }
+  const ipfsUpload = async (f: any) => {
+    const res = await fetch('https://ipfs.near.social/add', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+      },
+      body: f,
+    })
+    return (await res.json()).cid
+  }
+
+  const handleUpload = async (file: any) => {
+    setLoading(true)
+    try {
+      const cid = await ipfsUpload(file)
+      setUploadedImageCID(cid)
+    } catch (error) {
+      console.error('Error uploading image:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <SelectedMutationEditorWrapper>
       <HeaderEditor>
@@ -352,6 +385,12 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
         placeholder="My Mutation"
         onChange={handleMutationNameChange}
         disabled={isFormDisabled}
+      />
+
+      <InputImage
+        label="Mutation icon"
+        handleImageChange={handleImageChange}
+        uploadedImageCID={uploadedImageCID}
       />
 
       <AppsList>
