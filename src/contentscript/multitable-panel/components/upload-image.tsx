@@ -16,7 +16,7 @@ const InputContainer = styled.div`
     width: calc(100% - 54px);
     svg {
       position: absolute;
-      right: 10px;
+      right: 15px;
       top: 15px;
     }
   }

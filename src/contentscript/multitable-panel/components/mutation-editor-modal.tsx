@@ -309,6 +309,10 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       }
       editingMutation.metadata.name = name?.trim()
     }
+    // validate image
+    if (uploadedImageCID) {
+      editingMutation.metadata.image = { ipfs_cid: uploadedImageCID }
+    }
 
     // validate changes
     const hasChanges = checkIfModified()
