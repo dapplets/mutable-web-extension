@@ -111,6 +111,9 @@ export const StarSelectedMutationWrapper = styled.span`
   &:hover {
     transform: scale(1.2);
   }
+  & > svg {
+    vertical-align: initial;
+  }
 `
 
 export const MutationsList = styled.div`
@@ -284,6 +287,9 @@ export const InputIconWrapper = styled.span`
   transition: all 0.2s ease;
   &:hover {
     transform: scale(1.2);
+  }
+  & > svg {
+    vertical-align: initial;
   }
 `
 

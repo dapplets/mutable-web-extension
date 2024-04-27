@@ -94,6 +94,10 @@ const PinWrapper = styled.div`
   &:focus {
     opacity: 0.5;
   }
+
+  & > svg {
+    vertical-align: initial;
+  }
 `
 const DragWrapper = styled.div`
   width: 16px;
