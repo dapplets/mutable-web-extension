@@ -155,6 +155,8 @@ export const MutationsListWrapper = styled.div`
   overflow-y: auto;
   max-height: 500px;
   gap: 10px;
+  position: relative;
+  padding-top: 55px;
   &::-webkit-scrollbar {
     cursor: pointer;
     width: 4px;
@@ -187,15 +189,18 @@ export const ButtonListBlock = styled.div`
   justify-content: space-evenly;
   width: 100%;
   align-items: center;
-  position: relative;
+  position: fixed;
+  top: 40px;
+  z-index: 100;
+  left: 0;
   &::before {
     content: '';
     width: 318px;
     position: fixed;
-    top: 45px;
+    top: 40px;
     left: 0;
     background: #f8f9ff;
-    height: 80%;
+    height: 43px;
     z-index: 0;
   }
 `
