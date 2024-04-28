@@ -2,6 +2,7 @@ import React, { FC, useId } from 'react'
 import FloatingLabel from 'react-bootstrap/FloatingLabel'
 import Form from 'react-bootstrap/Form'
 import styled from 'styled-components'
+import { Image } from './image'
 
 const InputContainer = styled.div`
   display: flex;
@@ -14,6 +15,7 @@ const InputContainer = styled.div`
   .form-floating {
     position: relative;
     width: calc(100% - 54px);
+    cursor: pointer;
     svg {
       position: absolute;
       right: 15px;
@@ -34,11 +36,11 @@ const InputContainer = styled.div`
     border-radius: 10px;
     border: 1px solid #e2e2e5;
     font-size: 14px;
-
-    &:focus {
-      border: 1px solid rgba(56, 75, 255, 1);
-      outline: none;
-    }
+    cursor: pointer;
+    // &:focus {
+    //   border: 1px solid rgba(56, 75, 255, 1);
+    //   outline: none;
+    // }
   }
 `
 const CustomFileUpload = styled.label`
@@ -99,20 +101,40 @@ interface Props {
   handleImageChange: (event: any) => Promise<void>
   uploadedImageCID: string | null
 }
+
 export const InputImage: FC<Props> = ({ label, handleImageChange, uploadedImageCID }) => {
   const inputId = useId()
+  const image = {
+    ipfs_cid: uploadedImageCID ? uploadedImageCID : undefined,
+  }
 
   return (
-    <InputContainer>
-      <CustomFileUpload>
-        <UploadInput type="file" accept="image/*" onChange={handleImageChange} />
-        <UploadIcon>
-          <IconImage />
-        </UploadIcon>
-      </CustomFileUpload>
+    <InputContainer onChange={handleImageChange}>
+      {uploadedImageCID ? (
+        <CustomFileUpload onChange={handleImageChange}>
+          <Image image={image} />{' '}
+        </CustomFileUpload>
+      ) : (
+        <CustomFileUpload onChange={handleImageChange}>
+          <UploadInput type="file" accept="image/*" />
+          <UploadIcon>
+            <IconImage />
+          </UploadIcon>
+        </CustomFileUpload>
+      )}
 
-      <FloatingLabel controlId={inputId} label={label} className="mb-3">
-        <Form.Control readOnly value={uploadedImageCID ? uploadedImageCID : ''} type="text" />
+      <FloatingLabel
+        onChange={handleImageChange}
+        controlId={inputId}
+        label={label}
+        className="mb-3"
+      >
+        <Form.Control
+          onChange={handleImageChange}
+          readOnly
+          value={uploadedImageCID ? uploadedImageCID : ''}
+          type="text"
+        />
 
         <IconUpload />
       </FloatingLabel>

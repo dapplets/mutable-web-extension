@@ -11,6 +11,7 @@ import {
   cloneDeep,
   compareMutations,
   generateRandomHex,
+  ipfsUpload,
   isValidSocialIdCharacters,
   mergeDeep,
 } from '../../helpers'
@@ -282,6 +283,12 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     setEditingMutation((mut) => mergeDeep(cloneDeep(mut), { metadata: { name } }))
   }
 
+  const handleMutationImageChange = (cid: string) => {
+    setEditingMutation((mut) =>
+      mergeDeep(cloneDeep(mut), { metadata: { image: { ipfs_cid: cid } } })
+    )
+  }
+
   const handleAppCheckboxChange = (appId: string, checked: boolean) => {
     setEditingMutation((mut) => {
       const apps = checked ? [...mut.apps, appId] : mut.apps.filter((app) => app !== appId)
@@ -309,10 +316,6 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       }
       editingMutation.metadata.name = name?.trim()
     }
-    // validate image
-    if (uploadedImageCID) {
-      editingMutation.metadata.image = { ipfs_cid: uploadedImageCID }
-    }
 
     // validate changes
     const hasChanges = checkIfModified()
@@ -337,22 +340,13 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     setImage(file)
     await handleUpload(file)
   }
-  const ipfsUpload = async (f: any) => {
-    const res = await fetch('https://ipfs.near.social/add', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-      },
-      body: f,
-    })
-    return (await res.json()).cid
-  }
 
   const handleUpload = async (file: any) => {
     setLoading(true)
     try {
       const cid = await ipfsUpload(file)
       setUploadedImageCID(cid)
+      handleMutationImageChange(cid)
     } catch (error) {
       console.error('Error uploading image:', error)
     } finally {
