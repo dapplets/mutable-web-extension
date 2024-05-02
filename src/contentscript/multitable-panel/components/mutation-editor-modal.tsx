@@ -198,8 +198,6 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   const { mutations } = useMutableWeb()
   const [isModified, setIsModified] = useState(true)
 
-  const [image, setImage] = useState(null)
-  const [loading, setLoading] = useState(false)
   const [uploadedImageCID, setUploadedImageCID] = useState(null)
 
   // Close modal with escape key
@@ -296,9 +294,9 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     })
   }
 
-  const handleRevertClick = () => {
-    setEditingMutation(cloneDeep(originalMutation))
-  }
+  const handleRevertClick = useCallback(() => {
+    setEditingMutation(cloneDeep(originalMutation)), setUploadedImageCID(null)
+  }, [originalMutation, editingMutation, uploadedImageCID])
 
   const handleSaveClick = () => {
     // validate Name
@@ -337,20 +335,17 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
 
   const handleImageChange = async (event: any) => {
     const file = event.target.files[0]
-    setImage(file)
+
     await handleUpload(file)
   }
 
   const handleUpload = async (file: any) => {
-    setLoading(true)
     try {
       const cid = await ipfsUpload(file)
       setUploadedImageCID(cid)
       handleMutationImageChange(cid)
     } catch (error) {
       console.error('Error uploading image:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -387,6 +382,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
 
       <InputImage
         label="Mutation icon"
+        defaultCID={editingMutation.metadata.image ?? undefined}
         handleImageChange={handleImageChange}
         uploadedImageCID={uploadedImageCID}
       />

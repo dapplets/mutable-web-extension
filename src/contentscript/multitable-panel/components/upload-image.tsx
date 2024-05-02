@@ -1,4 +1,4 @@
-import React, { FC, useId } from 'react'
+import React, { FC, useEffect, useId } from 'react'
 import FloatingLabel from 'react-bootstrap/FloatingLabel'
 import Form from 'react-bootstrap/Form'
 import styled from 'styled-components'
@@ -37,10 +37,11 @@ const InputContainer = styled.div`
     border: 1px solid #e2e2e5;
     font-size: 14px;
     cursor: pointer;
-    // &:focus {
-    //   border: 1px solid rgba(56, 75, 255, 1);
-    //   outline: none;
-    // }
+    &:focus {
+      border: 1px solid #e2e2e5;
+      box-shadow: none;
+      outline: none;
+    }
   }
 `
 const CustomFileUpload = styled.label`
@@ -53,6 +54,12 @@ const CustomFileUpload = styled.label`
   border: 1px solid #e2e2e5;
   background: #fff;
   cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+  }
 `
 
 const UploadInput = styled.input`
@@ -100,19 +107,32 @@ interface Props {
   label: string
   handleImageChange: (event: any) => Promise<void>
   uploadedImageCID: string | null
+  defaultCID?:
+    | {
+        ipfs_cid?: string
+        url?: string
+      }
+    | undefined
 }
 
-export const InputImage: FC<Props> = ({ label, handleImageChange, uploadedImageCID }) => {
+export const InputImage: FC<Props> = ({
+  label,
+  handleImageChange,
+  uploadedImageCID,
+  defaultCID,
+}) => {
   const inputId = useId()
   const image = {
-    ipfs_cid: uploadedImageCID ? uploadedImageCID : undefined,
+    ipfs_cid: uploadedImageCID ? uploadedImageCID : defaultCID ? defaultCID.ipfs_cid : undefined,
   }
+  useEffect(() => {}, [image, uploadedImageCID, defaultCID])
 
   return (
     <InputContainer onChange={handleImageChange}>
-      {uploadedImageCID ? (
+      {image && image.ipfs_cid ? (
         <CustomFileUpload onChange={handleImageChange}>
-          <Image image={image} />{' '}
+          <UploadInput type="file" accept="image/*" />
+          <Image image={image} />
         </CustomFileUpload>
       ) : (
         <CustomFileUpload onChange={handleImageChange}>
@@ -123,18 +143,8 @@ export const InputImage: FC<Props> = ({ label, handleImageChange, uploadedImageC
         </CustomFileUpload>
       )}
 
-      <FloatingLabel
-        onChange={handleImageChange}
-        controlId={inputId}
-        label={label}
-        className="mb-3"
-      >
-        <Form.Control
-          onChange={handleImageChange}
-          readOnly
-          value={uploadedImageCID ? uploadedImageCID : ''}
-          type="text"
-        />
+      <FloatingLabel controlId={inputId} label={label}>
+        <Form.Control readOnly value={image && image.ipfs_cid ? image.ipfs_cid : ''} />
 
         <IconUpload />
       </FloatingLabel>
