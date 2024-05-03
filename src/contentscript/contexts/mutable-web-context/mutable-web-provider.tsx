@@ -34,6 +34,10 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
   )
 
   useEffect(() => {
+    setSelectedMutationId(selectedMutation?.id ?? null)
+  }, [selectedMutation])
+
+  useEffect(() => {
     loadMutations(engine)
   }, [engine])
 
