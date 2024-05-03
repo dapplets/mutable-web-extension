@@ -215,6 +215,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
             <Notch
               data-testid="notch"
               data-mweb-context-type="notch"
+              data-mweb-context-parsed={JSON.stringify({ id: 'notch' })}
               className={
                 isPin
                   ? 'visible-pin'
@@ -239,6 +240,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
                   {isPin ? <PinSolidIcon /> : <PinOutlineIcon />}
                 </PinWrapper>
               </div>
+              <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
             </Notch>
           </NotchWrapper>
         </Draggable>

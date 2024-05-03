@@ -208,6 +208,8 @@ export const Dropdown: FC<DropdownProps> = ({
                         <Trash />
                       </InputIconWrapper>
                     )}
+
+                    <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
                   </InputBlock>
                 ))}
               </ListMutations>
@@ -241,6 +243,7 @@ export const Dropdown: FC<DropdownProps> = ({
                           <InputMutation>{mut.metadata ? mut.metadata.name : ''}</InputMutation>
                           <AuthorMutation>{mut.id}</AuthorMutation>
                         </InputInfoWrapper>
+                        <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
                       </InputBlock>
                     ))
                   : null}
