@@ -281,7 +281,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     setEditingMutation((mut) => mergeDeep(cloneDeep(mut), { metadata: { name } }))
   }
 
-  const handleMutationImageChange = (cid: string) => {
+  const handleMutationImageChange = async (cid: string) => {
     setEditingMutation((mut) =>
       mergeDeep(cloneDeep(mut), { metadata: { image: { ipfs_cid: cid } } })
     )
@@ -294,9 +294,9 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     })
   }
 
-  const handleRevertClick = useCallback(() => {
+  const handleRevertClick = () => {
     setEditingMutation(cloneDeep(originalMutation)), setUploadedImageCID(null)
-  }, [originalMutation, editingMutation, uploadedImageCID])
+  }
 
   const handleSaveClick = () => {
     // validate Name
@@ -343,7 +343,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     try {
       const cid = await ipfsUpload(file)
       setUploadedImageCID(cid)
-      handleMutationImageChange(cid)
+      await handleMutationImageChange(cid)
     } catch (error) {
       console.error('Error uploading image:', error)
     }

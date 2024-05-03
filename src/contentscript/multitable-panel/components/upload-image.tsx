@@ -125,7 +125,7 @@ export const InputImage: FC<Props> = ({
   const image = {
     ipfs_cid: uploadedImageCID ? uploadedImageCID : defaultCID ? defaultCID.ipfs_cid : undefined,
   }
-  useEffect(() => {}, [image, uploadedImageCID, defaultCID])
+  useEffect(() => {}, [image, uploadedImageCID, defaultCID, handleImageChange])
 
   return (
     <InputContainer onChange={handleImageChange}>
