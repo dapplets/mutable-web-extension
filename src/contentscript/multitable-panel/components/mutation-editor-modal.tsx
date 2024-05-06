@@ -363,7 +363,11 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
       </HeaderEditor>
 
       {alert ? <Alert severity={alert.severity} text={alert.text} /> : null}
-
+      <InputImage
+        defaultCID={editingMutation.metadata.image ?? undefined}
+        handleImageChange={handleImageChange}
+        uploadedImageCID={uploadedImageCID}
+      />
       <Input
         label="Mutation ID"
         value={editingMutation.id}
@@ -378,13 +382,6 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
         placeholder="My Mutation"
         onChange={handleMutationNameChange}
         disabled={isFormDisabled}
-      />
-
-      <InputImage
-        label="Mutation icon"
-        defaultCID={editingMutation.metadata.image ?? undefined}
-        handleImageChange={handleImageChange}
-        uploadedImageCID={uploadedImageCID}
       />
 
       <AppsList>
