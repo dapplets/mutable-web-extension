@@ -156,7 +156,11 @@ export const Dropdown: FC<DropdownProps> = ({
       </SelectedMutationBlock>
 
       {isVisible && (
-        <MutationsList>
+        <MutationsList
+          data-testid="mutations-list-block"
+          data-mweb-context-type="notch"
+          data-mweb-context-parsed={JSON.stringify({ id: 'mutations-list-block' })}
+        >
           <MutationsListWrapper>
             <ButtonListBlock>
               <ButtonBack onClick={handleOriginalButtonClick}>{<Back />} to Original</ButtonBack>
@@ -250,6 +254,7 @@ export const Dropdown: FC<DropdownProps> = ({
               </AvalibleMutations>
             ) : null}
           </MutationsListWrapper>
+          <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
         </MutationsList>
       )}
     </WrapperDropdown>
