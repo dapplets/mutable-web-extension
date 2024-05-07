@@ -156,11 +156,7 @@ export const Dropdown: FC<DropdownProps> = ({
       </SelectedMutationBlock>
 
       {isVisible && (
-        <MutationsList
-          data-testid="mutations-list-block"
-          data-mweb-context-type="notch"
-          data-mweb-context-parsed={JSON.stringify({ id: 'mutations-list-block' })}
-        >
+        <MutationsList>
           <MutationsListWrapper>
             <ButtonListBlock>
               <ButtonBack onClick={handleOriginalButtonClick}>{<Back />} to Original</ButtonBack>
@@ -228,7 +224,12 @@ export const Dropdown: FC<DropdownProps> = ({
             ) : null}
 
             {unusedMutations.length > 0 ? (
-              <AvalibleMutations isAccordeonExpanded={isAccordeonExpanded}>
+              <AvalibleMutations
+                isAccordeonExpanded={isAccordeonExpanded}
+                data-testid="mutations-list-block"
+                data-mweb-context-type="notch"
+                data-mweb-context-parsed={JSON.stringify({ id: 'mutations-list-block' })}
+              >
                 <AvalibleLableBlock onClick={handleAccordeonClick}>
                   <AvalibleLable>available</AvalibleLable>
                   {/* todo: mock */}
@@ -259,10 +260,10 @@ export const Dropdown: FC<DropdownProps> = ({
                       </InputBlock>
                     ))
                   : null}
+                <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
               </AvalibleMutations>
             ) : null}
           </MutationsListWrapper>
-          <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
         </MutationsList>
       )}
     </WrapperDropdown>
