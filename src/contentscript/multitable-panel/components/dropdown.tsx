@@ -164,7 +164,15 @@ export const Dropdown: FC<DropdownProps> = ({
           <MutationsListWrapper>
             <ButtonListBlock>
               <ButtonBack onClick={handleOriginalButtonClick}>{<Back />} to Original</ButtonBack>
-              <ButtonMutation onClick={handleMutateButtonClick}>Mutate {<Mutate />}</ButtonMutation>
+              <ButtonMutation
+                onClick={handleMutateButtonClick}
+                data-testid="mutate-button"
+                data-mweb-context-type="notch"
+                data-mweb-context-parsed={JSON.stringify({ id: 'mutate-button' })}
+              >
+                Mutate {<Mutate />}
+                <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
+              </ButtonMutation>
             </ButtonListBlock>
 
             {recentlyUsedMutations.length > 0 ? (
