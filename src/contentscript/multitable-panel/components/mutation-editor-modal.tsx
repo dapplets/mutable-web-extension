@@ -197,8 +197,6 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   const { mutations } = useMutableWeb()
   const [isModified, setIsModified] = useState(true)
 
-  const [uploadedImageCID, setUploadedImageCID] = useState(null)
-
   // Close modal with escape key
   useEscape(onClose)
 
@@ -294,7 +292,7 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
   }
 
   const handleRevertClick = () => {
-    setEditingMutation(cloneDeep(originalMutation)), setUploadedImageCID(null)
+    setEditingMutation(cloneDeep(originalMutation))
   }
 
   const handleSaveClick = () => {
