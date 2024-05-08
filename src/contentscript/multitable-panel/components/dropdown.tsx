@@ -234,21 +234,22 @@ export const Dropdown: FC<DropdownProps> = ({
 
             {unusedMutations.length > 0 ? (
               <AvalibleMutations isAccordeonExpanded={isAccordeonExpanded}>
-                <AvalibleLableBlock onClick={handleAccordeonClick}>
+                <AvalibleLableBlock
+                  onClick={handleAccordeonClick}
+                  data-mweb-context-type="notch"
+                  data-mweb-context-parsed={JSON.stringify({ id: 'unused-mutations-title' })}
+                >
                   <AvalibleLable>available</AvalibleLable>
                   {/* todo: mock */}
                   <AvalibleArrowBlock className={isAccordeonExpanded ? 'iconRotate' : ''}>
                     <AvalibleArrowLable>{unusedMutations.length} mutations</AvalibleArrowLable>
                     <AvailableIcon />
                   </AvalibleArrowBlock>
+                  <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
                 </AvalibleLableBlock>
 
                 {isAccordeonExpanded ? (
-                  <div
-                    data-testid="unused-mutations"
-                    data-mweb-context-type="notch"
-                    data-mweb-context-parsed={JSON.stringify({ id: 'unused-mutations' })}
-                  >
+                  <div data-testid="unused-mutations">
                     {unusedMutations.map((mut) => (
                       <InputBlock
                         key={mut.id}
@@ -268,10 +269,6 @@ export const Dropdown: FC<DropdownProps> = ({
                         <div data-mweb-insertion-point="hidden" style={{ display: 'none' }}></div>
                       </InputBlock>
                     ))}
-                    <div
-                      data-mweb-insertion-point="unused-mutations"
-                      style={{ display: 'none' }}
-                    ></div>
                   </div>
                 ) : null}
               </AvalibleMutations>
