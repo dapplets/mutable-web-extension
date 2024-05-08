@@ -11,7 +11,6 @@ import {
   cloneDeep,
   compareMutations,
   generateRandomHex,
-  ipfsUpload,
   isValidSocialIdCharacters,
   mergeDeep,
 } from '../../helpers'
@@ -333,22 +332,6 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
     setMode(itemId as MutationModalMode)
   }
 
-  const handleImageChange = async (event: any) => {
-    const file = event.target.files[0]
-
-    await handleUpload(file)
-  }
-
-  const handleUpload = async (file: any) => {
-    try {
-      const cid = await ipfsUpload(file)
-      setUploadedImageCID(cid)
-      await handleMutationImageChange(cid)
-    } catch (error) {
-      console.error('Error uploading image:', error)
-    }
-  }
-
   return (
     <SelectedMutationEditorWrapper>
       <HeaderEditor>
@@ -364,9 +347,8 @@ export const MutationEditorModal: FC<Props> = ({ baseMutation, apps, onClose }) 
 
       {alert ? <Alert severity={alert.severity} text={alert.text} /> : null}
       <InputImage
-        defaultCID={editingMutation.metadata.image ?? undefined}
-        handleImageChange={handleImageChange}
-        uploadedImageCID={uploadedImageCID}
+        ipfsCid={editingMutation.metadata.image?.ipfs_cid ?? undefined}
+        onImageChange={handleMutationImageChange}
       />
       <Input
         label="Mutation ID"

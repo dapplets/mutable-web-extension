@@ -1,5 +1,6 @@
-import React, { FC, useEffect } from 'react'
+import React, { FC } from 'react'
 import styled from 'styled-components'
+import { ipfsUpload } from '../../helpers'
 import { Image } from './image'
 
 const InputContainer = styled.div`
@@ -58,37 +59,42 @@ const IconImage = () => (
 )
 
 interface Props {
-  handleImageChange: (event: any) => Promise<void>
-  uploadedImageCID: string | null
-  defaultCID?:
-    | {
-        ipfs_cid?: string
-        url?: string
-      }
-    | undefined
+  onImageChange: (event: any) => Promise<void>
+  ipfsCid: string | undefined
 }
 
-export const InputImage: FC<Props> = ({ handleImageChange, uploadedImageCID, defaultCID }) => {
+export const InputImage: FC<Props> = ({ onImageChange, ipfsCid }) => {
   const image = {
-    ipfs_cid: uploadedImageCID ?? defaultCID?.ipfs_cid,
+    ipfs_cid: ipfsCid,
   }
-  useEffect(() => {}, [image, uploadedImageCID, defaultCID, handleImageChange])
+
+  const handleImageChange = async (event: any) => {
+    const file = event.target.files[0]
+    try {
+      const cid = await ipfsUpload(file)
+      await onImageChange(cid)
+    } catch (error) {
+      console.error('Error uploading image:', error)
+    }
+  }
 
   return (
-    <InputContainer onChange={handleImageChange}>
-      {image?.ipfs_cid ? (
-        <CustomFileUpload onChange={handleImageChange}>
-          <UploadInput type="file" accept="image/*" />
+    <InputContainer>
+      <CustomFileUpload>
+        <UploadInput
+          value={''}
+          onChange={handleImageChange}
+          type="file"
+          accept=".png, .jpeg, .jpg"
+        />
+        {image?.ipfs_cid ? (
           <Image image={image} />
-        </CustomFileUpload>
-      ) : (
-        <CustomFileUpload onChange={handleImageChange}>
-          <UploadInput type="file" accept="image/*" />
+        ) : (
           <UploadIcon>
             <IconImage />
           </UploadIcon>
-        </CustomFileUpload>
-      )}
+        )}
+      </CustomFileUpload>
     </InputContainer>
   )
 }
