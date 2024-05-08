@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import styled from 'styled-components'
 import { Image } from './image'
 
@@ -72,6 +72,7 @@ export const InputImage: FC<Props> = ({ handleImageChange, uploadedImageCID, def
   const image = {
     ipfs_cid: uploadedImageCID ?? defaultCID?.ipfs_cid,
   }
+  useEffect(() => {}, [image, uploadedImageCID, defaultCID, handleImageChange])
 
   return (
     <InputContainer onChange={handleImageChange}>
