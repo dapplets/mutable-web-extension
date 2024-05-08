@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react'
+import React, { FC } from 'react'
 import styled from 'styled-components'
 import { Image } from './image'
 
@@ -70,13 +70,12 @@ interface Props {
 
 export const InputImage: FC<Props> = ({ handleImageChange, uploadedImageCID, defaultCID }) => {
   const image = {
-    ipfs_cid: uploadedImageCID ? uploadedImageCID : defaultCID ? defaultCID.ipfs_cid : undefined,
+    ipfs_cid: uploadedImageCID ?? defaultCID?.ipfs_cid,
   }
-  useEffect(() => {}, [image, uploadedImageCID, defaultCID, handleImageChange])
 
   return (
     <InputContainer onChange={handleImageChange}>
-      {image && image.ipfs_cid ? (
+      {image?.ipfs_cid ? (
         <CustomFileUpload onChange={handleImageChange}>
           <UploadInput type="file" accept="image/*" />
           <Image image={image} />

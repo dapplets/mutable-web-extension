@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useState } from 'react'
 
 export interface Props {
   image?: {
@@ -11,15 +11,10 @@ export interface Props {
 }
 
 export const Image: FC<Props> = ({ image, alt, fallbackUrl }) => {
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    image?.ipfs_cid
-      ? setImageUrl(`https://ipfs.near.social/ipfs/${image.ipfs_cid}`)
-      : image?.url
-      ? setImageUrl(image?.url)
-      : setImageUrl(fallbackUrl)
-  }, [image, imageUrl])
+  const [imageUrl, setImageUrl] = useState(
+    (image?.ipfs_cid ? `https://ipfs.near.social/ipfs/${image.ipfs_cid}` : image?.url) ||
+      fallbackUrl
+  )
 
   return (
     <img
