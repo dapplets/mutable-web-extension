@@ -1,6 +1,7 @@
+import { Mutation } from 'mutable-web-engine'
 import React, { FC } from 'react'
 import styled from 'styled-components'
-
+import { Image } from '../multitable-panel/components/image'
 const SidePanelWrapper = styled.div`
   display: flex;
   width: 58px;
@@ -22,14 +23,20 @@ const SidePanelWrapper = styled.div`
 const ButtonIconWrapper = styled.button`
   display: flex;
   box-sizing: border-box;
-  overlow: hidden;
+  overflow: hidden;
   width: 46px;
   height: 46px;
   outline: none;
   border: none;
   background: transparent;
   padding: 0;
+  border-radius: 50%;
   transition: all 0.2s ease;
+  img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
 
   &:hover {
     transform: scale(1.1);
@@ -55,7 +62,7 @@ const ButtonWrapper = styled.div`
 `
 
 // todo: replace on iconDefault. Now - from layout
-const iconDefaultProfile = (
+const IconDefaultProfile = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" viewBox="0 0 46 46" fill="none">
     <rect x="0.5" y="0.5" width="45" height="45" rx="22.5" fill="#02193A" />
     <rect x="0.5" y="0.5" width="45" height="45" rx="22.5" stroke="#E2E2E5" />
@@ -66,15 +73,23 @@ const iconDefaultProfile = (
   </svg>
 )
 
-interface SidePanelProps {}
+interface SidePanelProps {
+  baseMutation: Mutation | null
+}
 
-export const SidePanel: FC<SidePanelProps> = ({}) => {
+export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
   return (
     <SidePanelWrapper
       data-mweb-context-type="mweb-overlay"
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
-      <ButtonIconWrapper>{iconDefaultProfile}</ButtonIconWrapper>
+      <ButtonIconWrapper>
+        {baseMutation?.metadata.image ? (
+          <Image image={baseMutation?.metadata.image} />
+        ) : (
+          <IconDefaultProfile />
+        )}
+      </ButtonIconWrapper>
 
       <ButtonWrapper data-mweb-insertion-point="mweb-actions-panel">
         {
