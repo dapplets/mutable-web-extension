@@ -7,6 +7,7 @@ import { getIsPanelPinned, removePanelUnpinned, setPanelUnpinned } from '../stor
 import { PinOutlineIcon, PinSolidIcon } from './assets/vectors'
 import { Dropdown } from './components/dropdown'
 import { MutationEditorModal } from './components/mutation-editor-modal'
+import Profile from './profile'
 import SidePanel from './side-panel'
 
 const WrapperPanel = styled.div<{ $isAnimated?: boolean }>`
@@ -151,6 +152,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [isNotchDisplayed, setIsNotchDisplayed] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isProfileOpen, setProfileOpen] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -196,12 +198,18 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
     setIsModalOpen(false)
   }
 
+  const handleProfileVisible = () => {
+    setProfileOpen(!isProfileOpen)
+  }
+
   // The notch can be opened from the extension's context menu on websites without any mutation
   if (!isModalOpen && mutations.length === 0) return null
 
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutation-panel">
-      <SidePanel baseMutation={selectedMutation} />
+      {/* todo: mocked isConnected  */}
+      {isProfileOpen ? <Profile isConnected={false} /> : null}
+      <SidePanel handleProfileVisible={handleProfileVisible} baseMutation={selectedMutation} />
       {isModalOpen ? (
         <MutationEditorModal
           apps={apps}

@@ -70,15 +70,16 @@ const IconDefaultProfile = () => (
 
 interface SidePanelProps {
   baseMutation: Mutation | null
+  handleProfileVisible: () => void
 }
 
-export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
+export const SidePanel: FC<SidePanelProps> = ({ baseMutation, handleProfileVisible }) => {
   return (
     <SidePanelWrapper
       data-mweb-context-type="mweb-overlay"
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
-      <ButtonIconWrapper>
+      <ButtonIconWrapper onClick={handleProfileVisible}>
         {baseMutation?.metadata.image ? (
           <Image image={baseMutation?.metadata.image} />
         ) : (
