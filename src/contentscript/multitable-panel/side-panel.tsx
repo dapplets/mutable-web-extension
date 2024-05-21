@@ -2,18 +2,21 @@ import { Mutation } from 'mutable-web-engine'
 import React, { FC } from 'react'
 import styled from 'styled-components'
 import { Image } from '../multitable-panel/components/image'
+
 const SidePanelWrapper = styled.div`
   display: flex;
   width: 58px;
   padding: 6px;
-      position: absolute;
-    right: 0;
+  position: absolute;
+  top: 55px;
+  right: 0;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 10px;
   border-radius: 4px 0px 0px 4px;
-  border: 1px solid #E2E2E5;
+  border-width: 1px 0 1px 1px;
+  border-style: solid;
+  border-color: #E2E2E5;
   background: #F8F9FF;
   box-shadow: 0 4px 20px 0 rgba(11, 87, 111, 0.15)
   font-family: sans-serif;
@@ -47,18 +50,10 @@ const ButtonWrapper = styled.div`
   display: flex;
   box-sizing: border-box;
   overlow: hidden;
-  cursor: pointer;
   justify-content: center;
   align-items: center;
   width: 46px;
-  height: 22px;
-  outline: none;
-  border: none;
   padding: 0;
-  border-radius: 4px;
-  background: transparent;
-  box-shadow: 0 4px 5px 0 rgba(45, 52, 60, 0.1);
-  transition: all 0.2s ease;
 `
 
 // todo: replace on iconDefault. Now - from layout
@@ -91,11 +86,10 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
         )}
       </ButtonIconWrapper>
 
-      <ButtonWrapper data-mweb-insertion-point="mweb-actions-panel">
-        {
-          // todo: add widget action
-        }
-      </ButtonWrapper>
+      <ButtonWrapper
+        data-mweb-insertion-point="mweb-actions-panel"
+        data-mweb-layout-manager="bos.dapplets.near/widget/VerticalLayoutManager"
+      />
     </SidePanelWrapper>
   )
 }
