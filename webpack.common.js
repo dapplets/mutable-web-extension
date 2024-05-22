@@ -125,6 +125,7 @@ module.exports = {
       http: false,
       https: false,
       zlib: false,
+      fs: false,
       'process/browser': false,
     },
     modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],

@@ -1,3 +1,5 @@
+import { SocialProvider } from '@bos-web-engine/social-db'
+import { WalletSelectorProvider } from '@bos-web-engine/wallet-selector-control'
 import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core'
 import { EventEmitter as NEventEmitter } from 'events'
 import { customElements, Engine } from 'mutable-web-engine'
@@ -108,11 +110,15 @@ async function main() {
   document.body.appendChild(container)
   const root = createRoot(container)
   root.render(
-    <MutableWebProvider engine={engine}>
-      <ShadowDomWrapper stylesheetSrc={bootstrapCssUrl}>
-        <MultitablePanel eventEmitter={eventEmitter} />
-      </ShadowDomWrapper>
-    </MutableWebProvider>
+    <WalletSelectorProvider contractId="social.near" params={{ network: 'mainnet', modules: [] }}>
+      <SocialProvider debug networkId="mainnet" walletSelector={null}>
+        <MutableWebProvider engine={engine}>
+          <ShadowDomWrapper stylesheetSrc={bootstrapCssUrl}>
+            <MultitablePanel eventEmitter={eventEmitter} />
+          </ShadowDomWrapper>
+        </MutableWebProvider>
+      </SocialProvider>
+    </WalletSelectorProvider>
   )
 
   return engine
