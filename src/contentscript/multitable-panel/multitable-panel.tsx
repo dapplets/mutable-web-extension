@@ -201,7 +201,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
 
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutation-panel">
-      <SidePanel baseMutation={selectedMutation} />
+      <SidePanel baseMutation={selectedMutation} apps={apps} />
       {isModalOpen ? (
         <MutationEditorModal
           apps={apps}

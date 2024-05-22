@@ -1,5 +1,5 @@
-import { Mutation } from 'mutable-web-engine'
-import React, { FC } from 'react'
+import { AppMetadata, Mutation } from 'mutable-web-engine'
+import React, { FC, useState } from 'react'
 import styled from 'styled-components'
 import { Image } from '../multitable-panel/components/image'
 
@@ -31,10 +31,12 @@ const ButtonIconWrapper = styled.button`
   height: 46px;
   outline: none;
   border: none;
-  background: transparent;
+  background: #fff;
   padding: 0;
   border-radius: 50%;
   transition: all 0.2s ease;
+
+  box-shadow: 0 4px 5px 0 rgba(45, 52, 60, 0.2);
   img {
     object-fit: cover;
     width: 100%;
@@ -46,6 +48,17 @@ const ButtonIconWrapper = styled.button`
   }
 `
 
+const Delimeter = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  overlow: hidden;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  height: 10px;
+  border-bottom: 1px solid #e2e2e5;
+`
 const ButtonWrapper = styled.div`
   display: flex;
   box-sizing: border-box;
@@ -54,6 +67,65 @@ const ButtonWrapper = styled.div`
   align-items: center;
   width: 46px;
   padding: 0;
+`
+
+const AppsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 5px 0;
+  gap: 10px;
+`
+
+const ButtonOpenWrapper = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  height: 32px;
+  background: transparent;
+  padding: 0;
+  border-top: 1px solid #e2e2e5;
+`
+
+const ButtonOpen = styled.button`
+  display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 22px;
+  outline: none;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  border: 1px solid #e2e2e5;
+  padding: 0;
+  transition: all 0.2s ease;
+
+  path {
+    stroke: #7a818b;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    background: #fff;
+    border: none;
+    path {
+      stroke: #384bff;
+    }
+  }
+
+  &:active {
+    transform: scale(1.1);
+    background: #384bff;
+    border: none;
+    path {
+      stroke: #fff;
+    }
+  }
 `
 
 // todo: replace on iconDefault. Now - from layout
@@ -68,11 +140,28 @@ const IconDefaultProfile = () => (
   </svg>
 )
 
+const ArrowSvg = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
+    <path
+      d="M1.5 6.75L7 1.25L12.5 6.75"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+)
+
 interface SidePanelProps {
   baseMutation: Mutation | null
+  apps: AppMetadata[]
 }
 
-export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
+export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
+  const [isOpen, seOpen] = useState(false)
+  const [baseMutationApps, setMutationApps] = useState<AppMetadata[] | null>(
+    apps.filter((app) => baseMutation?.apps.includes(app.id))
+  )
+
   return (
     <SidePanelWrapper
       data-mweb-context-type="mweb-overlay"
@@ -85,11 +174,28 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
           <IconDefaultProfile />
         )}
       </ButtonIconWrapper>
-
+      {baseMutationApps?.length ? <Delimeter></Delimeter> : null}
       <ButtonWrapper
         data-mweb-insertion-point="mweb-actions-panel"
         data-mweb-layout-manager="bos.dapplets.near/widget/VerticalLayoutManager"
       />
+
+      {isOpen ? (
+        <AppsWrapper>
+          {baseMutationApps?.map((app, i) => (
+            <ButtonIconWrapper key={i}>
+              {app?.metadata.image ? <Image image={app?.metadata.image} /> : <IconDefaultProfile />}
+            </ButtonIconWrapper>
+          ))}
+        </AppsWrapper>
+      ) : null}
+      {baseMutationApps?.length && (
+        <ButtonOpenWrapper>
+          <ButtonOpen onClick={() => seOpen(!isOpen)}>
+            <ArrowSvg />
+          </ButtonOpen>
+        </ButtonOpenWrapper>
+      )}
     </SidePanelWrapper>
   )
 }
