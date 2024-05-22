@@ -307,15 +307,18 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
           {baseMutationApps?.map((app, i) => (
             <ButtonIconWrapper key={i}>
               {app?.metadata.image ? <Image image={app?.metadata.image} /> : <IconDefaultProfile />}
-              {/* <LabelAppTop>
+              <LabelAppTop>
                 <StopTopIcon />
-              </LabelAppTop> */}
-              {/* <LabelAppCenter>
-                <PlayCenterIcon />
-              </LabelAppCenter> */}
-              {/* <LabelAppCenter>
-                <StopCenterIcon />
-              </LabelAppCenter> */}
+              </LabelAppTop>
+              {i == 0 ? (
+                <LabelAppCenter>
+                  <PlayCenterIcon />
+                </LabelAppCenter>
+              ) : (
+                <LabelAppCenter>
+                  <StopCenterIcon />
+                </LabelAppCenter>
+              )}
             </ButtonIconWrapper>
           ))}
         </AppsWrapper>
