@@ -1,6 +1,7 @@
-import { AppMetadata, Mutation } from 'mutable-web-engine'
+import { AppWithSettings, Mutation } from 'mutable-web-engine'
 import React, { FC, useState } from 'react'
 import styled from 'styled-components'
+import { useMutableWeb, useMutationApp } from '../contexts/mutable-web-context'
 import { Image } from '../multitable-panel/components/image'
 
 const SidePanelWrapper = styled.div<{ $isApps?: boolean }>`
@@ -312,25 +313,50 @@ const StopCenterIcon = () => (
   </svg>
 )
 
+const AppSwitcher: FC<{ app: AppWithSettings }> = ({ app }) => {
+  const { enableApp, disableApp, isLoading } = useMutationApp(app.id)
+
+  // ToDo: add loader using isLoading
+
+  return (
+    <MutationIconWrapper $isStopped={!app.settings.isEnabled}>
+      {app?.metadata.image ? <Image image={app?.metadata.image} /> : <MutationFallbackIcon />}
+
+      {!app.settings.isEnabled ? (
+        <LabelAppTop className="labelAppTop">
+          <StopTopIcon />
+        </LabelAppTop>
+      ) : null}
+
+      {app.settings.isEnabled ? (
+        <LabelAppCenter className="labelAppCenter" onClick={disableApp}>
+          <StopCenterIcon />
+        </LabelAppCenter>
+      ) : (
+        <LabelAppCenter className="labelAppCenter" onClick={enableApp}>
+          <PlayCenterIcon />
+        </LabelAppCenter>
+      )}
+    </MutationIconWrapper>
+  )
+}
+
 interface SidePanelProps {
   baseMutation: Mutation | null
-  apps: AppMetadata[]
   onMutationIconClick: () => void
 }
 
-export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps, onMutationIconClick }) => {
+export const SidePanel: FC<SidePanelProps> = ({ baseMutation, onMutationIconClick }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [baseMutationApps, setMutationApps] = useState<AppMetadata[] | null>(
-    apps.filter((app) => baseMutation?.apps.includes(app.id))
-  )
+  const { mutationApps } = useMutableWeb()
 
   return (
     <SidePanelWrapper
-      $isApps={baseMutationApps?.length ? true : false}
+      $isApps={mutationApps.length > 0}
       data-mweb-context-type="mweb-overlay"
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
-      <TopBlock $open={isOpen || baseMutationApps?.length ? true : false}>
+      <TopBlock $open={isOpen || mutationApps.length > 0}>
         <MutationIconWrapper onClick={onMutationIconClick}>
           {baseMutation?.metadata.image ? (
             <Image image={baseMutation?.metadata.image} />
@@ -339,7 +365,9 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps, onMutationIc
           )}
         </MutationIconWrapper>
       </TopBlock>
-      {baseMutationApps?.length ? <Delimeter></Delimeter> : null}
+
+      {mutationApps.length ? <Delimeter /> : null}
+
       {isOpen ? null : (
         <ButtonWrapper
           data-mweb-insertion-point="mweb-actions-panel"
@@ -349,34 +377,14 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps, onMutationIc
 
       {isOpen ? (
         <AppsWrapper>
-          {baseMutationApps?.map((app, i) => (
-            <MutationIconWrapper key={i} $isStopped={i == 1 ? true : false}>
-              {app?.metadata.image ? (
-                <Image image={app?.metadata.image} />
-              ) : (
-                <MutationFallbackIcon />
-              )}
-              {i == 1 ? (
-                <LabelAppTop className="labelAppTop">
-                  <StopTopIcon />
-                </LabelAppTop>
-              ) : null}
-
-              {i == 0 ? (
-                <LabelAppCenter className="labelAppCenter">
-                  <StopCenterIcon />
-                </LabelAppCenter>
-              ) : (
-                <LabelAppCenter className="labelAppCenter">
-                  <PlayCenterIcon />
-                </LabelAppCenter>
-              )}
-            </MutationIconWrapper>
+          {mutationApps.map((app) => (
+            <AppSwitcher key={app.id} app={app} />
           ))}
         </AppsWrapper>
       ) : null}
-      {baseMutationApps?.length && (
-        <ButtonOpenWrapper $open={isOpen || baseMutationApps?.length ? true : false}>
+
+      {mutationApps.length > 0 ? (
+        <ButtonOpenWrapper $open={isOpen || mutationApps.length > 0}>
           <ButtonOpen
             $open={isOpen}
             className={isOpen ? 'svgTransform' : ''}
@@ -385,7 +393,7 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps, onMutationIc
             <ArrowSvg />
           </ButtonOpen>
         </ButtonOpenWrapper>
-      )}
+      ) : null}
     </SidePanelWrapper>
   )
 }
