@@ -6,7 +6,7 @@ import { Image } from '../multitable-panel/components/image'
 const SidePanelWrapper = styled.div`
   display: flex;
   width: 58px;
-  padding: 6px;
+
   position: absolute;
   top: 55px;
   right: 0;
@@ -22,8 +22,16 @@ const SidePanelWrapper = styled.div`
   font-family: sans-serif;
   box-sizing: border-box;
 `
+const TopBlock = styled.div<{ $open?: boolean }>`
+  display: flex;
+  width: 58px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px;
+  background: ${(props) => (props.$open ? '#fff' : 'transparent')};
+`
 
-const ButtonIconWrapper = styled.button`
+const ButtonIconWrapper = styled.button<{ $isStopped?: boolean }>`
   display: flex;
   box-sizing: border-box;
   width: 46px;
@@ -37,16 +45,31 @@ const ButtonIconWrapper = styled.button`
   position: relative;
   box-shadow: 0 4px 5px 0 rgba(45, 52, 60, 0.2);
 
+  .labelAppCenter {
+    visibility: hidden;
+    opacity: 0;
+  }
+
   img {
     box-sizing: border-box;
     object-fit: cover;
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    filter: ${(props) => (props.$isStopped ? 'grayscale(1)' : 'grayscale(0)')};
   }
 
   &:hover {
     transform: scale(1.1);
+  }
+
+  &:hover .labelAppCenter {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &:hover .labelAppTop {
+    opacity: ${(props) => (props.$isStopped ? '0' : '1')};
   }
 `
 
@@ -58,7 +81,7 @@ const Delimeter = styled.div`
   align-items: center;
   width: 100%;
   padding: 0;
-  height: 10px;
+  height: 1px;
   border-bottom: 1px solid #e2e2e5;
 `
 const ButtonWrapper = styled.div`
@@ -74,7 +97,7 @@ const ButtonWrapper = styled.div`
 const AppsWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 5px 0;
+  padding: 5px 6px;
   gap: 10px;
 `
 
@@ -103,7 +126,7 @@ const LabelAppTop = styled.div`
   cursor: pointer;
 `
 
-const ButtonOpenWrapper = styled.div`
+const ButtonOpenWrapper = styled.div<{ $open?: boolean }>`
   display: flex;
   box-sizing: border-box;
   justify-content: center;
@@ -111,8 +134,9 @@ const ButtonOpenWrapper = styled.div`
   overflow: hidden;
   width: 100%;
   height: 32px;
-  background: transparent;
-  padding: 0;
+  background: ${(props) => (props.$open ? '#fff' : 'transparent')};
+  padding-left: 6px;
+  padding-right: 6px;
   border-top: 1px solid #e2e2e5;
   transition: all 0.2s ease;
 
@@ -124,7 +148,7 @@ const ButtonOpenWrapper = styled.div`
   }
 `
 
-const ButtonOpen = styled.button`
+const ButtonOpen = styled.button<{ $open?: boolean }>`
   display: flex;
   box-sizing: border-box;
   overflow: hidden;
@@ -135,7 +159,7 @@ const ButtonOpen = styled.button`
   outline: none;
   background: transparent;
   border-radius: 4px;
-  border: 1px solid #e2e2e5;
+  border: ${(props) => (props.$open ? 'none' : '1px solid #e2e2e5')};
   padding: 0;
   transition: all 0.2s ease;
 
@@ -289,33 +313,40 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
       data-mweb-context-type="mweb-overlay"
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
-      <ButtonIconWrapper>
-        {baseMutation?.metadata.image ? (
-          <Image image={baseMutation?.metadata.image} />
-        ) : (
-          <IconDefaultProfile />
-        )}
-      </ButtonIconWrapper>
+      <TopBlock $open={isOpen}>
+        <ButtonIconWrapper>
+          {baseMutation?.metadata.image ? (
+            <Image image={baseMutation?.metadata.image} />
+          ) : (
+            <IconDefaultProfile />
+          )}
+        </ButtonIconWrapper>
+      </TopBlock>
       {baseMutationApps?.length ? <Delimeter></Delimeter> : null}
-      <ButtonWrapper
-        data-mweb-insertion-point="mweb-actions-panel"
-        data-mweb-layout-manager="bos.dapplets.near/widget/VerticalLayoutManager"
-      />
+      {isOpen ? null : (
+        <ButtonWrapper
+          data-mweb-insertion-point="mweb-actions-panel"
+          data-mweb-layout-manager="bos.dapplets.near/widget/VerticalLayoutManager"
+        />
+      )}
 
       {isOpen ? (
         <AppsWrapper>
           {baseMutationApps?.map((app, i) => (
-            <ButtonIconWrapper key={i}>
+            <ButtonIconWrapper key={i} $isStopped={i == 1 ? true : false}>
               {app?.metadata.image ? <Image image={app?.metadata.image} /> : <IconDefaultProfile />}
-              <LabelAppTop>
-                <StopTopIcon />
-              </LabelAppTop>
+              {i == 1 ? (
+                <LabelAppTop className="labelAppTop">
+                  <StopTopIcon />
+                </LabelAppTop>
+              ) : null}
+
               {i == 0 ? (
-                <LabelAppCenter>
+                <LabelAppCenter className="labelAppCenter">
                   <PlayCenterIcon />
                 </LabelAppCenter>
               ) : (
-                <LabelAppCenter>
+                <LabelAppCenter className="labelAppCenter">
                   <StopCenterIcon />
                 </LabelAppCenter>
               )}
@@ -324,8 +355,12 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
         </AppsWrapper>
       ) : null}
       {baseMutationApps?.length && (
-        <ButtonOpenWrapper>
-          <ButtonOpen className={isOpen ? 'svgTransform' : ''} onClick={() => seOpen(!isOpen)}>
+        <ButtonOpenWrapper $open={isOpen}>
+          <ButtonOpen
+            $open={isOpen}
+            className={isOpen ? 'svgTransform' : ''}
+            onClick={() => seOpen(!isOpen)}
+          >
             <ArrowSvg />
           </ButtonOpen>
         </ButtonOpenWrapper>
