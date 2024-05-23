@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react'
 import styled from 'styled-components'
 import { Image } from '../multitable-panel/components/image'
 
-const SidePanelWrapper = styled.div`
+const SidePanelWrapper = styled.div<{ $isApps?: boolean }>`
   display: flex;
   width: 58px;
     overflow: hidden;
@@ -17,7 +17,7 @@ const SidePanelWrapper = styled.div`
   border-width: 1px 0 1px 1px;
   border-style: solid;
   border-color: #E2E2E5;
-  background: #F8F9FF;
+  background:  ${(props) => (props.$isApps ? '#EEEFF5' : '#F8F9FF')};
   box-shadow: 0 4px 20px 0 rgba(11, 87, 111, 0.15)
   font-family: sans-serif;
   box-sizing: border-box;
@@ -310,10 +310,11 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
 
   return (
     <SidePanelWrapper
+      $isApps={baseMutationApps?.length ? true : false}
       data-mweb-context-type="mweb-overlay"
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
-      <TopBlock $open={isOpen}>
+      <TopBlock $open={isOpen || baseMutationApps?.length ? true : false}>
         <ButtonIconWrapper>
           {baseMutation?.metadata.image ? (
             <Image image={baseMutation?.metadata.image} />
@@ -355,7 +356,7 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
         </AppsWrapper>
       ) : null}
       {baseMutationApps?.length && (
-        <ButtonOpenWrapper $open={isOpen}>
+        <ButtonOpenWrapper $open={isOpen || baseMutationApps?.length ? true : false}>
           <ButtonOpen
             $open={isOpen}
             className={isOpen ? 'svgTransform' : ''}
