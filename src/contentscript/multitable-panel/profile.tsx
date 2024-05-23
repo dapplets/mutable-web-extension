@@ -292,7 +292,7 @@ export const Profile = ({ accountId }: { accountId: string | null }) => {
   const handleSignOut = async () => {
     setWaiting(true)
     try {
-      await Background.disconnect()
+      await Background.disconnectWallet()
     } finally {
       setWaiting(false)
     }

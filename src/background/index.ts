@@ -40,7 +40,7 @@ const connectWallet = async (): Promise<void> => {
   updateMenuForConnectedState(accounts[0].accountId)
 }
 
-const disconnect = async (): Promise<void> => {
+const disconnectWallet = async (): Promise<void> => {
   await near.signOut()
 
   // send events to all tabs
@@ -61,7 +61,7 @@ export const bgFunctions = {
   near_signAndSendTransactions: near.signAndSendTransactions.bind(near),
   popTabState: tabStateService.popForTab.bind(tabStateService),
   connectWallet,
-  disconnect,
+  disconnectWallet,
 }
 
 export type BgFunctions = typeof bgFunctions
@@ -170,7 +170,7 @@ function handleContextMenuClick(
       return connectWallet()
 
     case 'disconnect':
-      return disconnect()
+      return disconnectWallet()
 
     case 'copy': {
       if (tab) {
