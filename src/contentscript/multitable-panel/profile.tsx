@@ -24,7 +24,7 @@ const ButtonConnectWrapper = styled.button`
   display: flex;
   position: relative;
   box-sizing: border-box;
-  overlow: hidden;
+  overflow: hidden;
   cursor: pointer;
   justify-content: center;
   align-items: center;
@@ -37,19 +37,19 @@ const ButtonConnectWrapper = styled.button`
   border-radius: 10px;
   color: #fff;
   font-size: 14px;
-  padding:0;
-  transition: all  0.2s ease;
+  padding: 0;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity 0.8;
+    opacity: 0.8;
   }
 
   &:active {
-    opacity 0.6;
+    opacity: 0.6;
   }
 
   &:disabled {
-    opacity 0.6;
+    opacity: 0.6;
   }
 
   .loading {
@@ -134,7 +134,7 @@ const ProfileNetwork = styled.span`
 const ButtonCopy = styled.button`
   display: flex;
   box-sizing: border-box;
-  overlow: hidden;
+  overflow: hidden;
   cursor: pointer;
   justify-content: center;
   align-items: center;
@@ -179,14 +179,14 @@ const ButtonCopy = styled.button`
   }
 
   &:disabled {
-    opacity 0.7;
+    opacity: 0.7;
   }
 `
 
 const ButtonDisconnect = styled.button`
   display: flex;
   box-sizing: border-box;
-  overlow: hidden;
+  overflow: hidden;
   cursor: pointer;
   justify-content: center;
   align-items: center;
@@ -231,7 +231,7 @@ const ButtonDisconnect = styled.button`
   }
 
   &:disabled {
-    opacity 0.7;
+    opacity: 0.7;
   }
 `
 
