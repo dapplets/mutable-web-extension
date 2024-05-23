@@ -6,7 +6,7 @@ import { Image } from '../multitable-panel/components/image'
 const SidePanelWrapper = styled.div<{ $isApps?: boolean }>`
   display: flex;
   width: 58px;
-    overflow: hidden;
+  overflow: hidden;
   position: absolute;
   top: 55px;
   right: 0;
@@ -16,12 +16,13 @@ const SidePanelWrapper = styled.div<{ $isApps?: boolean }>`
   border-radius: 4px 0px 0px 4px;
   border-width: 1px 0 1px 1px;
   border-style: solid;
-  border-color: #E2E2E5;
-  background:  ${(props) => (props.$isApps ? '#EEEFF5' : '#F8F9FF')};
-  box-shadow: 0 4px 20px 0 rgba(11, 87, 111, 0.15)
+  border-color: #e2e2e5;
+  background: ${(props) => (props.$isApps ? '#EEEFF5' : '#F8F9FF')};
+  box-shadow: 0 4px 20px 0 rgba(11, 87, 111, 0.15);
   font-family: sans-serif;
   box-sizing: border-box;
 `
+
 const TopBlock = styled.div<{ $open?: boolean }>`
   display: flex;
   width: 58px;
@@ -31,7 +32,7 @@ const TopBlock = styled.div<{ $open?: boolean }>`
   background: ${(props) => (props.$open ? '#fff' : 'transparent')};
 `
 
-const ButtonIconWrapper = styled.button<{ $isStopped?: boolean }>`
+const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
   display: flex;
   box-sizing: border-box;
   width: 46px;
@@ -41,7 +42,7 @@ const ButtonIconWrapper = styled.button<{ $isStopped?: boolean }>`
   background: #fff;
   padding: 0;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease-in-out;
   position: relative;
   box-shadow: 0 4px 5px 0 rgba(45, 52, 60, 0.2);
 
@@ -57,10 +58,23 @@ const ButtonIconWrapper = styled.button<{ $isStopped?: boolean }>`
     height: 100%;
     border-radius: 50%;
     filter: ${(props) => (props.$isStopped ? 'grayscale(1)' : 'grayscale(0)')};
+    transition: all 0.15s ease-in-out;
   }
 
   &:hover {
-    transform: scale(1.1);
+    box-shadow: 0px 4px 20px 0px #0b576f26, 0px 4px 5px 0px #2d343c1a;
+
+    img {
+      filter: brightness(115%);
+    }
+  }
+
+  &:active {
+    box-shadow: 0px 4px 20px 0px #0b576f26, 0px 4px 5px 0px #2d343c1a;
+
+    img {
+      filter: brightness(125%);
+    }
   }
 
   &:hover .labelAppCenter {
@@ -76,7 +90,7 @@ const ButtonIconWrapper = styled.button<{ $isStopped?: boolean }>`
 const Delimeter = styled.div`
   display: flex;
   box-sizing: border-box;
-  overlow: hidden;
+  overflow: hidden;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -84,10 +98,11 @@ const Delimeter = styled.div`
   height: 1px;
   border-bottom: 1px solid #e2e2e5;
 `
+
 const ButtonWrapper = styled.div`
   display: flex;
   box-sizing: border-box;
-  overlow: hidden;
+  overflow: hidden;
   justify-content: center;
   align-items: center;
   width: 46px;
@@ -190,7 +205,7 @@ const ButtonOpen = styled.button<{ $open?: boolean }>`
 `
 
 // todo: replace on iconDefault. Now - from layout
-const IconDefaultProfile = () => (
+const MutationFallbackIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" viewBox="0 0 46 46" fill="none">
     <rect x="0.5" y="0.5" width="45" height="45" rx="22.5" fill="#02193A" />
     <rect x="0.5" y="0.5" width="45" height="45" rx="22.5" stroke="#E2E2E5" />
@@ -205,9 +220,9 @@ const ArrowSvg = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
     <path
       d="M1.5 1.25L7 6.75L12.5 1.25"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )
@@ -242,7 +257,7 @@ const StopTopIcon = () => (
 
 const PlayCenterIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clip-path="url(#clip0_194_475)">
+    <g clipPath="url(#clip0_194_475)">
       <path
         d="M12 2C10.6868 2 9.38642 2.25866 8.17317 2.7612C6.95991 3.26375 5.85752 4.00035 4.92893 4.92893C3.05357 6.8043 2 9.34784 2 12C2 14.6522 3.05357 17.1957 4.92893 19.0711C5.85752 19.9997 6.95991 20.7362 8.17317 21.2388C9.38642 21.7413 10.6868 22 12 22C14.6522 22 17.1957 20.9464 19.0711 19.0711C20.9464 17.1957 22 14.6522 22 12C22 10.6868 21.7413 9.38642 21.2388 8.17317C20.7362 6.95991 19.9997 5.85752 19.0711 4.92893C18.1425 4.00035 17.0401 3.26375 15.8268 2.7612C14.6136 2.25866 13.3132 2 12 2Z"
         fill="#02193A"
@@ -251,7 +266,7 @@ const PlayCenterIcon = () => (
       <path
         d="M12 1C10.5555 1 9.12506 1.28452 7.79048 1.83733C6.4559 2.39013 5.24327 3.20038 4.22183 4.22183C2.15893 6.28473 1 9.08262 1 12C1 14.9174 2.15893 17.7153 4.22183 19.7782C5.24327 20.7996 6.4559 21.6099 7.79048 22.1627C9.12506 22.7155 10.5555 23 12 23C14.9174 23 17.7153 21.8411 19.7782 19.7782C21.8411 17.7153 23 14.9174 23 12C23 10.5555 22.7155 9.12506 22.1627 7.79048C21.6099 6.4559 20.7996 5.24327 19.7782 4.22183C18.7567 3.20038 17.5441 2.39013 16.2095 1.83733C14.8749 1.28452 13.4445 1 12 1Z"
         stroke="white"
-        stroke-width="2"
+        strokeWidth="2"
       />
     </g>
     <defs>
@@ -264,7 +279,7 @@ const PlayCenterIcon = () => (
 
 const StopCenterIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clip-path="url(#clip0_194_487)">
+    <g clipPath="url(#clip0_194_487)">
       <mask
         id="path-1-outside-1_194_487"
         maskUnits="userSpaceOnUse"
@@ -300,10 +315,11 @@ const StopCenterIcon = () => (
 interface SidePanelProps {
   baseMutation: Mutation | null
   apps: AppMetadata[]
+  onMutationIconClick: () => void
 }
 
-export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
-  const [isOpen, seOpen] = useState(false)
+export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps, onMutationIconClick }) => {
+  const [isOpen, setIsOpen] = useState(false)
   const [baseMutationApps, setMutationApps] = useState<AppMetadata[] | null>(
     apps.filter((app) => baseMutation?.apps.includes(app.id))
   )
@@ -315,13 +331,13 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
       <TopBlock $open={isOpen || baseMutationApps?.length ? true : false}>
-        <ButtonIconWrapper>
+        <MutationIconWrapper onClick={onMutationIconClick}>
           {baseMutation?.metadata.image ? (
             <Image image={baseMutation?.metadata.image} />
           ) : (
-            <IconDefaultProfile />
+            <MutationFallbackIcon />
           )}
-        </ButtonIconWrapper>
+        </MutationIconWrapper>
       </TopBlock>
       {baseMutationApps?.length ? <Delimeter></Delimeter> : null}
       {isOpen ? null : (
@@ -334,8 +350,12 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
       {isOpen ? (
         <AppsWrapper>
           {baseMutationApps?.map((app, i) => (
-            <ButtonIconWrapper key={i} $isStopped={i == 1 ? true : false}>
-              {app?.metadata.image ? <Image image={app?.metadata.image} /> : <IconDefaultProfile />}
+            <MutationIconWrapper key={i} $isStopped={i == 1 ? true : false}>
+              {app?.metadata.image ? (
+                <Image image={app?.metadata.image} />
+              ) : (
+                <MutationFallbackIcon />
+              )}
               {i == 1 ? (
                 <LabelAppTop className="labelAppTop">
                   <StopTopIcon />
@@ -351,7 +371,7 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
                   <PlayCenterIcon />
                 </LabelAppCenter>
               )}
-            </ButtonIconWrapper>
+            </MutationIconWrapper>
           ))}
         </AppsWrapper>
       ) : null}
@@ -360,7 +380,7 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, apps }) => {
           <ButtonOpen
             $open={isOpen}
             className={isOpen ? 'svgTransform' : ''}
-            onClick={() => seOpen(!isOpen)}
+            onClick={() => setIsOpen(!isOpen)}
           >
             <ArrowSvg />
           </ButtonOpen>
