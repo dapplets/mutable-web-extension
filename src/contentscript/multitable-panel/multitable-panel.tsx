@@ -201,7 +201,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
     setIsModalOpen(false)
   }
 
-  const handleProfileVisible = () => {
+  const handleMutationIconClick = () => {
     setProfileOpen(!isProfileOpen)
   }
 
@@ -210,9 +210,8 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
 
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutation-panel">
-      {/* todo: mocked isConnected  */}
       {isProfileOpen ? <Profile accountId={loggedInAccountId} /> : null}
-      <SidePanel handleProfileVisible={handleProfileVisible} baseMutation={selectedMutation} />
+      <SidePanel onMutationIconClick={handleMutationIconClick} baseMutation={selectedMutation} />
       {isModalOpen ? (
         <MutationEditorModal
           apps={apps}
