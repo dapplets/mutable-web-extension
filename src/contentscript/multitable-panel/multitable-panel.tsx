@@ -1,4 +1,5 @@
 import { EventEmitter as NEventEmitter } from 'events'
+import { useAccountId } from 'near-social-vm'
 import React, { FC, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
@@ -109,6 +110,7 @@ const PinWrapper = styled.div`
     vertical-align: initial;
   }
 `
+
 const DragWrapper = styled.div`
   width: 16px;
   height: 37px;
@@ -153,6 +155,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
   const [isNotchDisplayed, setIsNotchDisplayed] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isProfileOpen, setProfileOpen] = useState(false)
+  const loggedInAccountId = useAccountId()
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -208,7 +211,7 @@ export const MultitablePanel: FC<MultitablePanelProps> = ({ eventEmitter }) => {
   return (
     <WrapperPanel $isAnimated={!isDragging} data-testid="mutation-panel">
       {/* todo: mocked isConnected  */}
-      {isProfileOpen ? <Profile isConnected={false} /> : null}
+      {isProfileOpen ? <Profile accountId={loggedInAccountId} /> : null}
       <SidePanel handleProfileVisible={handleProfileVisible} baseMutation={selectedMutation} />
       {isModalOpen ? (
         <MutationEditorModal

@@ -1,5 +1,7 @@
-import React, { FC } from 'react'
+import makeBlockie from 'ethereum-blockies-base64'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import Background from '../background'
 
 const ProfileWrapper = styled.div`
   display: flex;
@@ -14,12 +16,13 @@ const ProfileWrapper = styled.div`
   border-radius: 10px;
   padding: 4px 10px;
   background: #fff;
-  box-shadow: 0 4px 5px 0 rgba(45, 52, 60, 0.1);
+  box-shadow: 1px 1px 4px 0px rgba(45, 52, 60, 0.3), 0 4px 5px 0 rgba(45, 52, 60, 0.1);
   font-family: sans-serif;
 `
 
 const ButtonConnectWrapper = styled.button`
   display: flex;
+  position: relative;
   box-sizing: border-box;
   overlow: hidden;
   cursor: pointer;
@@ -37,8 +40,32 @@ const ButtonConnectWrapper = styled.button`
   padding:0;
   transition: all  0.2s ease;
 
-    &:hover {
-    opacity 0.5;
+  &:hover {
+    opacity 0.8;
+  }
+
+  &:active {
+    opacity 0.6;
+  }
+
+  &:disabled {
+    opacity 0.6;
+  }
+
+  .loading {
+    height: 0;
+    width: 0;
+    padding: 9px;
+    border: 3px solid #8893ff;
+    border-right-color: #0e1ebe;
+    border-radius: 15px;
+    animation: 1s infinite linear rotate;
+  }
+
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `
 
@@ -71,7 +98,6 @@ const ProfileInfo = styled.div`
   overflow: hidden;
 `
 
-// todo: link or not?
 const ProfileAddress = styled.span`
   display: inline-block;
   box-sizing: border-box;
@@ -90,21 +116,17 @@ const ProfileNetwork = styled.span`
   font-size: 12px;
   color: #7a818b;
   position: relative;
-  padding-left: 10px;
+  padding-left: 12px;
 
   &::before {
     position: absolute;
     content: '';
     display: block;
-    top: 5px;
+    top: 3px;
     left: 0;
     background: #6bea87;
     width: 8px;
     height: 8px;
-
-    box-shadow: 0px 0px 0px 0px rgba(107, 234, 135, 0.3), 0px 1px 2px 0px rgba(107, 234, 135, 0.29),
-      0px 4px 4px 0px rgba(107, 234, 135, 0.26), 0px 9px 6px 0px rgba(107, 234, 135, 0.22),
-      0px 6px 7px 0px rgba(107, 234, 135, 0.1), 0px 6px 7px 0px rgba(107, 234, 135, 0.02);
     border-radius: 50%;
   }
 `
@@ -123,10 +145,41 @@ const ButtonCopy = styled.button`
   border: none;
   background: #f8f9ff;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+
+  svg {
+    rect {
+      transition: all 0.15s ease;
+    }
+    path {
+      transition: all 0.15s ease;
+    }
+  }
 
   &:hover {
-    transform: scale(1.1);
+    svg {
+      rect {
+        fill: rgb(195 197 209);
+      }
+      path {
+        stroke: rgb(101 108 119);
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      rect {
+        fill: rgb(173 175 187);
+      }
+      path {
+        stroke: rgb(84 90 101);
+      }
+    }
+  }
+
+  &:disabled {
+    opacity 0.7;
   }
 `
 
@@ -144,10 +197,41 @@ const ButtonDisconnect = styled.button`
   border: none;
   background: #f8f9ff;
   border-radius: 50%;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+
+  svg {
+    rect {
+      transition: all 0.15s ease;
+    }
+    path {
+      transition: all 0.15s ease;
+    }
+  }
 
   &:hover {
-    transform: scale(1.1);
+    svg {
+      rect {
+        fill: rgb(195 197 209);
+      }
+      path {
+        stroke: rgb(101 108 119);
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      rect {
+        fill: rgb(173 175 187);
+      }
+      path {
+        stroke: rgb(84 90 101);
+      }
+    }
+  }
+
+  &:disabled {
+    opacity 0.7;
   }
 `
 
@@ -166,16 +250,16 @@ const IconCopy = () => (
     <path
       d="M16.7692 10H11.2308C10.551 10 10 10.551 10 11.2308V16.7692C10 17.449 10.551 18 11.2308 18H16.7692C17.449 18 18 17.449 18 16.7692V11.2308C18 10.551 17.449 10 16.7692 10Z"
       stroke="#7A818B"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       d="M7.84615 14H7.23077C6.90435 14 6.5913 13.8703 6.36048 13.6395C6.12967 13.4087 6 13.0957 6 12.7692V7.23077C6 6.90435 6.12967 6.5913 6.36048 6.36048C6.5913 6.12967 6.90435 6 7.23077 6H12.7692C13.0957 6 13.4087 6.12967 13.6395 6.36048C13.8703 6.5913 14 6.90435 14 7.23077V7.84615"
       stroke="#7A818B"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )
@@ -186,42 +270,60 @@ const IconDisconnect = () => (
     <path
       d="M15.8333 14.75L18.5 12M18.5 12L15.8333 9.25M18.5 12H9.16667M13.1667 14.75V15.4375C13.1667 15.9845 12.956 16.5091 12.5809 16.8959C12.2058 17.2827 11.6971 17.5 11.1667 17.5H8.5C7.96957 17.5 7.46086 17.2827 7.08579 16.8959C6.71071 16.5091 6.5 15.9845 6.5 15.4375V8.5625C6.5 8.01549 6.71071 7.49089 7.08579 7.10409C7.46086 6.7173 7.96957 6.5 8.5 6.5H11.1667C11.6971 6.5 12.2058 6.7173 12.5809 7.10409C12.956 7.49089 13.1667 8.01549 13.1667 8.5625V9.25"
       stroke="#7A818B"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )
 
-interface ProfileProps {
-  isConnected: boolean
-}
+export const Profile = ({ accountId }: { accountId: string | null }) => {
+  const [waiting, setWaiting] = useState(false)
 
-export const Profile: FC<ProfileProps> = ({ isConnected }) => {
+  const handleSignIn = async () => {
+    setWaiting(true)
+    try {
+      await Background.connectWallet()
+    } finally {
+      setWaiting(false)
+    }
+  }
+
+  const handleSignOut = async () => {
+    setWaiting(true)
+    try {
+      await Background.disconnect()
+    } finally {
+      setWaiting(false)
+    }
+  }
+
   return (
     <ProfileWrapper>
-      {/* todo: where connect? this component or parent? */}
-      {isConnected ? (
+      {accountId ? (
         <>
-          <ProfileIcon>{/* todo: added image */}</ProfileIcon>
+          <ProfileIcon>
+            <img src={makeBlockie(accountId)} alt="account blockie image" />
+          </ProfileIcon>
           <ProfileInfo>
-            <ProfileAddress>
-              015c9dc2219e050cef9fe3a720cc03619fb7be3141fa3c12b676ffa6b31c31a2
-            </ProfileAddress>
-            {/* todo: need different testnet or mainnet */}
-            <ProfileNetwork>NEAR-Mainnet</ProfileNetwork>
+            <ProfileAddress>{accountId}</ProfileAddress>
+            <ProfileNetwork>
+              {NEAR_NETWORK === 'mainnet' ? 'NEAR-Mainnet' : 'NEAR-Testnet'}
+            </ProfileNetwork>
           </ProfileInfo>
-          <ButtonCopy>
+          <ButtonCopy disabled={waiting} onClick={() => navigator.clipboard.writeText(accountId)}>
             <IconCopy />
           </ButtonCopy>
-          <ButtonDisconnect>
+          <ButtonDisconnect disabled={waiting} onClick={handleSignOut}>
             <IconDisconnect />
           </ButtonDisconnect>
         </>
       ) : (
         <>
           <TextConnect>No wallet connected</TextConnect>
-          <ButtonConnectWrapper>{iconConnect}Connect</ButtonConnectWrapper>
+          <ButtonConnectWrapper disabled={waiting} onClick={handleSignIn}>
+            {waiting ? <div className="loading"></div> : <>{iconConnect}Connect</>}
+          </ButtonConnectWrapper>
         </>
       )}
     </ProfileWrapper>
