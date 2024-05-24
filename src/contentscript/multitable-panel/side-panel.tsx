@@ -163,11 +163,9 @@ const ButtonOpenWrapper = styled.div<{ $open?: boolean }>`
   border-style: solid;
   border-color: #e2e2e5;
   border-radius: 0 0 0 4px;
-  transition: all 0.2s ease;
 
   .svgTransform {
     svg {
-      transition: all 0.2s ease;
       transform: rotate(180deg);
     }
   }
@@ -186,16 +184,12 @@ const ButtonOpen = styled.button<{ $open?: boolean }>`
   border-radius: 4px;
   border: ${(props) => (props.$open ? 'none' : '1px solid #e2e2e5')};
   padding: 0;
-  transition: all 0.2s ease;
 
   path {
-    transition: all 0.2s ease;
     stroke: #7a818b;
   }
 
   &:hover {
-    transition: all 0.2s ease;
-
     background: #fff;
 
     path {
@@ -209,7 +203,6 @@ const ButtonOpen = styled.button<{ $open?: boolean }>`
     path {
       stroke: #fff;
     }
-    transition: all 0.2s ease;
   }
 `
 
