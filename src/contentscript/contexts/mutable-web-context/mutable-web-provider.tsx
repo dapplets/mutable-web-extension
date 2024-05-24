@@ -31,7 +31,7 @@ const MutableWebProvider: FC<Props> = ({ children, engine }) => {
 
   const loadMutationApps = async (engine: Engine, selectedMutationId: string | null) => {
     if (selectedMutationId) {
-      setMutationApps(await engine.getAppsFromCurrentMutation())
+      setMutationApps(await engine.getAppsFromMutation(selectedMutationId))
     } else {
       setMutationApps([])
     }
