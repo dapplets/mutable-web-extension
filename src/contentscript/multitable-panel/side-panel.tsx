@@ -324,8 +324,6 @@ const StopCenterIcon = () => (
 const AppSwitcher: FC<{ app: AppWithSettings }> = ({ app }) => {
   const { enableApp, disableApp, isLoading } = useMutationApp(app.id)
 
-  // ToDo: add loader using isLoading
-
   return (
     <>
       {isLoading ? (
@@ -333,7 +331,7 @@ const AppSwitcher: FC<{ app: AppWithSettings }> = ({ app }) => {
           <Spinner animation="border" variant="primary"></Spinner>
         </Loading>
       ) : (
-        <MutationIconWrapper $isStopped={!app.settings.isEnabled}>
+        <MutationIconWrapper title={app.appLocalId} $isStopped={!app.settings.isEnabled}>
           {app?.metadata.image ? <Image image={app?.metadata.image} /> : <MutationFallbackIcon />}
 
           {!app.settings.isEnabled ? (
