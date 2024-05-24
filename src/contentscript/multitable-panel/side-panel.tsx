@@ -1,6 +1,7 @@
 import { AppWithSettings, Mutation } from 'mutable-web-engine'
 import { useAccountId } from 'near-social-vm'
 import React, { FC, useState } from 'react'
+import Spinner from 'react-bootstrap/Spinner'
 import styled from 'styled-components'
 import { useMutableWeb, useMutationApp } from '../contexts/mutable-web-context'
 import { Image } from '../multitable-panel/components/image'
@@ -90,6 +91,18 @@ const ButtonWrapper = styled.div`
   width: 46px;
   margin-top: -7px;
   padding: 0 5px 5px;
+`
+const Loading = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.8;
 `
 
 const AppsWrapper = styled.div`
@@ -314,25 +327,33 @@ const AppSwitcher: FC<{ app: AppWithSettings }> = ({ app }) => {
   // ToDo: add loader using isLoading
 
   return (
-    <MutationIconWrapper $isStopped={!app.settings.isEnabled}>
-      {app?.metadata.image ? <Image image={app?.metadata.image} /> : <MutationFallbackIcon />}
-
-      {!app.settings.isEnabled ? (
-        <LabelAppTop className="labelAppTop">
-          <StopTopIcon />
-        </LabelAppTop>
-      ) : null}
-
-      {app.settings.isEnabled ? (
-        <LabelAppCenter className="labelAppCenter" onClick={disableApp}>
-          <StopCenterIcon />
-        </LabelAppCenter>
+    <>
+      {isLoading ? (
+        <Loading>
+          <Spinner animation="border" variant="primary"></Spinner>
+        </Loading>
       ) : (
-        <LabelAppCenter className="labelAppCenter" onClick={enableApp}>
-          <PlayCenterIcon />
-        </LabelAppCenter>
+        <MutationIconWrapper $isStopped={!app.settings.isEnabled}>
+          {app?.metadata.image ? <Image image={app?.metadata.image} /> : <MutationFallbackIcon />}
+
+          {!app.settings.isEnabled ? (
+            <LabelAppTop className="labelAppTop">
+              <StopTopIcon />
+            </LabelAppTop>
+          ) : null}
+
+          {app.settings.isEnabled ? (
+            <LabelAppCenter className="labelAppCenter" onClick={disableApp}>
+              <StopCenterIcon />
+            </LabelAppCenter>
+          ) : (
+            <LabelAppCenter className="labelAppCenter" onClick={enableApp}>
+              <PlayCenterIcon />
+            </LabelAppCenter>
+          )}
+        </MutationIconWrapper>
       )}
-    </MutationIconWrapper>
+    </>
   )
 }
 
