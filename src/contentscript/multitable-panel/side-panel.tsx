@@ -11,7 +11,6 @@ const SidePanelWrapper = styled.div<{ $isApps: boolean }>`
   z-index: 5000;
   display: flex;
   width: 58px;
-  padding: 6px;
   top: 55px;
   right: 0;
   flex-direction: column;
