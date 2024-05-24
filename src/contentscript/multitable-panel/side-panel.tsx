@@ -1,14 +1,17 @@
 import { AppWithSettings, Mutation } from 'mutable-web-engine'
+import { useAccountId } from 'near-social-vm'
 import React, { FC, useState } from 'react'
 import styled from 'styled-components'
 import { useMutableWeb, useMutationApp } from '../contexts/mutable-web-context'
 import { Image } from '../multitable-panel/components/image'
+import Profile from './profile'
 
-const SidePanelWrapper = styled.div<{ $isApps?: boolean }>`
+const SidePanelWrapper = styled.div<{ $isApps: boolean }>`
+  position: fixed;
+  z-index: 5000;
   display: flex;
   width: 58px;
-  overflow: hidden;
-  position: absolute;
+  padding: 6px;
   top: 55px;
   right: 0;
   flex-direction: column;
@@ -337,12 +340,17 @@ const AppSwitcher: FC<{ app: AppWithSettings }> = ({ app }) => {
 
 interface SidePanelProps {
   baseMutation: Mutation | null
-  onMutationIconClick: () => void
 }
 
-export const SidePanel: FC<SidePanelProps> = ({ baseMutation, onMutationIconClick }) => {
+export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [isProfileOpen, setProfileOpen] = useState(false)
+  const loggedInAccountId = useAccountId()
   const { mutationApps } = useMutableWeb()
+
+  const handleMutationIconClick = () => {
+    setProfileOpen((val) => !val)
+  }
 
   return (
     <SidePanelWrapper
@@ -351,7 +359,7 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, onMutationIconClic
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
       <TopBlock $open={isOpen || mutationApps.length > 0} $noMutations={!mutationApps.length}>
-        <MutationIconWrapper onClick={onMutationIconClick}>
+        <MutationIconWrapper onClick={handleMutationIconClick}>
           {baseMutation?.metadata.image ? (
             <Image image={baseMutation?.metadata.image} />
           ) : (
@@ -385,6 +393,10 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, onMutationIconClic
             <ArrowSvg />
           </ButtonOpen>
         </ButtonOpenWrapper>
+      ) : null}
+
+      {isProfileOpen ? (
+        <Profile accountId={loggedInAccountId} closeProfile={() => setProfileOpen(false)} />
       ) : null}
     </SidePanelWrapper>
   )
