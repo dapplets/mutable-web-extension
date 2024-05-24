@@ -50,11 +50,6 @@ const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
   position: relative;
   box-shadow: 0 4px 5px 0 rgba(45, 52, 60, 0.2);
 
-  .labelAppCenter {
-    visibility: hidden;
-    opacity: 0;
-  }
-
   img {
     box-sizing: border-box;
     object-fit: cover;
@@ -79,11 +74,6 @@ const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
     img {
       filter: brightness(125%);
     }
-  }
-
-  &:hover .labelAppCenter {
-    visibility: visible;
-    opacity: 1;
   }
 
   &:hover .labelAppTop {
