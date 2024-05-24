@@ -182,7 +182,7 @@ const ButtonOpen = styled.button<{ $open?: boolean }>`
 
   &:hover {
     transition: all 0.2s ease;
-    transform: scale(1.1);
+
     background: #fff;
 
     path {
@@ -191,7 +191,6 @@ const ButtonOpen = styled.button<{ $open?: boolean }>`
   }
 
   &:active {
-    transform: scale(1.1);
     background: #384bff;
 
     path {
