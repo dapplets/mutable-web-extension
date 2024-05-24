@@ -37,9 +37,11 @@ const TopBlock = styled.div<{ $open?: boolean; $noMutations: boolean }>`
   border-radius: ${(props) => (props.$noMutations ? '4px 0 0 4px' : '4px 0 0 0')};
 `
 
-const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
+const MutationIconWrapper = styled.button<{ $isStopped?: boolean; $isStoppedCenter?: boolean }>`
   display: flex;
   box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
   width: 46px;
   height: 46px;
   outline: none;
@@ -50,6 +52,10 @@ const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
   transition: all 0.15s ease-in-out;
   position: relative;
   box-shadow: 0 4px 5px 0 rgba(45, 52, 60, 0.2);
+
+  .labelAppCenter {
+    opacity: 0;
+  }
 
   img {
     box-sizing: border-box;
@@ -79,6 +85,10 @@ const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
 
   &:hover .labelAppTop {
     opacity: ${(props) => (props.$isStopped ? '0' : '1')};
+  }
+
+  &:hover .labelAppCenter {
+    opacity: 1;
   }
 `
 
@@ -331,7 +341,11 @@ const AppSwitcher: FC<{ app: AppWithSettings }> = ({ app }) => {
           <Spinner animation="border" variant="primary"></Spinner>
         </Loading>
       ) : (
-        <MutationIconWrapper title={app.appLocalId} $isStopped={!app.settings.isEnabled}>
+        <MutationIconWrapper
+          // $isStoppedCenter={app.settings.isEnabled ? true : true}
+          title={app.appLocalId}
+          $isStopped={!app.settings.isEnabled}
+        >
           {app?.metadata.image ? <Image image={app?.metadata.image} /> : <MutationFallbackIcon />}
 
           {!app.settings.isEnabled ? (
