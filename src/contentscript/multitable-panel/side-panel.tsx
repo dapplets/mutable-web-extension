@@ -15,22 +15,23 @@ const SidePanelWrapper = styled.div<{ $isApps?: boolean }>`
   justify-content: center;
   align-items: center;
   border-radius: 4px 0px 0px 4px;
-  border-width: 1px 0 1px 1px;
-  border-style: solid;
-  border-color: #e2e2e5;
   background: ${(props) => (props.$isApps ? '#EEEFF5' : '#F8F9FF')};
   box-shadow: 0 4px 20px 0 rgba(11, 87, 111, 0.15);
   font-family: sans-serif;
   box-sizing: border-box;
 `
 
-const TopBlock = styled.div<{ $open?: boolean }>`
+const TopBlock = styled.div<{ $open?: boolean; $noMutations: boolean }>`
   display: flex;
   width: 58px;
   flex-direction: column;
   justify-content: center;
   padding: 6px;
   background: ${(props) => (props.$open ? '#fff' : 'transparent')};
+  border-width: 1px 0 1px 1px;
+  border-style: solid;
+  border-color: #e2e2e5;
+  border-radius: ${(props) => (props.$noMutations ? '4px 0 0 4px' : '4px 0 0 0')};
 `
 
 const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
@@ -88,26 +89,15 @@ const MutationIconWrapper = styled.button<{ $isStopped?: boolean }>`
   }
 `
 
-const Delimeter = styled.div`
-  display: flex;
-  box-sizing: border-box;
-  overflow: hidden;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: 0;
-  height: 1px;
-  border-bottom: 1px solid #e2e2e5;
-`
-
 const ButtonWrapper = styled.div`
   display: flex;
-  box-sizing: border-box;
+  box-sizing: content-box !important;
   overflow: hidden;
   justify-content: center;
   align-items: center;
   width: 46px;
-  padding: 0;
+  margin-top: -7px;
+  padding: 0 5px 5px;
 `
 
 const AppsWrapper = styled.div`
@@ -129,6 +119,7 @@ const LabelAppCenter = styled.div`
   height: 24px;
   cursor: pointer;
 `
+
 const LabelAppTop = styled.div`
   position: absolute;
   display: flex;
@@ -153,7 +144,10 @@ const ButtonOpenWrapper = styled.div<{ $open?: boolean }>`
   background: ${(props) => (props.$open ? '#fff' : 'transparent')};
   padding-left: 6px;
   padding-right: 6px;
-  border-top: 1px solid #e2e2e5;
+  border-width: 1px 0 1px 1px;
+  border-style: solid;
+  border-color: #e2e2e5;
+  border-radius: 0 0 0 4px;
   transition: all 0.2s ease;
 
   .svgTransform {
@@ -356,7 +350,7 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, onMutationIconClic
       data-mweb-context-type="mweb-overlay"
       data-mweb-context-parsed={JSON.stringify({ id: 'mweb-overlay' })}
     >
-      <TopBlock $open={isOpen || mutationApps.length > 0}>
+      <TopBlock $open={isOpen || mutationApps.length > 0} $noMutations={!mutationApps.length}>
         <MutationIconWrapper onClick={onMutationIconClick}>
           {baseMutation?.metadata.image ? (
             <Image image={baseMutation?.metadata.image} />
@@ -366,9 +360,7 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation, onMutationIconClic
         </MutationIconWrapper>
       </TopBlock>
 
-      {mutationApps.length ? <Delimeter /> : null}
-
-      {isOpen ? null : (
+      {isOpen || !mutationApps.length ? null : (
         <ButtonWrapper
           data-mweb-insertion-point="mweb-actions-panel"
           data-mweb-layout-manager="bos.dapplets.near/widget/VerticalLayoutManager"
