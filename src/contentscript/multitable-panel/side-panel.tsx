@@ -128,11 +128,13 @@ const LabelAppCenter = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  top: 25%;
-  left: 25%;
-  width: 24px;
-  height: 24px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 23px;
+  height: 23px;
   cursor: pointer;
+  box-sizing: border-box;
 `
 
 const LabelAppTop = styled.div`
@@ -364,9 +366,10 @@ const AppSwitcher: FC<{ app: AppWithSettings }> = ({ app }) => {
 
 interface SidePanelProps {
   baseMutation: Mutation | null
+  isDropdownVisible: boolean
 }
 
-export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
+export const SidePanel: FC<SidePanelProps> = ({ baseMutation, isDropdownVisible }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isProfileOpen, setProfileOpen] = useState(false)
   const loggedInAccountId = useAccountId()
@@ -420,7 +423,11 @@ export const SidePanel: FC<SidePanelProps> = ({ baseMutation }) => {
       ) : null}
 
       {isProfileOpen ? (
-        <Profile accountId={loggedInAccountId} closeProfile={() => setProfileOpen(false)} />
+        <Profile
+          isDropdownVisible={isDropdownVisible}
+          accountId={loggedInAccountId}
+          closeProfile={() => setProfileOpen(false)}
+        />
       ) : null}
     </SidePanelWrapper>
   )

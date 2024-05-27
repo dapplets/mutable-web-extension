@@ -281,14 +281,16 @@ const IconDisconnect = () => (
 export const Profile = ({
   accountId,
   closeProfile,
+  isDropdownVisible,
 }: {
   accountId: string | null
   closeProfile: () => void
+  isDropdownVisible: boolean
 }) => {
   const [waiting, setWaiting] = useState(false)
 
   const wrapperRef = useRef<HTMLDivElement>(null)
-  useOutside(wrapperRef, closeProfile)
+  useOutside(wrapperRef, closeProfile, isDropdownVisible)
 
   const handleSignIn = async () => {
     setWaiting(true)
