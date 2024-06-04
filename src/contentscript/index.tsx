@@ -1,6 +1,6 @@
 import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core'
 import { EventEmitter as NEventEmitter } from 'events'
-import { customElements, Engine } from 'mutable-web-engine'
+import { App as MWebApp, customElements, EngineConfig } from 'mutable-web-engine'
 import { useInitNear } from 'near-social-vm'
 import React, { FC, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -60,28 +60,15 @@ async function main() {
   const bootstrapCssUrl = browser.runtime.getURL('bootstrap.min.css')
 
   // ToDo: move to MutableWebContext
-  const engine = new Engine({
+  const engineConfig: EngineConfig = {
     networkId: networkConfig.networkId,
     gatewayId: 'mutable-web-extension',
     selector,
     storage: new ExtensionStorage('mutableweb'),
     bosElementStyleSrc: bootstrapCssUrl,
-  })
+  }
 
   const mutationIdToLoad = tabState?.mutationId
-
-  console.log('Mutable Web Engine is initializing...')
-
-  if (mutationIdToLoad) {
-    try {
-      await engine.start(mutationIdToLoad)
-    } catch (err) {
-      console.error(err)
-      await engine.start()
-    }
-  } else {
-    await engine.start()
-  }
 
   await selector.wallet()
 
@@ -103,19 +90,28 @@ async function main() {
     }
   })
 
-  const container = document.createElement('div')
-  container.style.display = 'flex'
-  document.body.appendChild(container)
-  const root = createRoot(container)
+  const outer = document.createElement('div')
+  outer.style.display = 'flex'
+  const stylesMountPoint = document.createElement('div')
+  outer.appendChild(stylesMountPoint)
+  const inner = document.createElement('div')
+  inner.style.display = 'flex'
+  outer.appendChild(inner)
+  document.body.appendChild(outer)
+  const root = createRoot(inner)
   root.render(
-    <MutableWebProvider engine={engine}>
-      <ShadowDomWrapper stylesheetSrc={bootstrapCssUrl}>
-        <MultitablePanel eventEmitter={eventEmitter} />
-      </ShadowDomWrapper>
-    </MutableWebProvider>
+    <MWebApp
+      config={engineConfig}
+      stylesMountPoint={stylesMountPoint}
+      defaultMutationId={mutationIdToLoad}
+    >
+      <MutableWebProvider>
+        <ShadowDomWrapper stylesheetSrc={bootstrapCssUrl}>
+          <MultitablePanel eventEmitter={eventEmitter} />
+        </ShadowDomWrapper>
+      </MutableWebProvider>
+    </MWebApp>
   )
-
-  return engine
 }
 
 main().catch(console.error)

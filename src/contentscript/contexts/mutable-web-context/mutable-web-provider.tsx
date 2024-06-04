@@ -1,13 +1,19 @@
-import { AppMetadata, AppWithSettings, Engine, MutationWithSettings } from 'mutable-web-engine'
+import {
+  AppMetadata,
+  AppWithSettings,
+  Engine,
+  MutationWithSettings,
+  useEngine,
+} from 'mutable-web-engine'
 import React, { FC, ReactElement, useEffect, useMemo, useState } from 'react'
 import { MutableWebContext, MutableWebContextState } from './mutable-web-context'
 
 type Props = {
-  engine: Engine
   children: ReactElement
 }
 
-const MutableWebProvider: FC<Props> = ({ children, engine }) => {
+const MutableWebProvider: FC<Props> = ({ children }) => {
+  const { engine } = useEngine()
   const [isLoading, setIsLoading] = useState(false)
   const [selectedMutationId, setSelectedMutationId] = useState<string | null>(null)
   const [mutations, setMutations] = useState<MutationWithSettings[]>([])
