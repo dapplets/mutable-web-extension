@@ -8,6 +8,7 @@ import browser from 'webextension-polyfill'
 import { networkConfig } from '../common/networks'
 import Background from './background'
 import { ExtensionStorage } from './extension-storage'
+import { ShadowDomWrapper } from './multitable-panel/components/shadow-dom-wrapper'
 import { MultitablePanel } from './multitable-panel/multitable-panel'
 import { setupWallet } from './wallet'
 
@@ -106,7 +107,9 @@ async function main() {
       stylesMountPoint={stylesMountPoint}
       defaultMutationId={mutationIdToLoad}
     >
-      <MultitablePanel eventEmitter={eventEmitter} />
+      <ShadowDomWrapper stylesheetSrc={bootstrapCssUrl}>
+        <MultitablePanel eventEmitter={eventEmitter} />
+      </ShadowDomWrapper>
     </MWebApp>
   )
 }
