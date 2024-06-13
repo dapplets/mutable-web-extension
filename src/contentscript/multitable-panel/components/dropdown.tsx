@@ -59,7 +59,6 @@ export const Dropdown: FC<DropdownProps> = ({
     favoriteMutationId,
     setFavoriteMutation,
     switchMutation,
-    stopEngine,
     removeMutationFromRecents,
   } = useMutableWeb()
 
@@ -107,7 +106,7 @@ export const Dropdown: FC<DropdownProps> = ({
 
   const handleOriginalButtonClick = async () => {
     onVisibilityChange(false)
-    stopEngine()
+    switchMutation(null)
   }
 
   const handleRemoveFromRecentlyUsedClick = async (mut: MutationWithSettings) => {
