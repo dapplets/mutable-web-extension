@@ -54,7 +54,7 @@ const App: FC = () => {
 async function main() {
   // Execute useInitNear hook before start the engine
   // It's necessary for widgets from near-social-vm
-  createRoot(document.createElement('div')).render(<App />)
+  createRoot(document.createDocumentFragment()).render(<App />)
 
   const tabState = await Background.popTabState()
   const selector = await selectorPromise
@@ -93,20 +93,12 @@ async function main() {
   })
 
   const outer = document.createElement('div')
+  outer.className = 'mweb-extension'
   outer.style.display = 'flex'
-  const stylesMountPoint = document.createElement('div')
-  outer.appendChild(stylesMountPoint)
-  const inner = document.createElement('div')
-  inner.style.display = 'flex'
-  outer.appendChild(inner)
   document.body.appendChild(outer)
-  const root = createRoot(inner)
+  const root = createRoot(outer)
   root.render(
-    <MWebApp
-      config={engineConfig}
-      stylesMountPoint={stylesMountPoint}
-      defaultMutationId={mutationIdToLoad}
-    >
+    <MWebApp config={engineConfig} defaultMutationId={mutationIdToLoad}>
       <ShadowDomWrapper stylesheetSrc={bootstrapCssUrl}>
         <MultitablePanel eventEmitter={eventEmitter} />
       </ShadowDomWrapper>
