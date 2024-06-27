@@ -91,11 +91,11 @@ async function main() {
     }
   })
 
-  const outer = document.createElement('div')
-  outer.className = 'mweb-extension'
-  outer.style.display = 'flex'
-  document.body.appendChild(outer)
-  const root = createRoot(outer)
+  const container = document.createElement('div')
+  container.className = 'mweb-extension'
+  container.style.display = 'flex'
+  document.body.appendChild(container)
+  const root = createRoot(container)
   root.render(
     <MWebApp config={engineConfig} defaultMutationId={mutationIdToLoad}>
       <MultitablePanel eventEmitter={eventEmitter} />
